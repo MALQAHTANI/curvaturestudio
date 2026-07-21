@@ -1,8 +1,8 @@
 import { Link } from "@tanstack/react-router";
 
-// External dashboard URL — update via VITE_DASHBOARD_URL when known.
-const DASHBOARD_URL =
-  (import.meta.env.VITE_DASHBOARD_URL as string | undefined) ?? "#";
+// External employee login URL — update via VITE_EMPLOYEE_LOGIN_URL when known.
+const EMPLOYEE_LOGIN_URL =
+  (import.meta.env.VITE_EMPLOYEE_LOGIN_URL as string | undefined) ?? "#";
 
 const NAV = [
   { to: "/", label: "HOME" },
@@ -20,7 +20,7 @@ export function SiteHeader() {
         style={{ fontFamily: "Jost, sans-serif", letterSpacing: "-0.01em" }}
         aria-label="Curvature Studio"
       >
-        Curvature<span className="text-muted-foreground">·</span>Studio
+        Curvature Studio
       </Link>
 
       <nav className="hidden sm:flex gap-6 md:gap-8 text-[11px]">
@@ -36,14 +36,7 @@ export function SiteHeader() {
         ))}
       </nav>
 
-      <a
-        href={DASHBOARD_URL}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="text-[11px] border border-border px-3 py-2 hover:bg-foreground hover:text-background transition-colors"
-      >
-        Dashboard ↗
-      </a>
+      <span className="w-[1px]" aria-hidden />
     </header>
   );
 }
@@ -54,12 +47,12 @@ export function SiteFooter() {
       <p>© CURVATURE STUDIO — ALL RIGHTS RESERVED</p>
       <p>SAUDI ARABIA — JEDDAH</p>
       <a
-        href={DASHBOARD_URL}
+        href={EMPLOYEE_LOGIN_URL}
         target="_blank"
         rel="noopener noreferrer"
         className="hover:text-foreground transition-colors"
       >
-        DASHBOARD ↗
+        دخول الموظفين ↗
       </a>
     </footer>
   );
