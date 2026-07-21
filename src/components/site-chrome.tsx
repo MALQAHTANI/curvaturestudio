@@ -1,8 +1,5 @@
 import { Link } from "@tanstack/react-router";
-
-// External employee login URL — update via VITE_EMPLOYEE_LOGIN_URL when known.
-const EMPLOYEE_LOGIN_URL =
-  (import.meta.env.VITE_EMPLOYEE_LOGIN_URL as string | undefined) ?? "#";
+import { useEffect, useRef, useState } from "react";
 
 const NAV = [
   { to: "/", label: "HOME" },
@@ -42,18 +39,61 @@ export function SiteHeader() {
 }
 
 export function SiteFooter() {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!open) return;
+    const onClick = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+    };
+    document.addEventListener("mousedown", onClick);
+    return () => document.removeEventListener("mousedown", onClick);
+  }, [open]);
+
   return (
     <footer className="border-t border-border px-6 md:px-12 py-10 flex flex-col md:flex-row md:justify-between gap-4 text-[10px] text-muted-foreground tracking-[0.15em]">
       <p>© CURVATURE STUDIO — ALL RIGHTS RESERVED</p>
       <p>SAUDI ARABIA — JEDDAH</p>
-      <a
-        href={EMPLOYEE_LOGIN_URL}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="hover:text-foreground transition-colors"
-      >
-        دخول الموظفين ↗
-      </a>
+      <div className="relative" ref={ref}>
+        <button
+          type="button"
+          onClick={() => setOpen((v) => !v)}
+          className="hover:text-foreground transition-colors tracking-[0.15em]"
+          aria-haspopup="menu"
+          aria-expanded={open}
+        >
+          PROFILE ↗
+        </button>
+        {open && (
+          <div
+            role="menu"
+            className="absolute right-0 bottom-full mb-2 min-w-[180px] border border-border bg-background/95 backdrop-blur-md text-[10px] tracking-[0.15em]"
+          >
+            <Link
+              to="/portfolio"
+              onClick={() => setOpen(false)}
+              className="block px-4 py-3 text-muted-foreground hover:text-foreground hover:bg-white/5 border-b border-border"
+            >
+              PROJECTS
+            </Link>
+            <Link
+              to="/studio"
+              onClick={() => setOpen(false)}
+              className="block px-4 py-3 text-muted-foreground hover:text-foreground hover:bg-white/5 border-b border-border"
+            >
+              STUDIO
+            </Link>
+            <Link
+              to="/auth"
+              onClick={() => setOpen(false)}
+              className="block px-4 py-3 text-muted-foreground hover:text-foreground hover:bg-white/5"
+            >
+              EMPLOYEE LOGIN
+            </Link>
+          </div>
+        )}
+      </div>
     </footer>
   );
 }
