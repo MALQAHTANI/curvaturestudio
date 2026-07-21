@@ -1,6 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
 import { SiteHeader, SiteFooter } from "@/components/site-chrome";
 import projects from "@/data/projects.json";
+import { supabase } from "@/integrations/supabase/client";
+import { isVideo } from "@/lib/media";
 
 export const Route = createFileRoute("/portfolio")({
   head: () => ({
@@ -15,9 +18,16 @@ export const Route = createFileRoute("/portfolio")({
 });
 
 function Portfolio() {
-  const items = (projects as any[])
+  const staticItems = (projects as any[])
     .filter((p) => p.published && p.cover_image && !p.cover_image.includes("88e8419e"))
     .sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0));
+  const [dbItems, setDbItems] = useState<any[]>([]);
+  useEffect(() => {
+    supabase.from("projects").select("id,title,cover_image,media_urls,sort_order,created_at")
+      .eq("published", true).order("sort_order", { ascending: true }).order("created_at", { ascending: false })
+      .then(({ data }) => setDbItems((data as any[])?.map(d => ({ ...d, cover_image: d.cover_image ?? d.media_urls?.[0] })) ?? []));
+  }, []);
+  const items = [...dbItems, ...staticItems];
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -31,12 +41,10 @@ function Portfolio() {
           {items.map((p, i) => (
             <div key={p.id} className="group">
               <div className="aspect-[4/3] overflow-hidden bg-white/5">
-                <img
-                  src={p.cover_image}
-                  alt={p.title}
-                  loading="lazy"
-                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.03]"
-                />
+                {p.cover_image && (isVideo(p.cover_image)
+                  ? <video src={p.cover_image} className="w-full h-full object-cover" muted loop playsInline autoPlay />
+                  : <img src={p.cover_image} alt={p.title} loading="lazy" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.03]" />
+                )}
               </div>
               <div className="flex justify-between mt-4 text-[11px] gap-4">
                 <div className="flex gap-3 min-w-0">
