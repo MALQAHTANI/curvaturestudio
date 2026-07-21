@@ -14,7 +14,84 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      projects: {
+        Row: {
+          cover_image: string | null
+          created_at: string
+          created_by: string | null
+          description: string | null
+          id: string
+          media_urls: string[]
+          published: boolean
+          sort_order: number
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          cover_image?: string | null
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          media_urls?: string[]
+          published?: boolean
+          sort_order?: number
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          cover_image?: string | null
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          media_urls?: string[]
+          published?: boolean
+          sort_order?: number
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      studio_items: {
+        Row: {
+          cover_image: string | null
+          created_at: string
+          created_by: string | null
+          description: string | null
+          id: string
+          media_urls: string[]
+          published: boolean
+          sort_order: number
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          cover_image?: string | null
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          media_urls?: string[]
+          published?: boolean
+          sort_order?: number
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          cover_image?: string | null
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          media_urls?: string[]
+          published?: boolean
+          sort_order?: number
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
