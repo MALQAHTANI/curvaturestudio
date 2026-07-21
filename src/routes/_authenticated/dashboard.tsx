@@ -179,10 +179,10 @@ function ItemForm({ table, onDone }: { table: "projects" | "studio_items"; onDon
 
   function onPick(e: React.ChangeEvent<HTMLInputElement>) {
     const list = Array.from(e.target.files ?? []);
-    const ok: File[] = []; const bad: string[] = [];
-    for (const f of list) (acceptedMime(f) ? ok : bad).push(f as File);
+    const ok: File[] = []; const bad: File[] = [];
+    for (const f of list) { if (acceptedMime(f)) ok.push(f); else bad.push(f); }
     setFiles(ok);
-    setRejected(bad.map((f: any) => f.name));
+    setRejected(bad.map((f) => f.name));
   }
 
   async function submit(e: React.FormEvent) {
