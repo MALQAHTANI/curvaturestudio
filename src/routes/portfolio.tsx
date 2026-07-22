@@ -29,12 +29,14 @@ function Portfolio() {
   }, []);
   const items = [...dbItems, ...staticItems];
 
-  // Flatten to a single ordered list of media (images/videos) preserving item order.
-  const media: { src: string; key: string }[] = [];
-  for (const it of items) {
-    const urls: string[] = it.media_urls?.length ? it.media_urls : (it.cover_image ? [it.cover_image] : []);
-    urls.forEach((src, idx) => media.push({ src, key: `${it.id}-${idx}` }));
-  }
+  // One tile per project (cover only), preserving order — matches curvaturestudio.com/portfolio.
+  const tiles = items
+    .map((it) => ({
+      id: it.id,
+      title: it.title,
+      src: it.cover_image ?? it.media_urls?.[0] ?? null,
+    }))
+    .filter((t) => !!t.src) as { id: string; title: string; src: string }[];
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -44,13 +46,13 @@ function Portfolio() {
         <h1 className="display-lg">SELECTED<br />WORK.</h1>
       </section>
       <section className="border-t border-border px-6 md:px-12 py-16">
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 md:gap-3">
-          {media.map((m) => (
-            <div key={m.key} className="aspect-square overflow-hidden bg-white/5 group">
-              {isVideo(m.src) ? (
-                <video src={m.src} className="w-full h-full object-cover" muted loop playsInline autoPlay />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-2 md:gap-3">
+          {tiles.map((t) => (
+            <div key={t.id} className="aspect-square overflow-hidden bg-white/5 group">
+              {isVideo(t.src) ? (
+                <video src={t.src} className="w-full h-full object-cover" muted loop playsInline autoPlay />
               ) : (
-                <img src={m.src} alt="" loading="lazy" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.03]" />
+                <img src={t.src} alt={t.title} loading="lazy" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.03]" />
               )}
             </div>
           ))}
