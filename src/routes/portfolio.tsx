@@ -29,6 +29,13 @@ function Portfolio() {
   }, []);
   const items = [...dbItems, ...staticItems];
 
+  // Flatten to a single ordered list of media (images/videos) preserving item order.
+  const media: { src: string; key: string }[] = [];
+  for (const it of items) {
+    const urls: string[] = it.media_urls?.length ? it.media_urls : (it.cover_image ? [it.cover_image] : []);
+    urls.forEach((src, idx) => media.push({ src, key: `${it.id}-${idx}` }));
+  }
+
   return (
     <div className="min-h-screen bg-background text-foreground">
       <SiteHeader />
@@ -37,22 +44,14 @@ function Portfolio() {
         <h1 className="display-lg">SELECTED<br />WORK.</h1>
       </section>
       <section className="border-t border-border px-6 md:px-12 py-16">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-12">
-          {items.map((p, i) => (
-            <div key={p.id} className="group">
-              <div className="aspect-[4/3] overflow-hidden bg-white/5">
-                {p.cover_image && (isVideo(p.cover_image)
-                  ? <video src={p.cover_image} className="w-full h-full object-cover" muted loop playsInline autoPlay />
-                  : <img src={p.cover_image} alt={p.title} loading="lazy" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.03]" />
-                )}
-              </div>
-              <div className="flex justify-between mt-4 text-[11px] gap-4">
-                <div className="flex gap-3 min-w-0">
-                  <span className="text-muted-foreground shrink-0">{String(i + 1).padStart(2, "0")}</span>
-                  <span className="truncate">{p.title}</span>
-                </div>
-                {p.client && <span className="text-muted-foreground shrink-0 truncate">{p.client}</span>}
-              </div>
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 md:gap-3">
+          {media.map((m) => (
+            <div key={m.key} className="aspect-square overflow-hidden bg-white/5 group">
+              {isVideo(m.src) ? (
+                <video src={m.src} className="w-full h-full object-cover" muted loop playsInline autoPlay />
+              ) : (
+                <img src={m.src} alt="" loading="lazy" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.03]" />
+              )}
             </div>
           ))}
         </div>
