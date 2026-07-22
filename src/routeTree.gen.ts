@@ -10,7 +10,6 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as StudioRouteImport } from './routes/studio'
-import { Route as PortfolioRouteImport } from './routes/portfolio'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AboutRouteImport } from './routes/about'
@@ -21,11 +20,6 @@ import { Route as AuthenticatedDashboardRouteImport } from './routes/_authentica
 const StudioRoute = StudioRouteImport.update({
   id: '/studio',
   path: '/studio',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PortfolioRoute = PortfolioRouteImport.update({
-  id: '/portfolio',
-  path: '/portfolio',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ContactRoute = ContactRouteImport.update({
@@ -63,7 +57,6 @@ export interface FileRoutesByFullPath {
   '/about': typeof AboutRoute
   '/auth': typeof AuthRoute
   '/contact': typeof ContactRoute
-  '/portfolio': typeof PortfolioRoute
   '/studio': typeof StudioRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
 }
@@ -72,7 +65,6 @@ export interface FileRoutesByTo {
   '/about': typeof AboutRoute
   '/auth': typeof AuthRoute
   '/contact': typeof ContactRoute
-  '/portfolio': typeof PortfolioRoute
   '/studio': typeof StudioRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
 }
@@ -83,29 +75,14 @@ export interface FileRoutesById {
   '/about': typeof AboutRoute
   '/auth': typeof AuthRoute
   '/contact': typeof ContactRoute
-  '/portfolio': typeof PortfolioRoute
   '/studio': typeof StudioRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths:
-    | '/'
-    | '/about'
-    | '/auth'
-    | '/contact'
-    | '/portfolio'
-    | '/studio'
-    | '/dashboard'
+  fullPaths: '/' | '/about' | '/auth' | '/contact' | '/studio' | '/dashboard'
   fileRoutesByTo: FileRoutesByTo
-  to:
-    | '/'
-    | '/about'
-    | '/auth'
-    | '/contact'
-    | '/portfolio'
-    | '/studio'
-    | '/dashboard'
+  to: '/' | '/about' | '/auth' | '/contact' | '/studio' | '/dashboard'
   id:
     | '__root__'
     | '/'
@@ -113,7 +90,6 @@ export interface FileRouteTypes {
     | '/about'
     | '/auth'
     | '/contact'
-    | '/portfolio'
     | '/studio'
     | '/_authenticated/dashboard'
   fileRoutesById: FileRoutesById
@@ -124,7 +100,6 @@ export interface RootRouteChildren {
   AboutRoute: typeof AboutRoute
   AuthRoute: typeof AuthRoute
   ContactRoute: typeof ContactRoute
-  PortfolioRoute: typeof PortfolioRoute
   StudioRoute: typeof StudioRoute
 }
 
@@ -135,13 +110,6 @@ declare module '@tanstack/react-router' {
       path: '/studio'
       fullPath: '/studio'
       preLoaderRoute: typeof StudioRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/portfolio': {
-      id: '/portfolio'
-      path: '/portfolio'
-      fullPath: '/portfolio'
-      preLoaderRoute: typeof PortfolioRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/contact': {
@@ -206,19 +174,8 @@ const rootRouteChildren: RootRouteChildren = {
   AboutRoute: AboutRoute,
   AuthRoute: AuthRoute,
   ContactRoute: ContactRoute,
-  PortfolioRoute: PortfolioRoute,
   StudioRoute: StudioRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
