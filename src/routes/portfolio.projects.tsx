@@ -1,7 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { SiteHeader, SiteFooter } from "@/components/site-chrome";
-import projects from "@/data/projects.json";
 import { supabase } from "@/integrations/supabase/client";
 import { isVideo } from "@/lib/media";
 
@@ -17,20 +16,26 @@ export const Route = createFileRoute("/portfolio/projects")({
   component: ProjectsGallery,
 });
 
+const REFERENCE_TILES = [
+  { id: "mb-snd-2025", title: "MB SND 2025", src: "https://static.wixstatic.com/media/f3dbf9_b0d653724924428e8536d3a37763bbd2~mv2.jpg/v1/fill/w_1200,q_90,enc_avif,quality_auto/f3dbf9_b0d653724924428e8536d3a37763bbd2~mv2.jpg" },
+  { id: "mb-cla-concept", title: "MB - THE CONCEPT CLA", src: "https://static.wixstatic.com/media/f3dbf9_6665de1f31d548468531414b0d766fdd~mv2.jpg/v1/fill/w_1200,q_90,enc_avif,quality_auto/f3dbf9_6665de1f31d548468531414b0d766fdd~mv2.jpg" },
+  { id: "mb-eqg-alula", title: "MB EQG Landing in AlUla", src: "https://static.wixstatic.com/media/f3dbf9_5bb37d25ad1440fdbeb267de61a953d9~mv2.jpg/v1/fill/w_1200,q_90,enc_avif,quality_auto/f3dbf9_5bb37d25ad1440fdbeb267de61a953d9~mv2.jpg" },
+  { id: "mb-snd-2022", title: "MB SND 2022", src: "https://static.wixstatic.com/media/f3dbf9_30a49fabe45d450e82ac9038dc06c6f4~mv2.jpg/v1/fill/w_1200,q_90,enc_avif,quality_auto/f3dbf9_30a49fabe45d450e82ac9038dc06c6f4~mv2.jpg" },
+  { id: "cle-ludovic-ballouard", title: "CLE — Ludovic Ballouard", src: "https://static.wixstatic.com/media/f3dbf9_1e6bd2c4d5974321bbe95d2a2b49d993~mv2.jpg/v1/fill/w_1200,q_90,enc_avif,quality_auto/f3dbf9_1e6bd2c4d5974321bbe95d2a2b49d993~mv2.jpg" },
+  { id: "porsche-green-roof-alula", title: "Porsche Green Roof AlUla", src: "https://static.wixstatic.com/media/f3dbf9_530f9dbd54714b13b28d30d8b190ad69~mv2.jpg/v1/fill/w_1200,q_90,enc_avif,quality_auto/f3dbf9_530f9dbd54714b13b28d30d8b190ad69~mv2.jpg" },
+];
+
 function ProjectsGallery() {
-  const staticItems = (projects as any[])
-    .filter((p) => p.published && p.cover_image && !p.cover_image.includes("88e8419e"))
-    .sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0));
   const [dbItems, setDbItems] = useState<any[]>([]);
   useEffect(() => {
     supabase.from("projects").select("id,title,cover_image,media_urls,sort_order,created_at")
       .eq("published", true).order("sort_order", { ascending: true }).order("created_at", { ascending: false })
       .then(({ data }) => setDbItems((data as any[])?.map(d => ({ ...d, cover_image: d.cover_image ?? d.media_urls?.[0] })) ?? []));
   }, []);
-  const items = [...dbItems, ...staticItems];
-  const tiles = items
+  const dbTiles = dbItems
     .map((it) => ({ id: it.id, title: it.title, src: it.cover_image ?? it.media_urls?.[0] ?? null }))
     .filter((t) => !!t.src) as { id: string; title: string; src: string }[];
+  const tiles = [...dbTiles, ...REFERENCE_TILES];
 
   return (
     <div className="min-h-screen bg-background text-foreground">
