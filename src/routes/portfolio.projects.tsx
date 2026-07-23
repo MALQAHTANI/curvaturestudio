@@ -16,11 +16,10 @@ export const Route = createFileRoute("/portfolio/projects")({
   component: ProjectsGallery,
 });
 
-const REFERENCE_TILES = [
 const wix = (id: string) =>
   `https://static.wixstatic.com/media/${id}/v1/fit/w_960,h_640,q_90,enc_avif,quality_auto/${id}`;
 
-const REFERENCE_TILES: { id: string; title: string; src: string }[] = [
+const REFERENCE_TILES: { id: string; title: string; src: string }[] = ([
   ["mb-snd-2025", "MB SND 2025", "f3dbf9_b0d653724924428e8536d3a37763bbd2~mv2.jpg"],
   ["mb-the-concept-cla", "MB — THE CONCEPT CLA", "f3dbf9_6665de1f31d548468531414b0d766fdd~mv2.jpg"],
   ["mb-eqg-landing-in-alula", "MB EQG — Landing in AlUla", "f3dbf9_5bb37d25ad1440fdbeb267de61a953d9~mv2.jpg"],
@@ -74,7 +73,7 @@ const REFERENCE_TILES: { id: string; title: string; src: string }[] = [
   ["industrial-projects", "Industrial Projects", "f3dbf9_306b3bd6af864fe98f83027643d83403~mv2.jpg"],
   ["seraj-sanad-collection", "Seraj Sanad Collection", "f3dbf9_c88e934790cc47ecaee0e7cae4217020~mv2.jpg"],
   ["street-signs-saudi-signs", "Street Signs — Saudi Signs", "f3dbf9_edbe2e16f17944d78d70f69768780766~mv2.jpg"],
-].map(([id, title, img]) => ({ id, title, src: wix(img) }));
+] as [string, string, string][]).map(([id, title, img]) => ({ id, title, src: wix(img) }));
 
 function ProjectsGallery() {
   const [dbItems, setDbItems] = useState<any[]>([]);
