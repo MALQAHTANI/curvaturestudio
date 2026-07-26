@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { SiteHeader, SiteFooter } from "@/components/site-chrome";
 import { supabase } from "@/integrations/supabase/client";
 import { isVideo } from "@/lib/media";
+import { Lightbox, type LightboxItem } from "@/components/lightbox";
 
 export const Route = createFileRoute("/portfolio/projects")({
   head: () => ({
@@ -75,17 +76,49 @@ const REFERENCE_TILES: { id: string; title: string; src: string }[] = ([
   ["street-signs-saudi-signs", "Street Signs — Saudi Signs", "f3dbf9_edbe2e16f17944d78d70f69768780766~mv2.jpg"],
 ] as [string, string, string][]).map(([id, title, img]) => ({ id, title, src: wix(img) }));
 
+type Tile = {
+  id: string;
+  title: string;
+  category?: string;
+  description?: string;
+  coverImage: string;
+  images: string[];
+};
+
 function ProjectsGallery() {
   const [dbItems, setDbItems] = useState<any[]>([]);
+  const [active, setActive] = useState<LightboxItem | null>(null);
   useEffect(() => {
-    supabase.from("projects").select("id,title,cover_image,media_urls,sort_order,created_at")
+    supabase.from("projects").select("id,title,description,cover_image,media_urls,sort_order,created_at")
       .eq("published", true).order("sort_order", { ascending: true }).order("created_at", { ascending: false })
       .then(({ data }) => setDbItems((data as any[])?.map(d => ({ ...d, cover_image: d.cover_image ?? d.media_urls?.[0] })) ?? []));
   }, []);
-  const dbTiles = dbItems
-    .map((it) => ({ id: it.id, title: it.title, src: it.cover_image ?? it.media_urls?.[0] ?? null }))
-    .filter((t) => !!t.src) as { id: string; title: string; src: string }[];
-  const tiles = [...dbTiles, ...REFERENCE_TILES];
+  const dbTiles: Tile[] = dbItems
+    .map((it) => {
+      const cover = it.cover_image ?? it.media_urls?.[0] ?? null;
+      const images: string[] = Array.from(
+        new Set([cover, ...((it.media_urls as string[]) ?? [])].filter(Boolean) as string[]),
+      );
+      return {
+        id: it.id,
+        title: it.title,
+        category: "PROJECT",
+        description: it.description ?? undefined,
+        coverImage: cover as string,
+        images,
+      };
+    })
+    .filter((t) => !!t.coverImage);
+  const tiles: Tile[] = [
+    ...dbTiles,
+    ...REFERENCE_TILES.map((t) => ({
+      id: t.id,
+      title: t.title,
+      category: "SELECTED WORK",
+      coverImage: t.src,
+      images: [t.src],
+    })),
+  ];
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -97,18 +130,38 @@ function ProjectsGallery() {
         </h1>
       </section>
       <section className="border-t border-border px-6 md:px-12 py-10">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-2 md:gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
           {tiles.map((t) => (
-            <div key={t.id} className="aspect-square overflow-hidden bg-white/5 group">
-              {isVideo(t.src) ? (
-                <video src={t.src} className="w-full h-full object-cover" muted loop playsInline autoPlay />
+            <button
+              key={t.id}
+              type="button"
+              onClick={() =>
+                setActive({ title: t.title, category: t.category, description: t.description, images: t.images })
+              }
+              aria-label={`Open gallery: ${t.title}`}
+              className="group relative aspect-square overflow-hidden rounded-2xl bg-white/5 text-left"
+            >
+              {isVideo(t.coverImage) ? (
+                <video src={t.coverImage} className="w-full h-full object-cover" muted loop playsInline autoPlay />
               ) : (
-                <img src={t.src} alt={t.title} loading="eager" decoding="async" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.03]" />
+                <img
+                  src={t.coverImage}
+                  alt={t.title}
+                  loading="lazy"
+                  decoding="async"
+                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.06]"
+                />
               )}
-            </div>
+              <span className="pointer-events-none absolute inset-x-0 bottom-0 bg-gradient-to-t from-background/85 to-transparent px-4 pb-4 pt-10 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
+                <span className="block text-xs md:text-sm text-foreground" style={{ fontFamily: "Jost, sans-serif" }}>
+                  {t.title}
+                </span>
+              </span>
+            </button>
           ))}
         </div>
       </section>
+      <Lightbox item={active} onClose={() => setActive(null)} />
       <SiteFooter />
     </div>
   );
