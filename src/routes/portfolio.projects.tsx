@@ -103,7 +103,7 @@ function ProjectsGallery() {
               {isVideo(t.src) ? (
                 <video src={t.src} className="w-full h-full object-cover" muted loop playsInline autoPlay />
               ) : (
-                <img src={t.src} alt={t.title} loading="lazy" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.03]" />
+                <img src={t.src} alt={t.title} loading="eager" decoding="async" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.03]" />
               )}
             </div>
           ))}

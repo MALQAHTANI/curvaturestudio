@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, Outlet, useRouterState } from "@tanstack/react-router";
 import { SiteHeader, SiteFooter } from "@/components/site-chrome";
 
 export const Route = createFileRoute("/portfolio")({
@@ -31,6 +31,12 @@ function Tile({ to, label }: { to: string; label: string }) {
 }
 
 function PortfolioChooser() {
+  const pathname = useRouterState({ select: (state) => state.location.pathname });
+
+  if (pathname !== "/portfolio") {
+    return <Outlet />;
+  }
+
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col">
       <SiteHeader />
