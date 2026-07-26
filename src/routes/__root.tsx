@@ -80,9 +80,13 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { title: "Curvature Studio — Creative Media Production" },
       { name: "description", content: "Curvature is a creative media production studio founded in 2016, based in Saudi Arabia." },
       { property: "og:title", content: "Curvature Studio — Creative Media Production" },
-      { property: "og:description", content: "Creative media production studio based in Saudi Arabia." },
+      { property: "og:description", content: "Curvature is a creative media production studio founded in 2016, based in Saudi Arabia." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:title", content: "Curvature Studio — Creative Media Production" },
+      { name: "twitter:description", content: "Curvature is a creative media production studio founded in 2016, based in Saudi Arabia." },
+      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/339b5a27-2caf-484f-abb9-1cf76eeac2bc/id-preview-34f5855a--154d1f25-8ad4-409c-8e7d-cd145b1ee11b.lovable.app-1785106530047.png" },
+      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/339b5a27-2caf-484f-abb9-1cf76eeac2bc/id-preview-34f5855a--154d1f25-8ad4-409c-8e7d-cd145b1ee11b.lovable.app-1785106530047.png" },
     ],
     links: [
       {
