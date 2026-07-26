@@ -17,6 +17,7 @@ export function Lightbox({
 }) {
   const [index, setIndex] = useState(0);
   const [visible, setVisible] = useState(false);
+  const [zoomed, setZoomed] = useState(false);
   const touchX = useRef<number | null>(null);
 
   const total = item?.images.length ?? 0;
@@ -33,6 +34,20 @@ export function Lightbox({
     const id = requestAnimationFrame(() => setVisible(true));
     return () => cancelAnimationFrame(id);
   }, [item]);
+
+  useEffect(() => setZoomed(false), [index, item]);
+
+  // preload neighbours
+  useEffect(() => {
+    if (!item || total < 2) return;
+    [ (index + 1) % total, (index - 1 + total) % total ].forEach((i) => {
+      const src = item.images[i];
+      if (src && !isVideo(src)) {
+        const img = new Image();
+        img.src = src;
+      }
+    });
+  }, [item, index, total]);
 
   useEffect(() => {
     if (!item) return;
@@ -99,25 +114,30 @@ export function Lightbox({
           <button
             onClick={prev}
             aria-label="Previous image"
-            className="absolute left-2 md:left-5 z-10 h-11 w-11 rounded-full border border-border bg-background/60 text-foreground/80 transition-colors hover:text-foreground"
+            className="absolute left-2 md:left-5 z-10 h-11 w-11 rounded-full border border-border bg-background/60 text-foreground/80 shadow-lg backdrop-blur transition-colors hover:text-foreground"
           >
             ‹
           </button>
         )}
         <div
           key={src}
-          className={`max-h-full max-w-full overflow-hidden rounded-2xl transition-all duration-300 ${
+          className={`max-h-full max-w-full overflow-auto rounded-2xl transition-all duration-300 ${
             visible ? "scale-100 opacity-100" : "scale-95 opacity-0"
           }`}
+          style={{ touchAction: "pinch-zoom" }}
         >
           {isVideo(src) ? (
-            <video src={src} controls autoPlay playsInline className="max-h-[72vh] max-w-full rounded-2xl" />
+            <video src={src} controls autoPlay playsInline className="max-h-[68vh] max-w-full rounded-2xl" />
           ) : (
             <img
               src={src}
               alt={`${item.title} — ${index + 1}`}
               decoding="async"
-              className="max-h-[72vh] max-w-full rounded-2xl object-contain"
+              onDoubleClick={() => setZoomed((z) => !z)}
+              className={`rounded-2xl object-contain transition-transform duration-300 ${
+                zoomed ? "max-h-none max-w-none scale-100 cursor-zoom-out" : "max-h-[68vh] max-w-full cursor-zoom-in"
+              }`}
+              style={zoomed ? { height: "150vh" } : undefined}
             />
           )}
         </div>
@@ -125,7 +145,7 @@ export function Lightbox({
           <button
             onClick={next}
             aria-label="Next image"
-            className="absolute right-2 md:right-5 z-10 h-11 w-11 rounded-full border border-border bg-background/60 text-foreground/80 transition-colors hover:text-foreground"
+            className="absolute right-2 md:right-5 z-10 h-11 w-11 rounded-full border border-border bg-background/60 text-foreground/80 shadow-lg backdrop-blur transition-colors hover:text-foreground"
           >
             ›
           </button>
@@ -133,6 +153,26 @@ export function Lightbox({
       </div>
 
       <div className="px-5 md:px-10 pb-8 text-center" onClick={(e) => e.stopPropagation()}>
+        {total > 1 && (
+          <div className="mb-4 flex justify-center gap-2 overflow-x-auto px-1 py-1">
+            {item.images.map((thumb, i) => (
+              <button
+                key={thumb + i}
+                onClick={() => setIndex(i)}
+                aria-label={`Image ${i + 1}`}
+                className={`h-12 w-16 shrink-0 overflow-hidden rounded-lg border transition-opacity ${
+                  i === index ? "border-foreground opacity-100" : "border-border opacity-50 hover:opacity-90"
+                }`}
+              >
+                {isVideo(thumb) ? (
+                  <video src={thumb} className="h-full w-full object-cover" muted playsInline />
+                ) : (
+                  <img src={thumb} alt="" loading="lazy" decoding="async" className="h-full w-full object-cover" />
+                )}
+              </button>
+            ))}
+          </div>
+        )}
         {item.description && (
           <p className="mx-auto mb-3 max-w-2xl text-xs text-muted-foreground">{item.description}</p>
         )}
