@@ -129,8 +129,8 @@ function ProjectsGallery() {
           Selected Work
         </h1>
       </section>
-      <section className="border-t border-border px-6 md:px-12 py-10">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+      <section className="border-t border-border px-6 md:px-12 py-12">
+        <div className="columns-1 sm:columns-2 lg:columns-3 gap-5 md:gap-8 [column-fill:_balance]">
           {tiles.map((t) => (
             <button
               key={t.id}
@@ -139,20 +139,25 @@ function ProjectsGallery() {
                 setActive({ title: t.title, category: t.category, description: t.description, images: t.images })
               }
               aria-label={`Open gallery: ${t.title}`}
-              className="group relative aspect-square overflow-hidden rounded-2xl bg-white/5 text-left"
+              className="group relative mb-5 md:mb-8 block w-full break-inside-avoid overflow-hidden rounded-2xl bg-white/5 text-left shadow-[0_10px_40px_-15px_rgba(0,0,0,0.6)] transition-shadow duration-500 hover:shadow-[0_20px_60px_-15px_rgba(0,0,0,0.8)]"
             >
               {isVideo(t.coverImage) ? (
-                <video src={t.coverImage} className="w-full h-full object-cover" muted loop playsInline autoPlay />
+                <video src={t.coverImage} className="w-full h-auto object-contain" muted loop playsInline autoPlay />
               ) : (
                 <img
                   src={t.coverImage}
                   alt={t.title}
                   loading="lazy"
                   decoding="async"
-                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.06]"
+                  className="w-full h-auto object-contain transition-transform duration-700 group-hover:scale-[1.04]"
                 />
               )}
-              <span className="pointer-events-none absolute inset-x-0 bottom-0 bg-gradient-to-t from-background/85 to-transparent px-4 pb-4 pt-10 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
+              <span className="pointer-events-none absolute inset-x-0 bottom-0 bg-gradient-to-t from-background/90 to-transparent px-4 pb-4 pt-12 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
+                {t.category && (
+                  <span className="mb-1 block text-[10px] tracking-[0.2em] text-muted-foreground uppercase">
+                    {t.category}
+                  </span>
+                )}
                 <span className="block text-xs md:text-sm text-foreground" style={{ fontFamily: "Jost, sans-serif" }}>
                   {t.title}
                 </span>
