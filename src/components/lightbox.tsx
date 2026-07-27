@@ -225,6 +225,7 @@ export function Lightbox({
       </motion.div>
     </motion.div>
       )}
-    </AnimatePresence>
+    </AnimatePresence>,
+    document.body,
   );
 }
