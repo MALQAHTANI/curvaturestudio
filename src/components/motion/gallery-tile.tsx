@@ -32,7 +32,7 @@ export function GalleryTile({
   const ref = useRef<HTMLButtonElement>(null);
   const enabled = useMotionEnabled();
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start end", "end start"] });
-  const raw = useTransform(scrollYProgress, [0, 1], [18, -18]);
+  const raw = useTransform(scrollYProgress, [0, 1], [10, -10]);
   const y = useSpring(raw, { stiffness: 90, damping: 22, mass: 0.4 });
 
   const delay = Math.min(index % 6, 5) * 0.12; // 120ms stagger
@@ -67,6 +67,7 @@ export function GalleryTile({
     <motion.span
       className="pointer-events-none absolute inset-x-0 bottom-0 bg-gradient-to-t from-background/90 to-transparent px-4 pb-4 pt-12"
       initial={{ opacity: 0 }}
+      animate={{ opacity: 0 }}
       variants={{ hovered: { opacity: 1 } }}
       transition={{ duration: 0.5, ease: EASE }}
     >
@@ -76,6 +77,7 @@ export function GalleryTile({
       <motion.span
         className="block text-xs md:text-sm text-foreground"
         initial={{ y: 8 }}
+        animate={{ y: 8 }}
         variants={{ hovered: { y: 0 } }}
         transition={{ duration: 0.5, ease: EASE }}
         style={{ fontFamily: "Jost, sans-serif" }}
