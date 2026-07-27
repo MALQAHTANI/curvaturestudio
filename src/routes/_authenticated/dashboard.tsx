@@ -221,6 +221,7 @@ function SectionEditor({ table, label }: { table: "projects" | "studio_items"; l
   const [items, setItems] = useState<Item[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
+  const [editing, setEditing] = useState<Item | null>(null);
   const [viewer, setViewer] = useState<{ item: LightboxItem; index: number } | null>(null);
 
   function openViewer(it: Item, index: number) {
@@ -253,14 +254,30 @@ function SectionEditor({ table, label }: { table: "projects" | "studio_items"; l
     <div>
       <div className="flex items-center justify-between mb-6">
         <p className="text-[11px] text-muted-foreground">{items.length} ITEMS</p>
-        <button onClick={() => setShowForm((v) => !v)} className="text-[11px] border-b border-foreground pb-0.5">
+        <button
+          onClick={() => { setEditing(null); setShowForm((v) => !v); }}
+          className="text-[11px] border-b border-foreground pb-0.5"
+        >
           {showForm ? "CLOSE" : `+ ADD ${label.toUpperCase()}`}
         </button>
       </div>
 
       {showForm && (
         <div className="border border-border p-6 mb-8">
-          <ItemForm table={table} onDone={() => { setShowForm(false); refresh(); }} />
+          <ItemForm table={table} onDone={() => { setShowForm(false); refresh(); }} onCancel={() => setShowForm(false)} />
+        </div>
+      )}
+
+      {editing && (
+        <div className="border border-foreground p-6 mb-8">
+          <p className="text-[11px] text-muted-foreground mb-4">EDITING · {editing.title}</p>
+          <ItemForm
+            key={editing.id}
+            table={table}
+            item={editing}
+            onDone={() => { setEditing(null); refresh(); }}
+            onCancel={() => setEditing(null)}
+          />
         </div>
       )}
 
@@ -307,6 +324,12 @@ function SectionEditor({ table, label }: { table: "projects" | "studio_items"; l
                   {it.media_urls.length} MEDIA · {it.published ? "PUBLISHED" : "DRAFT"}
                 </div>
                 <div className="mt-3 flex justify-between text-[10px] tracking-[0.15em]">
+                  <button
+                    onClick={() => { setShowForm(false); setEditing(it); }}
+                    className="hover:opacity-70"
+                  >
+                    EDIT ↗
+                  </button>
                   <button onClick={() => remove(it.id)} className="text-destructive hover:opacity-70">DELETE ↗</button>
                 </div>
               </div>
