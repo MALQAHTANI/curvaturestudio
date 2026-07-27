@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { SiteHeader, SiteFooter } from "@/components/site-chrome";
+import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/contact")({
   head: () => ({
@@ -16,7 +17,31 @@ export const Route = createFileRoute("/contact")({
 
 function Contact() {
   const [sent, setSent] = useState(false);
+  const [sending, setSending] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const formStyle = { fontFamily: "Jost, sans-serif", textTransform: "none" as const };
+
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    const form = e.currentTarget;
+    const fd = new FormData(form);
+    const name = String(fd.get("name") ?? "").trim();
+    const email = String(fd.get("email") ?? "").trim();
+    const company = String(fd.get("company") ?? "").trim();
+    const message = String(fd.get("message") ?? "").trim();
+    if (!name || !email || !message) { setError("الرجاء تعبئة الحقول المطلوبة."); return; }
+    setError(null); setSending(true);
+    const { error: err } = await supabase.from("contact_messages").insert({
+      name: name.slice(0, 100),
+      email: email.slice(0, 255),
+      company: company ? company.slice(0, 200) : null,
+      message: message.slice(0, 5000),
+    });
+    setSending(false);
+    if (err) { setError("تعذّر إرسال الرسالة، حاول مرة أخرى."); return; }
+    setSent(true);
+    form.reset();
+  }
   return (
     <div className="min-h-screen bg-background text-foreground">
       <SiteHeader />
@@ -33,7 +58,7 @@ function Contact() {
           <form
             className="space-y-6"
             style={formStyle}
-            onSubmit={(e) => { e.preventDefault(); setSent(true); (e.currentTarget as HTMLFormElement).reset(); }}
+            onSubmit={handleSubmit}
           >
             {[
               { name: "name", label: "Name", type: "text", required: true },
@@ -61,11 +86,15 @@ function Contact() {
             </div>
             <button
               type="submit"
-              className="text-[11px] uppercase tracking-[0.15em] border border-border px-6 py-3 hover:bg-foreground hover:text-background transition-colors"
+              disabled={sending}
+              className="text-[11px] uppercase tracking-[0.15em] border border-border px-6 py-3 hover:bg-foreground hover:text-background transition-colors disabled:opacity-50"
               style={{ fontFamily: "JetBrains Mono, monospace" }}
             >
-              Send Message ↗
+              {sending ? "SENDING…" : "Send Message ↗"}
             </button>
+            {error && (
+              <p className="text-[11px] text-destructive normal-case tracking-normal" style={formStyle}>{error}</p>
+            )}
             {sent && (
               <p className="text-[11px] text-muted-foreground" style={{ fontFamily: "JetBrains Mono, monospace" }}>
                 THANKS — WE'LL BE IN TOUCH.
