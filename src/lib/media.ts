@@ -54,11 +54,11 @@ const MIME_BY_EXT: Record<string, string> = {
 
 export async function uploadMedia(file: File): Promise<string> {
   if (!acceptedMime(file)) {
-    throw new Error("صيغة الملف غير مدعومة. يُقبل فقط الصور والفيديوهات.");
+    throw new Error("Unsupported file format. Only images and videos are accepted.");
   }
   if (file.size > MAX_UPLOAD_BYTES) {
     throw new Error(
-      `حجم الملف "${file.name}" كبير جداً (${(file.size / 1024 / 1024).toFixed(1)} ميجابايت). الحد الأقصى 50 ميجابايت للملف الواحد — الرجاء ضغط الفيديو أو تقسيمه.`,
+      `File "${file.name}" is too large (${(file.size / 1024 / 1024).toFixed(1)} MB). Maximum is 50 MB per file — please compress or split the video.`,
     );
   }
   const ext = extOf(file.name) || "bin";
@@ -68,7 +68,7 @@ export async function uploadMedia(file: File): Promise<string> {
     upsert: false,
     contentType: file.type || MIME_BY_EXT[ext] || "application/octet-stream",
   });
-  if (error) throw new Error(`فشل رفع "${file.name}": ${error.message}`);
+  if (error) throw new Error(`Failed to upload "${file.name}": ${error.message}`);
   const { data } = supabase.storage.from("media").getPublicUrl(path);
   return data.publicUrl;
 }

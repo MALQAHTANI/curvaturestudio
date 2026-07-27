@@ -68,7 +68,7 @@ type Item = {
 export const Route = createFileRoute("/_authenticated/dashboard")({
   head: () => ({
     meta: [
-      { title: "لوحة التحكم — Curvature Studio" },
+      { title: "Dashboard — Curvature Studio" },
       { name: "robots", content: "noindex" },
     ],
   }),
@@ -104,7 +104,7 @@ function Dashboard() {
           <div>
             <p className="text-[11px] text-muted-foreground mb-2">DASHBOARD</p>
             <h1 className="text-2xl md:text-3xl" style={{ fontFamily: "Jost, sans-serif", letterSpacing: "-0.02em" }}>
-              لوحة التحكم
+              Dashboard
             </h1>
           </div>
           <div className="flex items-center gap-4 text-[10px] text-muted-foreground tracking-[0.15em]">
@@ -115,7 +115,7 @@ function Dashboard() {
 
         {isEmployee === false && (
           <div className="border border-border p-6 text-[11px] tracking-normal normal-case" style={{ fontFamily: "Jost, sans-serif" }}>
-            حسابك ليس لديه صلاحية موظف. تواصل مع الموظف المسؤول لمنحك الصلاحية.
+            Your account does not have employee access. Contact an administrator to grant permission.
           </div>
         )}
 
@@ -138,7 +138,7 @@ function Dashboard() {
               <SectionEditor
                 key={tab}
                 table={tab === "projects" ? "projects" : "studio_items"}
-                label={tab === "projects" ? "مشروع" : "عنصر استديو"}
+                label={tab === "projects" ? "Project" : "Studio item"}
               />
             )}
           </>
@@ -167,7 +167,7 @@ function MessagesPanel() {
     refresh();
   }
   async function remove(id: string) {
-    if (!confirm("حذف هذه الرسالة؟")) return;
+    if (!confirm("Delete this message?")) return;
     await supabase.from("contact_messages").delete().eq("id", id);
     refresh();
   }
@@ -182,7 +182,7 @@ function MessagesPanel() {
       {loading ? (
         <p className="text-[11px] text-muted-foreground">LOADING…</p>
       ) : rows.length === 0 ? (
-        <p className="text-[11px] text-muted-foreground">لا توجد رسائل بعد.</p>
+        <p className="text-[11px] text-muted-foreground">No messages yet.</p>
       ) : (
         <ul className="space-y-4">
           {rows.map((m) => (
@@ -243,7 +243,7 @@ function SectionEditor({ table, label }: { table: "projects" | "studio_items"; l
   useEffect(() => { refresh(); }, [table]);
 
   async function remove(id: string) {
-    if (!confirm("حذف هذا العنصر؟")) return;
+    if (!confirm("Delete this item?")) return;
     const { error } = await supabase.from(table).delete().eq("id", id);
     if (error) { alert(error.message); return; }
     refresh();
@@ -254,7 +254,7 @@ function SectionEditor({ table, label }: { table: "projects" | "studio_items"; l
       <div className="flex items-center justify-between mb-6">
         <p className="text-[11px] text-muted-foreground">{items.length} ITEMS</p>
         <button onClick={() => setShowForm((v) => !v)} className="text-[11px] border-b border-foreground pb-0.5">
-          {showForm ? "إغلاق" : `+ إضافة ${label}`}
+          {showForm ? "CLOSE" : `+ ADD ${label.toUpperCase()}`}
         </button>
       </div>
 
@@ -267,7 +267,7 @@ function SectionEditor({ table, label }: { table: "projects" | "studio_items"; l
       {loading ? (
         <p className="text-[11px] text-muted-foreground">LOADING…</p>
       ) : items.length === 0 ? (
-        <p className="text-[11px] text-muted-foreground">لا توجد عناصر بعد.</p>
+        <p className="text-[11px] text-muted-foreground">No items yet.</p>
       ) : (
         <ul className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {items.map((it) => (
@@ -279,7 +279,7 @@ function SectionEditor({ table, label }: { table: "projects" | "studio_items"; l
                   <button
                     type="button"
                     onClick={() => raw && openViewer(it, coverIndex)}
-                    aria-label={`معاينة ${it.title}`}
+                    aria-label={`Preview ${it.title}`}
                     className="block w-full aspect-[4/3] bg-white/5 overflow-hidden cursor-zoom-in"
                   >
                     {raw ? <Thumb url={raw} alt={it.title} width={640} /> : null}
@@ -293,7 +293,7 @@ function SectionEditor({ table, label }: { table: "projects" | "studio_items"; l
                       key={m}
                       type="button"
                       onClick={() => openViewer(it, i)}
-                      aria-label={`معاينة الوسيط ${i + 1}`}
+                      aria-label={`Preview media ${i + 1}`}
                       className="w-12 h-12 shrink-0 bg-white/5 overflow-hidden cursor-zoom-in"
                     >
                       <Thumb url={m} width={128} />
@@ -350,16 +350,16 @@ function ItemForm({ table, onDone }: { table: "projects" | "studio_items"; onDon
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
-    if (!title.trim()) { setError("العنوان مطلوب."); return; }
-    if (files.length === 0) { setError("أضف صورة أو فيديو واحد على الأقل."); return; }
+    if (!title.trim()) { setError("Title is required."); return; }
+    if (files.length === 0) { setError("Add at least one image or video."); return; }
     setError(null); setUploading(true);
     try {
       const urls: string[] = [];
       for (let i = 0; i < files.length; i++) {
-        setProgress(`رفع ${i + 1}/${files.length}…`);
+        setProgress(`Uploading ${i + 1}/${files.length}…`);
         urls.push(await uploadMedia(files[i]));
       }
-      setProgress("حفظ…");
+      setProgress("Saving…");
       const { error } = await supabase.from(table).insert({
         title: title.trim(),
         description: description.trim() || null,
@@ -369,7 +369,7 @@ function ItemForm({ table, onDone }: { table: "projects" | "studio_items"; onDon
       if (error) throw error;
       onDone();
     } catch (err: any) {
-      setError(err?.message ?? "فشل الرفع.");
+      setError(err?.message ?? "Upload failed.");
     } finally {
       setUploading(false); setProgress("");
     }
@@ -394,7 +394,7 @@ function ItemForm({ table, onDone }: { table: "projects" | "studio_items"; onDon
         />
       </div>
       <div>
-        <label className="block text-[11px] text-muted-foreground mb-2">MEDIA (صور / فيديوهات)</label>
+        <label className="block text-[11px] text-muted-foreground mb-2">MEDIA (IMAGES / VIDEOS)</label>
         <input
           type="file"
           accept="image/*,video/*,.mp4,.mov,.m4v,.webm,.mkv,.avi,.ogv,.3gp,.heic,.heif"
@@ -403,7 +403,7 @@ function ItemForm({ table, onDone }: { table: "projects" | "studio_items"; onDon
           style={{ fontFamily: "Jost, sans-serif" }}
         />
         {files.length > 0 && (
-          <p className="mt-2 text-[10px] text-muted-foreground">{files.length} ملف مقبول</p>
+          <p className="mt-2 text-[10px] text-muted-foreground">{files.length} file(s) accepted</p>
         )}
         {previews.length > 0 && (
           <div className="mt-3 grid grid-cols-4 sm:grid-cols-6 gap-2">
@@ -421,10 +421,10 @@ function ItemForm({ table, onDone }: { table: "projects" | "studio_items"; onDon
             ))}
           </div>
         )}
-        <p className="mt-1 text-[10px] text-muted-foreground">الحد الأقصى 50 ميجابايت للملف الواحد</p>
+        <p className="mt-1 text-[10px] text-muted-foreground">Maximum 50 MB per file</p>
         {rejected.length > 0 && (
           <p className="mt-1 text-[10px] text-destructive normal-case tracking-normal" style={{ fontFamily: "Jost, sans-serif" }}>
-            رُفض (صيغة غير مدعومة): {rejected.join(", ")}
+            Rejected (unsupported format): {rejected.join(", ")}
           </p>
         )}
       </div>
@@ -434,7 +434,7 @@ function ItemForm({ table, onDone }: { table: "projects" | "studio_items"; onDon
         type="submit" disabled={uploading}
         className="border border-foreground text-foreground px-6 py-2 text-[11px] tracking-[0.15em] hover:bg-foreground hover:text-background transition-colors disabled:opacity-50"
       >
-        {uploading ? "..." : "حفظ ↗"}
+        {uploading ? "..." : "SAVE ↗"}
       </button>
     </form>
   );
