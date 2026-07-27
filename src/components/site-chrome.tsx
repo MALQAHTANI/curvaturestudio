@@ -1,5 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { AnimatePresence, motion, useMotionValueEvent, useScroll } from "motion/react";
 import { DUR, EASE, fadeUp, staggerParent, viewportOnce } from "@/lib/motion";
 import { useMotionEnabled } from "@/components/motion/use-motion-enabled";
@@ -14,25 +15,39 @@ const NAV = [
 export function SiteHeader() {
   const { scrollY } = useScroll();
   const [scrolled, setScrolled] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const enabled = useMotionEnabled();
+  const [mounted, setMounted] = useState(false);
   useMotionValueEvent(scrollY, "change", (v) => setScrolled(v > 24));
 
+  useEffect(() => setMounted(true), []);
+
+  useEffect(() => {
+    document.body.style.overflow = menuOpen ? "hidden" : "";
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [menuOpen]);
+
   return (
+    <>
     <motion.header
-      className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 md:px-12 border-b"
+      className="fixed top-0 left-0 right-0 z-[70] flex items-center justify-between px-6 md:px-12 border-b"
       initial={false}
       animate={{
         paddingTop: scrolled ? 12 : 20,
         paddingBottom: scrolled ? 12 : 20,
-        backgroundColor: scrolled ? "rgba(0,0,0,0.55)" : "rgba(0,0,0,0)",
-        backdropFilter: scrolled ? "blur(14px)" : "blur(0px)",
+        backgroundColor: scrolled && !menuOpen ? "rgba(0,0,0,0.55)" : "rgba(0,0,0,0)",
+        backdropFilter: scrolled && !menuOpen ? "blur(14px)" : "blur(0px)",
         boxShadow: scrolled ? "0 10px 30px -18px rgba(0,0,0,0.9)" : "0 0px 0px 0px rgba(0,0,0,0)",
-        borderColor: scrolled ? "var(--border)" : "rgba(0,0,0,0)",
+        borderColor: scrolled && !menuOpen ? "var(--border)" : "rgba(0,0,0,0)",
       }}
       transition={{ duration: DUR.fast, ease: EASE }}
       style={{ willChange: "transform, opacity" }}
     >
       <Link
         to="/"
+        onClick={() => setMenuOpen(false)}
         className="nav-underline text-[15px] font-medium tracking-tight normal-case"
         style={{ fontFamily: "Jost, sans-serif", letterSpacing: "-0.01em" }}
         aria-label="Curvature Studio"
@@ -54,8 +69,68 @@ export function SiteHeader() {
         ))}
       </nav>
 
-      <span className="w-[1px]" aria-hidden />
+      <span className="block w-7 sm:w-[1px]" aria-hidden />
     </motion.header>
+
+    {mounted &&
+      createPortal(
+      <>
+      <motion.button
+        type="button"
+        onClick={() => setMenuOpen((v) => !v)}
+        aria-label={menuOpen ? "Close menu" : "Open menu"}
+        aria-expanded={menuOpen}
+        className="fixed right-6 z-[75] flex h-6 w-7 flex-col items-end justify-center gap-[6px] text-foreground sm:hidden"
+        initial={false}
+        animate={{ top: scrolled ? 18 : 26 }}
+        transition={{ duration: DUR.fast, ease: EASE }}
+      >
+        <motion.span
+          className="block h-[1.5px] w-7 origin-center bg-foreground"
+          animate={{ rotate: menuOpen ? 45 : 0, y: menuOpen ? 3.75 : 0 }}
+          transition={{ duration: DUR.fast, ease: EASE }}
+        />
+        <motion.span
+          className="block h-[1.5px] origin-center bg-foreground"
+          animate={{ rotate: menuOpen ? -45 : 0, y: menuOpen ? -3.75 : 0, width: menuOpen ? 28 : 20 }}
+          transition={{ duration: DUR.fast, ease: EASE }}
+        />
+      </motion.button>
+    <AnimatePresence>
+      {menuOpen && (
+        <motion.div
+          className="fixed inset-0 z-[60] flex flex-col justify-center gap-2 bg-background/95 px-8 text-foreground backdrop-blur-xl sm:hidden"
+          initial={enabled ? { opacity: 0, clipPath: "inset(0% 0% 100% 0%)" } : false}
+          animate={{ opacity: 1, clipPath: "inset(0% 0% 0% 0%)" }}
+          exit={{ opacity: 0, clipPath: "inset(0% 0% 100% 0%)" }}
+          transition={{ duration: DUR.base, ease: EASE }}
+        >
+          {NAV.map((n, i) => (
+            <div key={n.to} className="overflow-hidden py-1">
+              <motion.div
+                initial={enabled ? { y: "110%", opacity: 0 } : false}
+                animate={{ y: "0%", opacity: 1 }}
+                exit={{ y: "60%", opacity: 0 }}
+                transition={{ duration: DUR.slow, ease: EASE, delay: 0.08 + i * 0.07 }}
+              >
+                <Link
+                  to={n.to}
+                  onClick={() => setMenuOpen(false)}
+                  className="block text-[13vw] leading-[1.05] tracking-[-0.02em] text-foreground/90"
+                  style={{ fontFamily: "Jost, sans-serif", fontWeight: 500 }}
+                >
+                  {n.label}
+                </Link>
+              </motion.div>
+            </div>
+          ))}
+        </motion.div>
+      )}
+    </AnimatePresence>
+      </>,
+        document.body,
+      )}
+    </>
   );
 }
 
