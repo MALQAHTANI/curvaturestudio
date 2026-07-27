@@ -102,7 +102,7 @@ export function MotionButton({
       whileHover={{ scale: 1.03 }}
       whileTap={{ scale: 0.97 }}
       transition={transition(DUR.fast)}
-      {...(rest as never)}
+      {...(rest as Record<string, unknown>)}
     >
       {children}
     </motion.button>
