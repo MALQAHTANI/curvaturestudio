@@ -265,6 +265,7 @@ function ItemForm({ table, onDone }: { table: "projects" | "studio_items"; onDon
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [files, setFiles] = useState<File[]>([]);
+  const [previews, setPreviews] = useState<{ url: string; video: boolean; name: string }[]>([]);
   const [rejected, setRejected] = useState<string[]>([]);
   const [uploading, setUploading] = useState(false);
   const [progress, setProgress] = useState<string>("");
@@ -276,7 +277,17 @@ function ItemForm({ table, onDone }: { table: "projects" | "studio_items"; onDon
     for (const f of list) { if (acceptedMime(f)) ok.push(f); else bad.push(f); }
     setFiles(ok);
     setRejected(bad.map((f) => f.name));
+    setPreviews((prev) => {
+      prev.forEach((p) => URL.revokeObjectURL(p.url));
+      return ok.map((f) => ({
+        url: URL.createObjectURL(f),
+        video: f.type.startsWith("video/") || isVideo(f.name),
+        name: f.name,
+      }));
+    });
   }
+
+  useEffect(() => () => { previews.forEach((p) => URL.revokeObjectURL(p.url)); }, [previews]);
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
@@ -334,6 +345,22 @@ function ItemForm({ table, onDone }: { table: "projects" | "studio_items"; onDon
         />
         {files.length > 0 && (
           <p className="mt-2 text-[10px] text-muted-foreground">{files.length} ملف مقبول</p>
+        )}
+        {previews.length > 0 && (
+          <div className="mt-3 grid grid-cols-4 sm:grid-cols-6 gap-2">
+            {previews.map((p, i) => (
+              <div key={p.url} className="relative aspect-square bg-white/5 overflow-hidden border border-border">
+                {p.video ? (
+                  <video src={p.url} className="w-full h-full object-cover" muted playsInline preload="metadata" />
+                ) : (
+                  <img src={p.url} alt={p.name} className="w-full h-full object-cover" />
+                )}
+                {i === 0 && (
+                  <span className="absolute bottom-0 left-0 right-0 bg-background/80 text-[8px] tracking-[0.15em] text-center py-0.5">COVER</span>
+                )}
+              </div>
+            ))}
+          </div>
         )}
         <p className="mt-1 text-[10px] text-muted-foreground">الحد الأقصى 50 ميجابايت للملف الواحد</p>
         {rejected.length > 0 && (
