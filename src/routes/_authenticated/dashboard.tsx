@@ -313,13 +313,16 @@ function ItemForm({ table, onDone }: { table: "projects" | "studio_items"; onDon
       <div>
         <label className="block text-[11px] text-muted-foreground mb-2">MEDIA (صور / فيديوهات)</label>
         <input
-          type="file" accept="image/*,video/*" multiple onChange={onPick}
+          type="file"
+          accept="image/*,video/*,.mp4,.mov,.m4v,.webm,.mkv,.avi,.ogv,.3gp,.heic,.heif"
+          multiple onChange={onPick}
           className="block w-full text-[11px] normal-case tracking-normal file:mr-3 file:px-3 file:py-2 file:border file:border-border file:bg-transparent file:text-foreground file:text-[10px] file:tracking-[0.15em] file:cursor-pointer"
           style={{ fontFamily: "Jost, sans-serif" }}
         />
         {files.length > 0 && (
           <p className="mt-2 text-[10px] text-muted-foreground">{files.length} ملف مقبول</p>
         )}
+        <p className="mt-1 text-[10px] text-muted-foreground">الحد الأقصى 50 ميجابايت للملف الواحد</p>
         {rejected.length > 0 && (
           <p className="mt-1 text-[10px] text-destructive normal-case tracking-normal" style={{ fontFamily: "Jost, sans-serif" }}>
             رُفض (صيغة غير مدعومة): {rejected.join(", ")}
