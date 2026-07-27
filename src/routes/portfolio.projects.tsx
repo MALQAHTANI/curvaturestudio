@@ -4,7 +4,6 @@ import { SiteHeader, SiteFooter } from "@/components/site-chrome";
 import { supabase } from "@/integrations/supabase/client";
 import { isVideo, mediaSrc } from "@/lib/media";
 import { Lightbox, type LightboxItem } from "@/components/lightbox";
-import { REFERENCE_PROJECTS } from "@/data/portfolio-reference";
 
 export const Route = createFileRoute("/portfolio/projects")({
   head: () => ({
@@ -17,19 +16,6 @@ export const Route = createFileRoute("/portfolio/projects")({
   }),
   component: ProjectsGallery,
 });
-
-const wix = (id: string) =>
-  `https://static.wixstatic.com/media/${id}/v1/fit/w_960,h_640,q_90,enc_avif,quality_auto/${id}`;
-
-const wixFull = (id: string) =>
-  `https://static.wixstatic.com/media/${id}/v1/fit/w_1600,h_1600,q_90,enc_avif,quality_auto/${id}`;
-
-const REFERENCE_TILES = REFERENCE_PROJECTS.map((p) => ({
-  id: p.id,
-  title: p.title,
-  src: wix(p.images[0]),
-  images: p.images.map(wixFull),
-}));
 
 type Tile = {
   id: string;
@@ -68,16 +54,8 @@ function ProjectsGallery() {
       };
     })
     .filter((t) => !!t.coverImage);
-  const tiles: Tile[] = [
-    ...dbTiles,
-    ...REFERENCE_TILES.map((t) => ({
-      id: t.id,
-      title: t.title,
-      category: "SELECTED WORK",
-      coverImage: t.src,
-      images: t.images,
-    })),
-  ];
+  const tiles: Tile[] = dbTiles;
+
 
   return (
     <div className="min-h-screen bg-background text-foreground">
