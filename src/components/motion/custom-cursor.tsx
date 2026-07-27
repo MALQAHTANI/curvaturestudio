@@ -51,14 +51,24 @@ export function CustomCursor() {
   return (
     <div aria-hidden className="pointer-events-none fixed inset-0 z-[9999] hidden md:block">
       <motion.div
-        className="absolute left-0 top-0 flex items-center justify-center rounded-full border border-foreground/70 bg-foreground/5 backdrop-blur-[1px]"
-        style={{ x: sx, y: sy, translateX: "-50%", translateY: "-50%", willChange: "transform" }}
-        animate={{
-          width: label ? 96 : active ? 46 : 26,
-          height: label ? 96 : active ? 46 : 26,
-          opacity: visible ? 1 : 0,
+        className="absolute left-0 top-0 flex items-center justify-center rounded-full border border-foreground/70 backdrop-blur-[2px]"
+        style={{
+          x: sx,
+          y: sy,
+          translateX: "-50%",
+          translateY: "-50%",
+          willChange: "transform",
+          width: 26,
+          height: 26,
         }}
-        transition={{ duration: 0.35, ease: EASE }}
+        animate={{
+          scale: label ? 4.2 : active ? 1.8 : 1,
+          opacity: visible ? 1 : 0,
+          backgroundColor: label
+            ? "color-mix(in oklab, var(--background) 82%, transparent)"
+            : "color-mix(in oklab, var(--foreground) 6%, transparent)",
+        }}
+        transition={{ duration: 0.45, ease: EASE }}
       >
         <AnimatePresence>
           {label && (
@@ -68,7 +78,7 @@ export function CustomCursor() {
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.9 }}
               transition={{ duration: 0.25, ease: EASE }}
-              className="px-2 text-center text-[9px] uppercase tracking-[0.18em] text-foreground"
+              className="px-1 text-center text-[2.6px] uppercase leading-[1.3] tracking-[0.18em] text-foreground"
             >
               {label}
             </motion.span>
