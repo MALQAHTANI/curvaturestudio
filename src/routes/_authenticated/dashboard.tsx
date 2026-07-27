@@ -225,12 +225,25 @@ function SectionEditor({ table, label }: { table: "projects" | "studio_items"; l
                   if (!raw) return null;
                   const src = mediaSrc(raw);
                   return isVideo(raw) ? (
-                    <video src={src} className="w-full h-full object-cover" muted />
+                    <video src={src} className="w-full h-full object-cover" muted playsInline preload="metadata" />
                   ) : (
-                    <img src={src} alt={it.title} className="w-full h-full object-cover" />
+                    <img src={src} alt={it.title} loading="lazy" decoding="async" className="w-full h-full object-cover" />
                   );
                 })()}
               </div>
+              {it.media_urls.length > 1 && (
+                <div className="flex gap-1 overflow-x-auto p-1 border-t border-border">
+                  {it.media_urls.map((m) => (
+                    <div key={m} className="w-12 h-12 shrink-0 bg-white/5 overflow-hidden">
+                      {isVideo(m) ? (
+                        <video src={mediaSrc(m)} className="w-full h-full object-cover" muted playsInline preload="metadata" />
+                      ) : (
+                        <img src={mediaSrc(m)} alt="" loading="lazy" decoding="async" className="w-full h-full object-cover" />
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
               <div className="p-4">
                 <div className="text-[12px] normal-case tracking-normal truncate" style={{ fontFamily: "Jost, sans-serif" }}>{it.title}</div>
                 <div className="mt-1 text-[10px] text-muted-foreground">
