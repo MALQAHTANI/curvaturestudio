@@ -85,7 +85,7 @@ export function StaggerItem({
 }: {
   children: ReactNode;
   className?: string;
-  as?: "div" | "li" | "span" | "p";
+  as?: "div" | "li" | "span" | "p" | "form";
 } & Omit<DivProps, "children">) {
   const enabled = useMotionEnabled();
   const Comp = motion[as] as typeof motion.div;
