@@ -4,7 +4,16 @@ import { supabase } from "@/integrations/supabase/client";
 import { SiteHeader, SiteFooter } from "@/components/site-chrome";
 import { uploadMedia, isVideo, acceptedMime } from "@/lib/media";
 
-type Tab = "projects" | "studio";
+type Tab = "projects" | "studio" | "messages";
+type Message = {
+  id: string;
+  name: string;
+  email: string;
+  company: string | null;
+  message: string;
+  read: boolean;
+  created_at: string;
+};
 type Item = {
   id: string;
   title: string;
@@ -72,25 +81,97 @@ function Dashboard() {
         {isEmployee && (
           <>
             <div className="flex gap-2 border-b border-border mb-8">
-              {(["projects", "studio"] as Tab[]).map((t) => (
+              {(["projects", "studio", "messages"] as Tab[]).map((t) => (
                 <button
                   key={t}
                   onClick={() => setTab(t)}
                   className={`px-4 py-3 text-[11px] tracking-[0.15em] -mb-px border-b ${tab === t ? "text-foreground border-foreground" : "text-muted-foreground border-transparent hover:text-foreground"}`}
                 >
-                  {t === "projects" ? "PROJECTS" : "STUDIO"}
+                  {t === "projects" ? "PROJECTS" : t === "studio" ? "STUDIO" : "MESSAGES"}
                 </button>
               ))}
             </div>
-            <SectionEditor
-              key={tab}
-              table={tab === "projects" ? "projects" : "studio_items"}
-              label={tab === "projects" ? "مشروع" : "عنصر استديو"}
-            />
+            {tab === "messages" ? (
+              <MessagesPanel />
+            ) : (
+              <SectionEditor
+                key={tab}
+                table={tab === "projects" ? "projects" : "studio_items"}
+                label={tab === "projects" ? "مشروع" : "عنصر استديو"}
+              />
+            )}
           </>
         )}
       </main>
       <SiteFooter />
+    </div>
+  );
+}
+
+function MessagesPanel() {
+  const [rows, setRows] = useState<Message[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  async function refresh() {
+    setLoading(true);
+    const { data } = await supabase
+      .from("contact_messages").select("*").order("created_at", { ascending: false });
+    setRows((data as any) ?? []);
+    setLoading(false);
+  }
+  useEffect(() => { refresh(); }, []);
+
+  async function toggleRead(m: Message) {
+    await supabase.from("contact_messages").update({ read: !m.read }).eq("id", m.id);
+    refresh();
+  }
+  async function remove(id: string) {
+    if (!confirm("حذف هذه الرسالة؟")) return;
+    await supabase.from("contact_messages").delete().eq("id", id);
+    refresh();
+  }
+
+  const unread = rows.filter((r) => !r.read).length;
+
+  return (
+    <div>
+      <p className="text-[11px] text-muted-foreground mb-6">
+        {rows.length} MESSAGES · {unread} UNREAD
+      </p>
+      {loading ? (
+        <p className="text-[11px] text-muted-foreground">LOADING…</p>
+      ) : rows.length === 0 ? (
+        <p className="text-[11px] text-muted-foreground">لا توجد رسائل بعد.</p>
+      ) : (
+        <ul className="space-y-4">
+          {rows.map((m) => (
+            <li key={m.id} className={`border p-5 ${m.read ? "border-border" : "border-foreground"}`}>
+              <div className="flex flex-wrap items-start justify-between gap-3">
+                <div className="normal-case tracking-normal" style={{ fontFamily: "Jost, sans-serif" }}>
+                  <div className="text-[14px]">{m.name}</div>
+                  <a href={`mailto:${m.email}`} className="text-[12px] text-muted-foreground hover:text-foreground">{m.email}</a>
+                  {m.company && <div className="text-[12px] text-muted-foreground">{m.company}</div>}
+                </div>
+                <div className="text-[10px] text-muted-foreground tracking-[0.15em]">
+                  {new Date(m.created_at).toLocaleString()}
+                </div>
+              </div>
+              <p
+                className="mt-4 text-[13px] whitespace-pre-wrap normal-case tracking-normal"
+                style={{ fontFamily: "Jost, sans-serif", lineHeight: 1.6 }}
+              >
+                {m.message}
+              </p>
+              <div className="mt-4 flex gap-6 text-[10px] tracking-[0.15em]">
+                <button onClick={() => toggleRead(m)} className="hover:opacity-70">
+                  {m.read ? "MARK UNREAD ↗" : "MARK READ ↗"}
+                </button>
+                <button onClick={() => remove(m.id)} className="text-destructive hover:opacity-70">DELETE ↗</button>
+              </div>
+            </li>
+          ))}
+        </ul>
+      )}
     </div>
   );
 }
