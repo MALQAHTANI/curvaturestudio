@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { SiteHeader, SiteFooter } from "@/components/site-chrome";
 import { supabase } from "@/integrations/supabase/client";
-import { isVideo } from "@/lib/media";
+import { isVideo, mediaSrc } from "@/lib/media";
 import { Lightbox, type LightboxItem } from "@/components/lightbox";
 import { REFERENCE_PROJECTS } from "@/data/portfolio-reference";
 
