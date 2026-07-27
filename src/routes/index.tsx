@@ -1,11 +1,11 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { motion } from "motion/react";
 import { SiteHeader, SiteFooter } from "@/components/site-chrome";
 import projects from "@/data/projects.json";
 import services from "@/data/services.json";
 import { supabase } from "@/integrations/supabase/client";
-import { isVideo, mediaSrc } from "@/lib/media";
+import { mediaSrc } from "@/lib/media";
 import { Reveal, RevealLines, Stagger, StaggerItem } from "@/components/motion/primitives";
 import { GalleryTile } from "@/components/motion/gallery-tile";
 import { Parallax } from "@/components/motion/parallax";
@@ -34,6 +34,7 @@ export const Route = createFileRoute("/")({
 });
 
 function Index() {
+  const navigate = useNavigate();
   const staticFeatured = (projects as any[])
     .filter((p) => p.published && p.cover_image && !p.cover_image.includes("88e8419e"))
     .slice(0, 6);
@@ -112,6 +113,7 @@ function Index() {
                   title={p.title}
                   category="PROJECT"
                   index={i}
+                  onOpen={() => navigate({ to: "/portfolio/projects" })}
                   className="block w-full text-left"
                   mediaClassName="aspect-[4/3] w-full h-full object-cover bg-white/5"
                 />
