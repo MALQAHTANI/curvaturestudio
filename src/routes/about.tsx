@@ -41,8 +41,8 @@ function About() {
         <Stagger className="mt-14 grid grid-cols-3 gap-6 max-w-xl" stagger={0.12}>
           {[
             { value: new Date().getFullYear() - 2016, suffix: "+", label: "YEARS" },
-            { value: svcsCount, suffix: "", label: "SERVICES" },
-            { value: clsCount, suffix: "+", label: "CLIENTS" },
+            { value: svcs.length, suffix: "", label: "SERVICES" },
+            { value: cls.length, suffix: "+", label: "CLIENTS" },
           ].map((s) => (
             <StaggerItem key={s.label}>
               <p className="display-md">
