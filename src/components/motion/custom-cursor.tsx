@@ -29,9 +29,11 @@ export function CustomCursor() {
       x.set(e.clientX);
       y.set(e.clientY);
       setVisible(true);
-      const target = (e.target as HTMLElement | null)?.closest?.(INTERACTIVE) as HTMLElement | null;
+      const el = e.target as HTMLElement | null;
+      const target = el?.closest?.(INTERACTIVE) as HTMLElement | null;
+      const labelled = el?.closest?.("[data-cursor]") as HTMLElement | null;
       setActive(!!target);
-      setLabel(target?.dataset?.cursor ?? null);
+      setLabel(labelled?.dataset?.cursor ?? null);
     };
     const onLeave = () => setVisible(false);
 

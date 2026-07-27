@@ -6,12 +6,30 @@ import projects from "@/data/projects.json";
 import services from "@/data/services.json";
 import { supabase } from "@/integrations/supabase/client";
 import { isVideo, mediaSrc } from "@/lib/media";
-import { Reveal, RevealLines, Stagger, StaggerItem, HoverCard } from "@/components/motion/primitives";
+import { Reveal, RevealLines, Stagger, StaggerItem } from "@/components/motion/primitives";
+import { GalleryTile } from "@/components/motion/gallery-tile";
 import { Parallax } from "@/components/motion/parallax";
 import { MotionNavLink } from "@/components/motion/button";
 import { DUR, EASE } from "@/lib/motion";
 
 export const Route = createFileRoute("/")({
+  head: () => ({
+    meta: [
+      { title: "Curvature Studio — Cinematic Media Production" },
+      {
+        name: "description",
+        content:
+          "Curvature Studio is a creative media production studio in Saudi Arabia crafting cinematic content for global and regional brands.",
+      },
+      { property: "og:title", content: "Curvature Studio — Cinematic Media Production" },
+      {
+        property: "og:description",
+        content: "Creative media production studio in Saudi Arabia — cinematic stories, crafted.",
+      },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
+    ],
+  }),
   component: Index,
 });
 
@@ -87,13 +105,17 @@ function Index() {
         <Stagger className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-12" stagger={0.09}>
           {featured.map((p, i) => (
             <StaggerItem key={p.id}>
-              <HoverCard className="group rounded-sm transition-shadow duration-500 hover:shadow-[0_28px_60px_-30px_rgba(0,0,0,0.95)]">
-              <div className="aspect-[4/3] overflow-hidden bg-white/5">
-                {p.cover_image && (isVideo(p.cover_image)
-                  ? <video src={p.cover_image} className="w-full h-full object-cover" muted loop playsInline autoPlay />
-                  : <img src={p.cover_image} alt={p.title} loading="lazy" decoding="async" className="w-full h-full object-cover will-change-transform transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.06]" />
-                )}
-              </div>
+              <div className="group">
+              {p.cover_image && (
+                <GalleryTile
+                  src={p.cover_image}
+                  title={p.title}
+                  category="PROJECT"
+                  index={i}
+                  className="block w-full text-left"
+                  mediaClassName="aspect-[4/3] w-full h-full object-cover bg-white/5"
+                />
+              )}
               <div className="flex justify-between mt-4 text-[11px] gap-4 transition-colors duration-500 group-hover:text-foreground">
                 <div className="flex gap-3 min-w-0">
                   <span className="text-muted-foreground shrink-0">{String(i + 1).padStart(2, "0")}</span>
@@ -101,7 +123,7 @@ function Index() {
                 </div>
                 <span className="text-muted-foreground shrink-0">{p.year ?? ""}</span>
               </div>
-              </HoverCard>
+              </div>
             </StaggerItem>
           ))}
         </Stagger>
