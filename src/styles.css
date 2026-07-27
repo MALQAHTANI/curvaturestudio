@@ -292,3 +292,27 @@
   .hero-globe::after,
   .hero-sweep { animation: none; }
 }
+
+/* --- Accessibility widget preferences --- */
+:root { --a11y-font-scale: 1; }
+
+html { font-size: calc(16px * var(--a11y-font-scale)); }
+
+html.a11y-underline a { text-decoration: underline; text-underline-offset: 3px; }
+
+html.a11y-contrast {
+  --background: oklch(0 0 0);
+  --foreground: oklch(1 0 0);
+  --muted-foreground: oklch(1 0 0);
+  --border: oklch(1 0 0);
+}
+html.a11y-contrast img,
+html.a11y-contrast video { filter: contrast(1.15); }
+
+html.a11y-reduce-motion *,
+html.a11y-reduce-motion *::before,
+html.a11y-reduce-motion *::after {
+  animation: none !important;
+  transition: none !important;
+  scroll-behavior: auto !important;
+}
