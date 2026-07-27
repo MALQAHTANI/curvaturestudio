@@ -28,12 +28,15 @@ function Index() {
       <SiteHeader />
 
       {/* Hero */}
-      <section className="min-h-[92vh] flex flex-col justify-end px-6 md:px-12 pt-40 pb-16">
-        <p className="text-[11px] text-muted-foreground mb-6">CREATIVE MEDIA PRODUCTION — EST. 2016</p>
-        <h1 className="display-xl">
+      <section className="relative isolate overflow-hidden min-h-[92vh] flex flex-col justify-end px-6 md:px-12 pt-40 pb-16">
+        <div aria-hidden className="hero-bg" />
+        <div aria-hidden className="hero-grid" />
+        <div aria-hidden className="hero-sweep" />
+        <p className="relative text-[11px] text-muted-foreground mb-6">CREATIVE MEDIA PRODUCTION — EST. 2016</p>
+        <h1 className="relative display-xl">
           CINEMATIC<br />STORIES,<br />CRAFTED.
         </h1>
-        <p className="mt-10 max-w-xl text-muted-foreground normal-case tracking-normal" style={{ fontFamily: "Jost, sans-serif", textTransform: "none", fontSize: "14px", lineHeight: 1.6 }}>
+        <p className="relative mt-10 max-w-xl text-muted-foreground normal-case tracking-normal" style={{ fontFamily: "Jost, sans-serif", textTransform: "none", fontSize: "14px", lineHeight: 1.6 }}>
           Curvature Studio is a creative media production studio based in Saudi Arabia — crafting visually compelling content for global and regional brands.
         </p>
       </section>
