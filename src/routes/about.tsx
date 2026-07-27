@@ -1,10 +1,15 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
 import { SiteHeader, SiteFooter } from "@/components/site-chrome";
 import services from "@/data/services.json";
 import clients from "@/data/clients.json";
 import { Reveal, RevealLines, Stagger, StaggerItem } from "@/components/motion/primitives";
 import { Marquee } from "@/components/motion/marquee";
 import { Counter } from "@/components/motion/counter";
+import { GalleryTile } from "@/components/motion/gallery-tile";
+import { Lightbox, type LightboxItem } from "@/components/lightbox";
+import { supabase } from "@/integrations/supabase/client";
+import { mediaSrc } from "@/lib/media";
 
 export const Route = createFileRoute("/about")({
   head: () => ({
@@ -21,6 +26,26 @@ export const Route = createFileRoute("/about")({
 function About() {
   const svcs = (services as any[]).filter((s) => s.published);
   const cls = (clients as any[]).filter((c) => c.published);
+  const [shots, setShots] = useState<{ id: string; title: string; src: string }[]>([]);
+  const [active, setActive] = useState<LightboxItem | null>(null);
+
+  useEffect(() => {
+    supabase
+      .from("projects")
+      .select("id,title,cover_image,media_urls,sort_order,created_at")
+      .eq("published", true)
+      .order("sort_order", { ascending: true })
+      .order("created_at", { ascending: false })
+      .limit(6)
+      .then(({ data }) =>
+        setShots(
+          ((data as any[]) ?? [])
+            .map((d) => ({ id: d.id, title: d.title, src: mediaSrc(d.cover_image ?? d.media_urls?.[0]) || "" }))
+            .filter((d) => !!d.src),
+        ),
+      );
+  }, []);
+
   return (
     <div className="min-h-screen bg-background text-foreground">
       <SiteHeader />
@@ -92,6 +117,36 @@ function About() {
         </Reveal>
       </section>
 
+      {shots.length > 0 && (
+        <section className="border-t border-border px-6 md:px-12 py-28 md:py-40">
+          <Reveal>
+            <p className="text-[11px] text-muted-foreground mb-16">IN FRAME</p>
+          </Reveal>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-10 md:gap-x-16 gap-y-20 md:gap-y-28">
+            {shots.map((s, i) => (
+              <div key={s.id} className={i % 3 === 1 ? "sm:mt-16" : i % 3 === 2 ? "lg:mt-28" : ""}>
+                <GalleryTile
+                  src={s.src}
+                  title={s.title}
+                  category="IN FRAME"
+                  index={i}
+                  onOpen={() =>
+                    setActive({
+                      title: s.title,
+                      category: "IN FRAME",
+                      images: shots.map((x) => x.src),
+                    })
+                  }
+                  className="block w-full text-left"
+                  mediaClassName={`${i % 2 === 0 ? "aspect-[4/5]" : "aspect-[4/3]"} w-full h-full object-cover bg-white/5`}
+                />
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
+      <Lightbox item={active} onClose={() => setActive(null)} />
       <SiteFooter />
     </div>
   );
