@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { motion } from "motion/react";
 import { SiteHeader, SiteFooter } from "@/components/site-chrome";
@@ -11,6 +11,7 @@ import { GalleryTile } from "@/components/motion/gallery-tile";
 import { Parallax } from "@/components/motion/parallax";
 import { MotionNavLink } from "@/components/motion/button";
 import { ScrollIndicator } from "@/components/motion/scroll-indicator";
+import { Lightbox, type LightboxItem } from "@/components/lightbox";
 import { DUR, EASE } from "@/lib/motion";
 
 export const Route = createFileRoute("/")({
@@ -35,15 +36,29 @@ export const Route = createFileRoute("/")({
 });
 
 function Index() {
-  const navigate = useNavigate();
+  const [active, setActive] = useState<LightboxItem | null>(null);
   const staticFeatured = (projects as any[])
     .filter((p) => p.published && p.cover_image && !p.cover_image.includes("88e8419e"))
     .slice(0, 6);
   const [dbItems, setDbItems] = useState<any[]>([]);
   useEffect(() => {
-    supabase.from("projects").select("id,title,cover_image,media_urls,sort_order,created_at")
+    supabase.from("projects").select("id,title,description,cover_image,media_urls,sort_order,created_at")
       .eq("published", true).order("sort_order", { ascending: true }).order("created_at", { ascending: false }).limit(6)
-      .then(({ data }) => setDbItems((data as any[])?.map(d => ({ ...d, cover_image: mediaSrc(d.cover_image ?? d.media_urls?.[0]) || null })) ?? []));
+      .then(({ data }) =>
+        setDbItems(
+          (data as any[])?.map((d) => ({
+            ...d,
+            cover_image: mediaSrc(d.cover_image ?? d.media_urls?.[0]) || null,
+            gallery: Array.from(
+              new Set(
+                [mediaSrc(d.cover_image ?? d.media_urls?.[0]), ...((d.media_urls as string[]) ?? []).map((u) => mediaSrc(u))].filter(
+                  Boolean,
+                ) as string[],
+              ),
+            ),
+          })) ?? [],
+        ),
+      );
   }, []);
   const featured = [...dbItems, ...staticFeatured].slice(0, 6);
 
@@ -131,7 +146,14 @@ function Index() {
                         title={p.title}
                         category="PROJECT"
                         index={i}
-                        onOpen={() => navigate({ to: "/portfolio/projects" })}
+                        onOpen={() =>
+                          setActive({
+                            title: p.title,
+                            category: "PROJECT",
+                            description: p.description ?? undefined,
+                            images: p.gallery?.length ? p.gallery : [p.cover_image],
+                          })
+                        }
                         className="block w-full text-left"
                         mediaClassName={`${ratio} w-full h-full object-cover bg-white/5`}
                       />
@@ -182,6 +204,7 @@ function Index() {
       </section>
 
       <SiteFooter />
+      <Lightbox item={active} onClose={() => setActive(null)} />
     </div>
   );
 }
