@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { SiteHeader, SiteFooter } from "@/components/site-chrome";
 import { uploadMedia, isVideo, acceptedMime, mediaSrc, mediaThumb } from "@/lib/media";
+import { Lightbox, type LightboxItem } from "@/components/lightbox";
 
 // مصغّرة تظهر دائماً: مصغّرة الخدمة ← الملف الأصلي ← بديل نصي بالصيغة
 function Thumb({ url, alt, width = 480 }: { url: string; alt?: string; width?: number }) {
