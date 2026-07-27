@@ -287,6 +287,8 @@
 @media (prefers-reduced-motion: reduce) {
   .hero-bg::before,
   .hero-bg::after,
-  .hero-grid,
+  .hero-globe,
+  .hero-globe::before,
+  .hero-globe::after,
   .hero-sweep { animation: none; }
 }
