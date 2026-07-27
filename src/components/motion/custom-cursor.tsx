@@ -3,7 +3,7 @@ import { AnimatePresence, motion, useMotionValue, useSpring } from "motion/react
 import { EASE } from "@/lib/motion";
 import { useMotionEnabled } from "./use-motion-enabled";
 
-const INTERACTIVE = 'a, button, [role="button"], input, textarea, select, summary, [data-cursor]';
+const INTERACTIVE = 'a, button, [role="button"], input, textarea, select, summary, [data-cursor], img, video';
 
 export function CustomCursor() {
   const enabled = useMotionEnabled();
@@ -29,9 +29,11 @@ export function CustomCursor() {
       x.set(e.clientX);
       y.set(e.clientY);
       setVisible(true);
-      const target = (e.target as HTMLElement | null)?.closest?.(INTERACTIVE) as HTMLElement | null;
+      const el = e.target as HTMLElement | null;
+      const target = el?.closest?.(INTERACTIVE) as HTMLElement | null;
+      const labelled = el?.closest?.("[data-cursor]") as HTMLElement | null;
       setActive(!!target);
-      setLabel(target?.dataset?.cursor ?? null);
+      setLabel(labelled?.dataset?.cursor ?? null);
     };
     const onLeave = () => setVisible(false);
 

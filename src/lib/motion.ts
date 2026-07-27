@@ -17,8 +17,8 @@ export const transition = (duration: number = DUR.base, delay = 0): Transition =
 
 /** Fade + translateY reveal (GPU-only properties). */
 export const fadeUp: Variants = {
-  hidden: { opacity: 0, y: 40 },
-  visible: { opacity: 1, y: 0, transition: transition(DUR.base) },
+  hidden: { opacity: 0, y: 40, scale: 0.96 },
+  visible: { opacity: 1, y: 0, scale: 1, transition: transition(DUR.base) },
 };
 
 export const fadeIn: Variants = {
