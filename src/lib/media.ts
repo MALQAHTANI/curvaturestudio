@@ -13,6 +13,15 @@ export function isVideo(url: string) {
   return VIDEO_EXT.some((e) => u.endsWith("." + e));
 }
 
+// روابط التخزين العامة لا تعمل لأن المخزن خاص — نمررها عبر مسار الموقع.
+export function mediaSrc(url: string | null | undefined): string {
+  if (!url) return "";
+  const marker = "/storage/v1/object/public/media/";
+  const i = url.indexOf(marker);
+  if (i === -1) return url;
+  return "/api/public/media/" + url.slice(i + marker.length);
+}
+
 export const MAX_UPLOAD_BYTES = 50 * 1024 * 1024; // حد الرفع في التخزين
 
 function extOf(name: string) {
