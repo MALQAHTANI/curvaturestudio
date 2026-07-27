@@ -11,9 +11,11 @@ export type LightboxItem = {
 export function Lightbox({
   item,
   onClose,
+  startIndex = 0,
 }: {
   item: LightboxItem | null;
   onClose: () => void;
+  startIndex?: number;
 }) {
   const [index, setIndex] = useState(0);
   const [visible, setVisible] = useState(false);
@@ -30,10 +32,10 @@ export function Lightbox({
       setVisible(false);
       return;
     }
-    setIndex(0);
+    setIndex(startIndex < (item.images.length ?? 0) ? startIndex : 0);
     const id = requestAnimationFrame(() => setVisible(true));
     return () => cancelAnimationFrame(id);
-  }, [item]);
+  }, [item, startIndex]);
 
   useEffect(() => setZoomed(false), [index, item]);
 
