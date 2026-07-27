@@ -52,7 +52,7 @@ function Index() {
 
       {/* Hero */}
       <motion.section
-        className="relative isolate overflow-hidden min-h-[92vh] flex flex-col justify-end px-6 md:px-12 pt-40 pb-16"
+        className="relative isolate overflow-hidden min-h-[100svh] flex flex-col justify-end px-6 md:px-12 pt-44 pb-24 md:pb-32"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: DUR.slow, ease: EASE, delay: 0.5 }}
@@ -97,46 +97,56 @@ function Index() {
         </motion.div>
       </motion.section>
 
-      {/* Featured work */}
-      <section className="border-t border-border px-6 md:px-12 py-16">
-        <Reveal className="flex items-baseline justify-between mb-10">
-          <p className="text-[11px] text-muted-foreground">SELECTED WORK</p>
-          <MotionNavLink to="/portfolio" className="text-[11px] border-b border-foreground pb-0.5">VIEW ALL ↗</MotionNavLink>
-        </Reveal>
-        <Stagger className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-12" stagger={0.09}>
-          {featured.map((p, i) => (
-            <StaggerItem key={p.id}>
-              <div className="group">
-              {p.cover_image && (
-                <GalleryTile
-                  src={p.cover_image}
-                  title={p.title}
-                  category="PROJECT"
-                  index={i}
-                  onOpen={() => navigate({ to: "/portfolio/projects" })}
-                  className="block w-full text-left"
-                  mediaClassName="aspect-[4/3] w-full h-full object-cover bg-white/5"
-                />
-              )}
-              <div className="flex justify-between mt-4 text-[11px] gap-4 transition-colors duration-500 group-hover:text-foreground">
-                <div className="flex gap-3 min-w-0">
-                  <span className="text-muted-foreground shrink-0">{String(i + 1).padStart(2, "0")}</span>
-                  <span className="truncate">{p.title}</span>
-                </div>
-                <span className="text-muted-foreground shrink-0">{p.year ?? ""}</span>
-              </div>
-              </div>
-            </StaggerItem>
-          ))}
-        </Stagger>
+      {/* Featured work — editorial rhythm, sticky index column */}
+      <section className="border-t border-border px-6 md:px-12 py-28 md:py-40">
+        <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,14rem)_minmax(0,1fr)] gap-y-12 lg:gap-x-16">
+          <div className="lg:sticky lg:top-28 lg:self-start">
+            <Reveal className="flex items-baseline justify-between lg:block">
+              <p className="text-[11px] text-muted-foreground">SELECTED WORK</p>
+              <MotionNavLink to="/portfolio" className="text-[11px] border-b border-foreground pb-0.5 lg:mt-6 lg:inline-block">
+                VIEW ALL ↗
+              </MotionNavLink>
+            </Reveal>
+          </div>
+          <Stagger className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 md:gap-x-16 gap-y-24 md:gap-y-32" stagger={0.09}>
+            {featured.map((p, i) => {
+              const offset = i % 4 === 1 ? "sm:mt-24" : i % 4 === 2 ? "sm:-mt-8" : i % 4 === 3 ? "sm:mt-16" : "";
+              const ratio = i % 3 === 0 ? "aspect-[4/5]" : i % 3 === 1 ? "aspect-[16/11]" : "aspect-square";
+              return (
+                <StaggerItem key={p.id} className={offset}>
+                  <div className="group">
+                    {p.cover_image && (
+                      <GalleryTile
+                        src={p.cover_image}
+                        title={p.title}
+                        category="PROJECT"
+                        index={i}
+                        onOpen={() => navigate({ to: "/portfolio/projects" })}
+                        className="block w-full text-left"
+                        mediaClassName={`${ratio} w-full h-full object-cover bg-white/5`}
+                      />
+                    )}
+                    <div className="flex justify-between mt-6 text-[11px] gap-4 transition-colors duration-500 group-hover:text-foreground">
+                      <div className="flex gap-3 min-w-0">
+                        <span className="text-muted-foreground shrink-0">{String(i + 1).padStart(2, "0")}</span>
+                        <span className="truncate">{p.title}</span>
+                      </div>
+                      <span className="text-muted-foreground shrink-0">{p.year ?? ""}</span>
+                    </div>
+                  </div>
+                </StaggerItem>
+              );
+            })}
+          </Stagger>
+        </div>
       </section>
 
       {/* Services */}
-      <section className="border-t border-border px-6 md:px-12 py-16">
+      <section className="border-t border-border px-6 md:px-12 py-28 md:py-40">
         <Reveal>
-          <p className="text-[11px] text-muted-foreground mb-10">SERVICES</p>
+          <p className="text-[11px] text-muted-foreground mb-16">SERVICES</p>
         </Reveal>
-        <Stagger as="ul" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-12" stagger={0.07}>
+        <Stagger as="ul" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-12 gap-y-20" stagger={0.07}>
           {(services as any[]).filter((s) => s.published).map((s, i) => (
             <StaggerItem as="li" key={s.id}>
               <span className="text-[11px] text-muted-foreground">{String(i + 1).padStart(2, "0")}</span>
@@ -152,7 +162,7 @@ function Index() {
       </section>
 
       {/* CTA */}
-      <section className="border-t border-border px-6 md:px-12 py-40 text-center">
+      <section className="border-t border-border px-6 md:px-12 py-48 md:py-64 text-center">
         <RevealLines as="h2" className="display-lg" lines={["LET'S BUILD", "SOMETHING."]} inView />
         <Reveal className="mt-12" delay={0.2}>
           <MotionNavLink to="/contact" className="inline-block text-[11px] border-b border-foreground pb-1">

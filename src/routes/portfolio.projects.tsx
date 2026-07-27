@@ -62,9 +62,9 @@ function ProjectsGallery() {
   return (
     <div className="min-h-screen bg-background text-foreground">
       <SiteHeader />
-      <section className="px-6 md:px-12 pt-40 pb-10">
+      <section className="px-6 md:px-12 pt-48 pb-20 md:pb-28">
         <Reveal>
-          <p className="text-[11px] text-muted-foreground mb-4">PORTFOLIO / SELECTED WORK</p>
+          <p className="text-[11px] text-muted-foreground mb-6">PORTFOLIO / SELECTED WORK</p>
         </Reveal>
         <RevealLines
           className="text-3xl md:text-5xl"
@@ -72,22 +72,27 @@ function ProjectsGallery() {
           delay={0.15}
         />
       </section>
-      <section className="border-t border-border px-6 md:px-12 py-12">
-        <div className="columns-1 sm:columns-2 lg:columns-3 gap-5 md:gap-8 [column-fill:_balance]">
-          {tiles.map((t, i) => (
-            <GalleryTile
-              key={t.id}
-              src={t.coverImage}
-              title={t.title}
-              category={t.category}
-              index={i}
-              onOpen={() =>
-                setActive({ title: t.title, category: t.category, description: t.description, images: t.images })
-              }
-              className="mb-5 md:mb-8 block w-full break-inside-avoid text-left"
-              mediaClassName="w-full h-auto object-contain bg-white/5"
-            />
-          ))}
+      <section className="border-t border-border px-6 md:px-12 py-20 md:py-32">
+        <div className="columns-1 sm:columns-2 lg:columns-3 gap-10 md:gap-20 [column-fill:_balance]">
+          {tiles.map((t, i) => {
+            // Uneven editorial rhythm: alternate widths and vertical air.
+            const width = i % 5 === 1 ? "w-[86%]" : i % 5 === 3 ? "w-[92%] ml-auto" : "w-full";
+            const air = i % 3 === 0 ? "mb-16 md:mb-32" : i % 3 === 1 ? "mb-20 md:mb-40" : "mb-14 md:mb-24";
+            return (
+              <GalleryTile
+                key={t.id}
+                src={t.coverImage}
+                title={t.title}
+                category={t.category}
+                index={i}
+                onOpen={() =>
+                  setActive({ title: t.title, category: t.category, description: t.description, images: t.images })
+                }
+                className={`${air} ${width} block break-inside-avoid text-left`}
+                mediaClassName="w-full h-auto object-contain bg-white/5"
+              />
+            );
+          })}
         </div>
       </section>
       <Lightbox item={active} onClose={() => setActive(null)} />

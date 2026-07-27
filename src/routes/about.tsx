@@ -24,7 +24,7 @@ function About() {
   return (
     <div className="min-h-screen bg-background text-foreground">
       <SiteHeader />
-      <section className="px-6 md:px-12 pt-40 pb-16 max-w-4xl">
+      <section className="px-6 md:px-12 pt-48 pb-24 md:pb-36 max-w-4xl">
         <Reveal>
           <p className="text-[11px] text-muted-foreground mb-6">ABOUT</p>
         </Reveal>
@@ -38,7 +38,7 @@ function About() {
           <StaggerItem as="p">Curvature Studio is a creative media production studio founded in 2016, based in Saudi Arabia. We craft visually compelling content for global and regional brands — commercial campaigns, behind-the-scenes storytelling, and visuals that resonate.</StaggerItem>
           <StaggerItem as="p">Over the years we've partnered with automotive icons, luxury brands, and cultural institutions across the region — building a body of work defined by craft, restraint, and cinematic intent.</StaggerItem>
         </Stagger>
-        <Stagger className="mt-14 grid grid-cols-3 gap-6 max-w-xl" stagger={0.12}>
+        <Stagger className="mt-20 grid grid-cols-3 gap-8 max-w-xl" stagger={0.12}>
           {[
             { value: new Date().getFullYear() - 2016, suffix: "+", label: "YEARS" },
             { value: svcs.length, suffix: "", label: "SERVICES" },
@@ -54,11 +54,11 @@ function About() {
         </Stagger>
       </section>
 
-      <section className="border-t border-border px-6 md:px-12 py-16">
+      <section className="border-t border-border px-6 md:px-12 py-28 md:py-40">
         <Reveal>
-          <p className="text-[11px] text-muted-foreground mb-10">SERVICES</p>
+          <p className="text-[11px] text-muted-foreground mb-16">SERVICES</p>
         </Reveal>
-        <Stagger as="ul" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-12" stagger={0.07}>
+        <Stagger as="ul" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-12 gap-y-20" stagger={0.07}>
           {svcs.map((s, i) => (
             <StaggerItem as="li" key={s.id}>
               <span className="text-[11px] text-muted-foreground">{String(i + 1).padStart(2, "0")}</span>
@@ -73,9 +73,9 @@ function About() {
         </Stagger>
       </section>
 
-      <section className="border-t border-border px-6 md:px-12 py-16">
+      <section className="border-t border-border px-6 md:px-12 py-28 md:py-40">
         <Reveal>
-          <p className="text-[11px] text-muted-foreground mb-10">CLIENTS</p>
+          <p className="text-[11px] text-muted-foreground mb-16">CLIENTS</p>
         </Reveal>
         <Reveal delay={0.1} className="border-y border-border py-6">
           <Marquee speed={45} className="[mask-image:linear-gradient(to_right,transparent,black_8%,black_92%,transparent)]">
