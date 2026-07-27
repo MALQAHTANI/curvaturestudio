@@ -10,6 +10,7 @@ import { Reveal, RevealLines, Stagger, StaggerItem } from "@/components/motion/p
 import { GalleryTile } from "@/components/motion/gallery-tile";
 import { Parallax } from "@/components/motion/parallax";
 import { MotionNavLink } from "@/components/motion/button";
+import { ScrollIndicator } from "@/components/motion/scroll-indicator";
 import { DUR, EASE } from "@/lib/motion";
 
 export const Route = createFileRoute("/")({
@@ -58,9 +59,17 @@ function Index() {
         transition={{ duration: DUR.slow, ease: EASE, delay: 0.5 }}
       >
         <Parallax className="absolute inset-0 -z-10" distance={60}>
-          <div aria-hidden className="hero-bg" />
-          <div aria-hidden className="hero-globe" />
-          <div aria-hidden className="hero-sweep" />
+          <motion.div
+            className="absolute inset-0"
+            initial={{ scale: 1.06, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ duration: 2, ease: EASE, delay: 0.4 }}
+            style={{ willChange: "transform, opacity" }}
+          >
+            <div aria-hidden className="hero-bg" />
+            <div aria-hidden className="hero-globe" />
+            <div aria-hidden className="hero-sweep" />
+          </motion.div>
         </Parallax>
         <motion.p
           className="relative text-[11px] text-muted-foreground mb-6"
@@ -95,10 +104,11 @@ function Index() {
             VIEW OUR WORK ↗
           </MotionNavLink>
         </motion.div>
+        <ScrollIndicator />
       </motion.section>
 
       {/* Featured work — editorial rhythm, sticky index column */}
-      <section className="border-t border-border px-6 md:px-12 py-28 md:py-40">
+      <section className="border-t border-border px-6 md:px-12 py-32 md:py-52">
         <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,14rem)_minmax(0,1fr)] gap-y-12 lg:gap-x-16">
           <div className="lg:sticky lg:top-28 lg:self-start">
             <Reveal className="flex items-baseline justify-between lg:block">
@@ -142,7 +152,7 @@ function Index() {
       </section>
 
       {/* Services */}
-      <section className="border-t border-border px-6 md:px-12 py-28 md:py-40">
+      <section className="border-t border-border px-6 md:px-12 py-32 md:py-52">
         <Reveal>
           <p className="text-[11px] text-muted-foreground mb-16">SERVICES</p>
         </Reveal>
