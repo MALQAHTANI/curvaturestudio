@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { SiteHeader, SiteFooter } from "@/components/site-chrome";
 import { uploadMedia, isVideo, acceptedMime, mediaSrc, mediaThumb } from "@/lib/media";
+import { Lightbox, type LightboxItem } from "@/components/lightbox";
 
 // مصغّرة تظهر دائماً: مصغّرة الخدمة ← الملف الأصلي ← بديل نصي بالصيغة
 function Thumb({ url, alt, width = 480 }: { url: string; alt?: string; width?: number }) {
@@ -220,6 +221,18 @@ function SectionEditor({ table, label }: { table: "projects" | "studio_items"; l
   const [items, setItems] = useState<Item[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
+  const [viewer, setViewer] = useState<{ item: LightboxItem; index: number } | null>(null);
+
+  function openViewer(it: Item, index: number) {
+    setViewer({
+      item: {
+        title: it.title,
+        description: it.description ?? undefined,
+        images: it.media_urls.map((m) => mediaSrc(m)),
+      },
+      index,
+    });
+  }
 
   async function refresh() {
     setLoading(true);
@@ -259,19 +272,32 @@ function SectionEditor({ table, label }: { table: "projects" | "studio_items"; l
         <ul className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {items.map((it) => (
             <li key={it.id} className="border border-border">
-              <div className="aspect-[4/3] bg-white/5 overflow-hidden">
-                {(() => {
-                  const raw = it.cover_image ?? it.media_urls[0] ?? null;
-                  if (!raw) return null;
-                  return <Thumb url={raw} alt={it.title} width={640} />;
-                })()}
-              </div>
+              {(() => {
+                const raw = it.cover_image ?? it.media_urls[0] ?? null;
+                const coverIndex = raw ? Math.max(0, it.media_urls.indexOf(raw)) : 0;
+                return (
+                  <button
+                    type="button"
+                    onClick={() => raw && openViewer(it, coverIndex)}
+                    aria-label={`معاينة ${it.title}`}
+                    className="block w-full aspect-[4/3] bg-white/5 overflow-hidden cursor-zoom-in"
+                  >
+                    {raw ? <Thumb url={raw} alt={it.title} width={640} /> : null}
+                  </button>
+                );
+              })()}
               {it.media_urls.length > 1 && (
                 <div className="flex gap-1 overflow-x-auto p-1 border-t border-border">
-                  {it.media_urls.map((m) => (
-                    <div key={m} className="w-12 h-12 shrink-0 bg-white/5 overflow-hidden">
+                  {it.media_urls.map((m, i) => (
+                    <button
+                      key={m}
+                      type="button"
+                      onClick={() => openViewer(it, i)}
+                      aria-label={`معاينة الوسيط ${i + 1}`}
+                      className="w-12 h-12 shrink-0 bg-white/5 overflow-hidden cursor-zoom-in"
+                    >
                       <Thumb url={m} width={128} />
-                    </div>
+                    </button>
                   ))}
                 </div>
               )}
@@ -288,6 +314,8 @@ function SectionEditor({ table, label }: { table: "projects" | "studio_items"; l
           ))}
         </ul>
       )}
+
+      <Lightbox item={viewer?.item ?? null} startIndex={viewer?.index ?? 0} onClose={() => setViewer(null)} />
     </div>
   );
 }
