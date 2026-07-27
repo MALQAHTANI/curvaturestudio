@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { AnimatePresence, motion } from "motion/react";
+import { AnimatePresence, motion, useMotionValue } from "motion/react";
 import { isVideo } from "@/lib/media";
 import { DUR, EASE } from "@/lib/motion";
 import { useMotionEnabled } from "@/components/motion/use-motion-enabled";
@@ -22,11 +22,35 @@ export function Lightbox({
   startIndex?: number;
 }) {
   const [index, setIndex] = useState(0);
-  const [zoomed, setZoomed] = useState(false);
+  const [scale, setScale] = useState(1);
   const [dir, setDir] = useState(1);
   const touchX = useRef<number | null>(null);
   const enabled = useMotionEnabled();
   const [mounted, setMounted] = useState(false);
+  const panX = useMotionValue(0);
+  const panY = useMotionValue(0);
+
+  const MIN = 1;
+  const MAX = 4;
+  const clamp = (v: number) => Math.min(MAX, Math.max(MIN, Math.round(v * 100) / 100));
+  const resetZoom = useCallback(() => {
+    setScale(1);
+    panX.set(0);
+    panY.set(0);
+  }, [panX, panY]);
+  const zoomIn = useCallback(() => setScale((s) => clamp(s + 0.5)), []);
+  const zoomOut = useCallback(
+    () =>
+      setScale((s) => {
+        const n = clamp(s - 0.5);
+        if (n === 1) {
+          panX.set(0);
+          panY.set(0);
+        }
+        return n;
+      }),
+    [panX, panY],
+  );
 
   useEffect(() => setMounted(true), []);
 
@@ -46,7 +70,9 @@ export function Lightbox({
     setIndex(startIndex < (item.images.length ?? 0) ? startIndex : 0);
   }, [item, startIndex]);
 
-  useEffect(() => setZoomed(false), [index, item]);
+  useEffect(() => {
+    resetZoom();
+  }, [index, item, resetZoom]);
 
   // preload neighbours
   useEffect(() => {
@@ -68,13 +94,16 @@ export function Lightbox({
       if (e.key === "Escape") onClose();
       else if (e.key === "ArrowRight") next();
       else if (e.key === "ArrowLeft") prev();
+      else if (e.key === "+" || e.key === "=") zoomIn();
+      else if (e.key === "-" || e.key === "_") zoomOut();
+      else if (e.key === "0") resetZoom();
     };
     window.addEventListener("keydown", onKey);
     return () => {
       window.removeEventListener("keydown", onKey);
       document.body.style.overflow = prevOverflow;
     };
-  }, [item, onClose, next, prev]);
+  }, [item, onClose, next, prev, zoomIn, zoomOut, resetZoom]);
 
   const src = item?.images[index] ?? "";
 
