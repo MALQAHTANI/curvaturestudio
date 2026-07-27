@@ -2,7 +2,47 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { SiteHeader, SiteFooter } from "@/components/site-chrome";
-import { uploadMedia, isVideo, acceptedMime, mediaSrc } from "@/lib/media";
+import { uploadMedia, isVideo, acceptedMime, mediaSrc, mediaThumb } from "@/lib/media";
+
+// مصغّرة تظهر دائماً: مصغّرة الخدمة ← الملف الأصلي ← بديل نصي بالصيغة
+function Thumb({ url, alt, width = 480 }: { url: string; alt?: string; width?: number }) {
+  const [stage, setStage] = useState<0 | 1 | 2>(0);
+  const ext = (url.toLowerCase().split("?")[0].split(".").pop() ?? "FILE").toUpperCase();
+
+  if (isVideo(url)) {
+    return stage === 2 ? (
+      <Fallback label={ext} />
+    ) : (
+      <video
+        src={mediaSrc(url)}
+        className="w-full h-full object-cover"
+        muted
+        playsInline
+        preload="metadata"
+        onError={() => setStage(2)}
+      />
+    );
+  }
+  if (stage === 2) return <Fallback label={ext} />;
+  return (
+    <img
+      src={stage === 0 ? mediaThumb(url, width) : mediaSrc(url)}
+      alt={alt ?? ""}
+      loading="lazy"
+      decoding="async"
+      className="w-full h-full object-cover"
+      onError={() => setStage((s) => (s === 0 ? 1 : 2))}
+    />
+  );
+}
+
+function Fallback({ label }: { label: string }) {
+  return (
+    <div className="w-full h-full flex items-center justify-center text-[9px] tracking-[0.15em] text-muted-foreground">
+      {label}
+    </div>
+  );
+}
 
 type Tab = "projects" | "studio" | "messages";
 type Message = {
@@ -223,23 +263,14 @@ function SectionEditor({ table, label }: { table: "projects" | "studio_items"; l
                 {(() => {
                   const raw = it.cover_image ?? it.media_urls[0] ?? null;
                   if (!raw) return null;
-                  const src = mediaSrc(raw);
-                  return isVideo(raw) ? (
-                    <video src={src} className="w-full h-full object-cover" muted playsInline preload="metadata" />
-                  ) : (
-                    <img src={src} alt={it.title} loading="lazy" decoding="async" className="w-full h-full object-cover" />
-                  );
+                  return <Thumb url={raw} alt={it.title} width={640} />;
                 })()}
               </div>
               {it.media_urls.length > 1 && (
                 <div className="flex gap-1 overflow-x-auto p-1 border-t border-border">
                   {it.media_urls.map((m) => (
                     <div key={m} className="w-12 h-12 shrink-0 bg-white/5 overflow-hidden">
-                      {isVideo(m) ? (
-                        <video src={mediaSrc(m)} className="w-full h-full object-cover" muted playsInline preload="metadata" />
-                      ) : (
-                        <img src={mediaSrc(m)} alt="" loading="lazy" decoding="async" className="w-full h-full object-cover" />
-                      )}
+                      <Thumb url={m} width={128} />
                     </div>
                   ))}
                 </div>
