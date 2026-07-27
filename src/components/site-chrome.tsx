@@ -1,5 +1,8 @@
 import { Link } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
+import { AnimatePresence, motion, useMotionValueEvent, useScroll } from "motion/react";
+import { DUR, EASE, fadeUp, staggerParent, viewportOnce } from "@/lib/motion";
+import { useMotionEnabled } from "@/components/motion/use-motion-enabled";
 
 const NAV = [
   { to: "/", label: "HOME" },
@@ -9,11 +12,28 @@ const NAV = [
 ] as const;
 
 export function SiteHeader() {
+  const { scrollY } = useScroll();
+  const [scrolled, setScrolled] = useState(false);
+  useMotionValueEvent(scrollY, "change", (v) => setScrolled(v > 24));
+
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 md:px-12 py-5 bg-background/40 backdrop-blur-md border-b border-border/60">
+    <motion.header
+      className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 md:px-12 border-b"
+      initial={false}
+      animate={{
+        paddingTop: scrolled ? 12 : 20,
+        paddingBottom: scrolled ? 12 : 20,
+        backgroundColor: scrolled ? "rgba(0,0,0,0.55)" : "rgba(0,0,0,0)",
+        backdropFilter: scrolled ? "blur(14px)" : "blur(0px)",
+        boxShadow: scrolled ? "0 10px 30px -18px rgba(0,0,0,0.9)" : "0 0px 0px 0px rgba(0,0,0,0)",
+        borderColor: scrolled ? "var(--border)" : "rgba(0,0,0,0)",
+      }}
+      transition={{ duration: DUR.fast, ease: EASE }}
+      style={{ willChange: "transform, opacity" }}
+    >
       <Link
         to="/"
-        className="text-[15px] font-medium tracking-tight normal-case"
+        className="nav-underline text-[15px] font-medium tracking-tight normal-case"
         style={{ fontFamily: "Jost, sans-serif", letterSpacing: "-0.01em" }}
         aria-label="Curvature Studio"
       >
@@ -25,6 +45,7 @@ export function SiteHeader() {
           <Link
             key={n.to}
             to={n.to}
+            className="nav-underline"
             activeProps={{ className: "text-foreground" }}
             inactiveProps={{ className: "text-muted-foreground hover:text-foreground transition-colors" }}
           >
@@ -34,7 +55,7 @@ export function SiteHeader() {
       </nav>
 
       <span className="w-[1px]" aria-hidden />
-    </header>
+    </motion.header>
   );
 }
 
