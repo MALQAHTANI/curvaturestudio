@@ -72,7 +72,7 @@ function ProjectsGallery() {
           delay={0.15}
         />
       </section>
-      <section className="border-t border-border px-6 md:px-12 py-20 md:py-32">
+      <section className="border-t border-border px-6 md:px-12 py-24 md:py-48">
         <div className="columns-1 sm:columns-2 lg:columns-3 gap-10 md:gap-20 [column-fill:_balance]">
           {tiles.map((t, i) => {
             // Uneven editorial rhythm: alternate widths and vertical air.

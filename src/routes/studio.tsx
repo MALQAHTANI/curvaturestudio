@@ -39,7 +39,7 @@ function StudioPage() {
         </Reveal>
         <RevealLines className="display-lg" lines={["FROM THE", "STUDIO."]} delay={0.15} />
       </section>
-      <section className="border-t border-border px-6 md:px-12 py-20 md:py-32">
+      <section className="border-t border-border px-6 md:px-12 py-24 md:py-48">
         {loading ? (
           <p className="text-[11px] text-muted-foreground">LOADING…</p>
         ) : items.length === 0 ? (

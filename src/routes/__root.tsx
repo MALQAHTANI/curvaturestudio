@@ -17,6 +17,7 @@ import { PageLoader } from "../components/motion/page-loader";
 import { PageTransition } from "../components/motion/page-transition";
 import { SmoothScroll } from "../components/motion/smooth-scroll";
 import { ScrollProgress } from "../components/motion/scroll-progress";
+import { ScrollToTop } from "../components/motion/scroll-to-top";
 
 function NotFoundComponent() {
   return (
@@ -140,6 +141,7 @@ function RootComponent() {
       <PageTransition>
         <Outlet />
       </PageTransition>
+      <ScrollToTop />
       <AccessibilityWidget />
     </QueryClientProvider>
   );
