@@ -8,9 +8,9 @@ export const Route = createFileRoute("/studio")({
   head: () => ({
     meta: [
       { title: "Studio — Curvature Studio" },
-      { name: "description", content: "من داخل الاستديو — لحظات وأعمال من فريق Curvature." },
+      { name: "description", content: "Inside the studio — moments and work from the Curvature team." },
       { property: "og:title", content: "Studio — Curvature Studio" },
-      { property: "og:description", content: "من داخل الاستديو — Curvature." },
+      { property: "og:description", content: "Inside the studio — Curvature." },
     ],
   }),
   component: StudioPage,
@@ -39,7 +39,7 @@ function StudioPage() {
         {loading ? (
           <p className="text-[11px] text-muted-foreground">LOADING…</p>
         ) : items.length === 0 ? (
-          <p className="text-[11px] text-muted-foreground">لا يوجد محتوى للاستديو حالياً.</p>
+          <p className="text-[11px] text-muted-foreground">NO STUDIO CONTENT YET.</p>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-12">
             {items.map((p, i) => {

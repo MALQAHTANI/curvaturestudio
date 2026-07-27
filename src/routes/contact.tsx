@@ -29,7 +29,7 @@ function Contact() {
     const email = String(fd.get("email") ?? "").trim();
     const company = String(fd.get("company") ?? "").trim();
     const message = String(fd.get("message") ?? "").trim();
-    if (!name || !email || !message) { setError("الرجاء تعبئة الحقول المطلوبة."); return; }
+    if (!name || !email || !message) { setError("Please fill in the required fields."); return; }
     setError(null); setSending(true);
     const { error: err } = await supabase.from("contact_messages").insert({
       name: name.slice(0, 100),
@@ -38,7 +38,7 @@ function Contact() {
       message: message.slice(0, 5000),
     });
     setSending(false);
-    if (err) { setError("تعذّر إرسال الرسالة، حاول مرة أخرى."); return; }
+    if (err) { setError("Couldn't send your message. Please try again."); return; }
     setSent(true);
     form.reset();
   }
