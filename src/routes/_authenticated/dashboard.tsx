@@ -2,7 +2,7 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { SiteHeader, SiteFooter } from "@/components/site-chrome";
-import { uploadMedia, isVideo, acceptedMime } from "@/lib/media";
+import { uploadMedia, isVideo, acceptedMime, mediaSrc } from "@/lib/media";
 
 type Tab = "projects" | "studio" | "messages";
 type Message = {
@@ -220,17 +220,16 @@ function SectionEditor({ table, label }: { table: "projects" | "studio_items"; l
           {items.map((it) => (
             <li key={it.id} className="border border-border">
               <div className="aspect-[4/3] bg-white/5 overflow-hidden">
-                {it.cover_image ? (
-                  isVideo(it.cover_image) ? (
-                    <video src={it.cover_image} className="w-full h-full object-cover" muted />
+                {(() => {
+                  const raw = it.cover_image ?? it.media_urls[0] ?? null;
+                  if (!raw) return null;
+                  const src = mediaSrc(raw);
+                  return isVideo(raw) ? (
+                    <video src={src} className="w-full h-full object-cover" muted />
                   ) : (
-                    <img src={it.cover_image} alt={it.title} className="w-full h-full object-cover" />
-                  )
-                ) : it.media_urls[0] ? (
-                  isVideo(it.media_urls[0])
-                    ? <video src={it.media_urls[0]} className="w-full h-full object-cover" muted />
-                    : <img src={it.media_urls[0]} alt={it.title} className="w-full h-full object-cover" />
-                ) : null}
+                    <img src={src} alt={it.title} className="w-full h-full object-cover" />
+                  );
+                })()}
               </div>
               <div className="p-4">
                 <div className="text-[12px] normal-case tracking-normal truncate" style={{ fontFamily: "Jost, sans-serif" }}>{it.title}</div>
@@ -314,13 +313,16 @@ function ItemForm({ table, onDone }: { table: "projects" | "studio_items"; onDon
       <div>
         <label className="block text-[11px] text-muted-foreground mb-2">MEDIA (صور / فيديوهات)</label>
         <input
-          type="file" accept="image/*,video/*" multiple onChange={onPick}
+          type="file"
+          accept="image/*,video/*,.mp4,.mov,.m4v,.webm,.mkv,.avi,.ogv,.3gp,.heic,.heif"
+          multiple onChange={onPick}
           className="block w-full text-[11px] normal-case tracking-normal file:mr-3 file:px-3 file:py-2 file:border file:border-border file:bg-transparent file:text-foreground file:text-[10px] file:tracking-[0.15em] file:cursor-pointer"
           style={{ fontFamily: "Jost, sans-serif" }}
         />
         {files.length > 0 && (
           <p className="mt-2 text-[10px] text-muted-foreground">{files.length} ملف مقبول</p>
         )}
+        <p className="mt-1 text-[10px] text-muted-foreground">الحد الأقصى 50 ميجابايت للملف الواحد</p>
         {rejected.length > 0 && (
           <p className="mt-1 text-[10px] text-destructive normal-case tracking-normal" style={{ fontFamily: "Jost, sans-serif" }}>
             رُفض (صيغة غير مدعومة): {rejected.join(", ")}

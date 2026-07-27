@@ -5,7 +5,7 @@ import { SiteHeader, SiteFooter } from "@/components/site-chrome";
 import projects from "@/data/projects.json";
 import services from "@/data/services.json";
 import { supabase } from "@/integrations/supabase/client";
-import { isVideo } from "@/lib/media";
+import { isVideo, mediaSrc } from "@/lib/media";
 
 export const Route = createFileRoute("/")({
   component: Index,
@@ -19,7 +19,7 @@ function Index() {
   useEffect(() => {
     supabase.from("projects").select("id,title,cover_image,media_urls,sort_order,created_at")
       .eq("published", true).order("sort_order", { ascending: true }).order("created_at", { ascending: false }).limit(6)
-      .then(({ data }) => setDbItems((data as any[])?.map(d => ({ ...d, cover_image: d.cover_image ?? d.media_urls?.[0] })) ?? []));
+      .then(({ data }) => setDbItems((data as any[])?.map(d => ({ ...d, cover_image: mediaSrc(d.cover_image ?? d.media_urls?.[0]) || null })) ?? []));
   }, []);
   const featured = [...dbItems, ...staticFeatured].slice(0, 6);
 

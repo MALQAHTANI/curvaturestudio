@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { SiteHeader, SiteFooter } from "@/components/site-chrome";
 import { supabase } from "@/integrations/supabase/client";
-import { isVideo } from "@/lib/media";
+import { isVideo, mediaSrc } from "@/lib/media";
 import { Lightbox, type LightboxItem } from "@/components/lightbox";
 import { REFERENCE_PROJECTS } from "@/data/portfolio-reference";
 
@@ -50,9 +50,13 @@ function ProjectsGallery() {
   }, []);
   const dbTiles: Tile[] = dbItems
     .map((it) => {
-      const cover = it.cover_image ?? it.media_urls?.[0] ?? null;
+      const cover = mediaSrc(it.cover_image ?? it.media_urls?.[0]) || null;
       const images: string[] = Array.from(
-        new Set([cover, ...((it.media_urls as string[]) ?? [])].filter(Boolean) as string[]),
+        new Set(
+          [cover, ...((it.media_urls as string[]) ?? []).map((u) => mediaSrc(u))].filter(
+            Boolean,
+          ) as string[],
+        ),
       );
       return {
         id: it.id,
