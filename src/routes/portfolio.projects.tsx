@@ -1,9 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
+import { motion } from "motion/react";
 import { SiteHeader, SiteFooter } from "@/components/site-chrome";
 import { supabase } from "@/integrations/supabase/client";
 import { isVideo, mediaSrc } from "@/lib/media";
 import { Lightbox, type LightboxItem } from "@/components/lightbox";
+import { Reveal, RevealLines } from "@/components/motion/primitives";
+import { DUR, EASE, viewportOnce } from "@/lib/motion";
 
 export const Route = createFileRoute("/portfolio/projects")({
   head: () => ({
@@ -61,22 +64,33 @@ function ProjectsGallery() {
     <div className="min-h-screen bg-background text-foreground">
       <SiteHeader />
       <section className="px-6 md:px-12 pt-40 pb-10">
-        <p className="text-[11px] text-muted-foreground mb-4">PORTFOLIO / SELECTED WORK</p>
-        <h1 className="text-3xl md:text-5xl" style={{ fontFamily: "Jost, sans-serif", letterSpacing: "-0.02em" }}>
-          Selected Work
-        </h1>
+        <Reveal>
+          <p className="text-[11px] text-muted-foreground mb-4">PORTFOLIO / SELECTED WORK</p>
+        </Reveal>
+        <RevealLines
+          className="text-3xl md:text-5xl"
+          lines={["Selected Work"]}
+          delay={0.15}
+        />
       </section>
       <section className="border-t border-border px-6 md:px-12 py-12">
         <div className="columns-1 sm:columns-2 lg:columns-3 gap-5 md:gap-8 [column-fill:_balance]">
-          {tiles.map((t) => (
-            <button
+          {tiles.map((t, i) => (
+            <motion.button
               key={t.id}
               type="button"
+              data-cursor="View Project"
+              initial={{ opacity: 0, y: 40 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={viewportOnce}
+              transition={{ duration: DUR.base, ease: EASE, delay: Math.min(i, 5) * 0.06 }}
+              whileHover={{ y: -8, scale: 1.02 }}
+              whileTap={{ scale: 0.99 }}
               onClick={() =>
                 setActive({ title: t.title, category: t.category, description: t.description, images: t.images })
               }
               aria-label={`Open gallery: ${t.title}`}
-              className="group relative mb-5 md:mb-8 block w-full break-inside-avoid overflow-hidden rounded-2xl bg-white/5 text-left shadow-[0_10px_40px_-15px_rgba(0,0,0,0.6)] transition-shadow duration-500 hover:shadow-[0_20px_60px_-15px_rgba(0,0,0,0.8)]"
+              className="group relative mb-5 md:mb-8 block w-full break-inside-avoid overflow-hidden rounded-2xl bg-white/5 text-left shadow-[0_10px_40px_-15px_rgba(0,0,0,0.6)] transition-shadow duration-500 hover:shadow-[0_28px_70px_-20px_rgba(0,0,0,0.9)] will-change-transform"
             >
               {isVideo(t.coverImage) ? (
                 <video src={t.coverImage} className="w-full h-auto object-contain" muted loop playsInline autoPlay />
@@ -86,20 +100,23 @@ function ProjectsGallery() {
                   alt={t.title}
                   loading="lazy"
                   decoding="async"
-                  className="w-full h-auto object-contain transition-transform duration-700 group-hover:scale-[1.04]"
+                  className="w-full h-auto object-contain will-change-transform transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.06]"
                 />
               )}
-              <span className="pointer-events-none absolute inset-x-0 bottom-0 bg-gradient-to-t from-background/90 to-transparent px-4 pb-4 pt-12 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
+              <span className="pointer-events-none absolute inset-x-0 bottom-0 bg-gradient-to-t from-background/90 to-transparent px-4 pb-4 pt-12 opacity-0 transition-opacity duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:opacity-100">
                 {t.category && (
                   <span className="mb-1 block text-[10px] tracking-[0.2em] text-muted-foreground uppercase">
                     {t.category}
                   </span>
                 )}
-                <span className="block text-xs md:text-sm text-foreground" style={{ fontFamily: "Jost, sans-serif" }}>
+                <span
+                  className="block text-xs md:text-sm text-foreground translate-y-2 transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:translate-y-0"
+                  style={{ fontFamily: "Jost, sans-serif" }}
+                >
                   {t.title}
                 </span>
               </span>
-            </button>
+            </motion.button>
           ))}
         </div>
       </section>

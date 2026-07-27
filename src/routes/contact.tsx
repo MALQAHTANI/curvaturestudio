@@ -2,6 +2,8 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { SiteHeader, SiteFooter } from "@/components/site-chrome";
 import { supabase } from "@/integrations/supabase/client";
+import { Reveal, RevealLines, Stagger, StaggerItem } from "@/components/motion/primitives";
+import { MotionButton } from "@/components/motion/button";
 
 export const Route = createFileRoute("/contact")({
   head: () => ({
@@ -46,19 +48,24 @@ function Contact() {
     <div className="min-h-screen bg-background text-foreground">
       <SiteHeader />
       <section className="px-6 md:px-12 pt-40 pb-16">
-        <p className="text-[11px] text-muted-foreground mb-6">CONTACT</p>
-        <h1 className="display-lg">LET'S<br />TALK.</h1>
-        <p className="mt-8 max-w-lg text-muted-foreground normal-case tracking-normal" style={{ ...formStyle, fontSize: "14px", lineHeight: 1.6 }}>
-          Tell us about your project. We reply within 48 hours.
-        </p>
+        <Reveal>
+          <p className="text-[11px] text-muted-foreground mb-6">CONTACT</p>
+        </Reveal>
+        <RevealLines className="display-lg" lines={["LET'S", "TALK."]} delay={0.15} />
+        <Reveal delay={0.35} className="mt-8 max-w-lg">
+          <p className="text-muted-foreground normal-case tracking-normal" style={{ ...formStyle, fontSize: "14px", lineHeight: 1.6 }}>
+            Tell us about your project. We reply within 48 hours.
+          </p>
+        </Reveal>
       </section>
 
       <section className="border-t border-border px-6 md:px-12 py-16">
-        <div className="grid md:grid-cols-2 gap-16 max-w-5xl">
-          <form
+        <Stagger className="grid md:grid-cols-2 gap-16 max-w-5xl" stagger={0.12}>
+          <StaggerItem
+            as="form"
             className="space-y-6"
             style={formStyle}
-            onSubmit={handleSubmit}
+            onSubmit={handleSubmit as never}
           >
             {[
               { name: "name", label: "Name", type: "text", required: true },
@@ -84,14 +91,14 @@ function Contact() {
                 className="w-full bg-transparent border-b border-border py-3 text-[14px] focus:outline-none focus:border-foreground transition-colors resize-none"
               />
             </div>
-            <button
+            <MotionButton
               type="submit"
               disabled={sending}
               className="text-[11px] uppercase tracking-[0.15em] border border-border px-6 py-3 hover:bg-foreground hover:text-background transition-colors disabled:opacity-50"
               style={{ fontFamily: "JetBrains Mono, monospace" }}
             >
               {sending ? "SENDING…" : "Send Message ↗"}
-            </button>
+            </MotionButton>
             {error && (
               <p className="text-[11px] text-destructive normal-case tracking-normal" style={formStyle}>{error}</p>
             )}
@@ -100,9 +107,9 @@ function Contact() {
                 THANKS — WE'LL BE IN TOUCH.
               </p>
             )}
-          </form>
+          </StaggerItem>
 
-          <div className="space-y-8 text-[11px]">
+          <StaggerItem className="space-y-8 text-[11px]">
             <div>
               <p className="text-muted-foreground mb-2">EMAIL</p>
               <p className="normal-case tracking-normal" style={{ ...formStyle, fontSize: "14px" }}>
@@ -117,8 +124,8 @@ function Contact() {
               <p className="text-muted-foreground mb-2">LOCATION</p>
               <p className="normal-case tracking-normal" style={{ ...formStyle, fontSize: "14px" }}>Saudi Arabia — Jeddah</p>
             </div>
-          </div>
-        </div>
+          </StaggerItem>
+        </Stagger>
       </section>
 
       <SiteFooter />

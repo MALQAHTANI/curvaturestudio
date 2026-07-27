@@ -1,11 +1,15 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
+import { motion } from "motion/react";
 import { SiteHeader, SiteFooter } from "@/components/site-chrome";
 import projects from "@/data/projects.json";
 import services from "@/data/services.json";
 import { supabase } from "@/integrations/supabase/client";
 import { isVideo, mediaSrc } from "@/lib/media";
+import { Reveal, RevealLines, Stagger, StaggerItem, HoverCard } from "@/components/motion/primitives";
+import { Parallax } from "@/components/motion/parallax";
+import { MotionNavLink } from "@/components/motion/button";
+import { DUR, EASE } from "@/lib/motion";
 
 export const Route = createFileRoute("/")({
   component: Index,
@@ -28,52 +32,89 @@ function Index() {
       <SiteHeader />
 
       {/* Hero */}
-      <section className="relative isolate overflow-hidden min-h-[92vh] flex flex-col justify-end px-6 md:px-12 pt-40 pb-16">
-        <div aria-hidden className="hero-bg" />
-        <div aria-hidden className="hero-globe" />
-        <div aria-hidden className="hero-sweep" />
-        <p className="relative text-[11px] text-muted-foreground mb-6">CREATIVE MEDIA PRODUCTION — EST. 2016</p>
-        <h1 className="relative display-xl">
-          CINEMATIC<br />STORIES,<br />CRAFTED.
-        </h1>
-        <p className="relative mt-10 max-w-xl text-muted-foreground normal-case tracking-normal" style={{ fontFamily: "Jost, sans-serif", textTransform: "none", fontSize: "14px", lineHeight: 1.6 }}>
+      <motion.section
+        className="relative isolate overflow-hidden min-h-[92vh] flex flex-col justify-end px-6 md:px-12 pt-40 pb-16"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: DUR.slow, ease: EASE, delay: 0.5 }}
+      >
+        <Parallax className="absolute inset-0 -z-10" distance={60}>
+          <div aria-hidden className="hero-bg" />
+          <div aria-hidden className="hero-globe" />
+          <div aria-hidden className="hero-sweep" />
+        </Parallax>
+        <motion.p
+          className="relative text-[11px] text-muted-foreground mb-6"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: DUR.base, ease: EASE, delay: 0.65 }}
+        >
+          CREATIVE MEDIA PRODUCTION — EST. 2016
+        </motion.p>
+        <RevealLines
+          className="relative display-xl"
+          lines={["CINEMATIC", "STORIES,", "CRAFTED."]}
+          delay={0.8}
+          stagger={0.1}
+        />
+        <motion.p
+          className="relative mt-10 max-w-xl text-muted-foreground normal-case tracking-normal"
+          style={{ fontFamily: "Jost, sans-serif", textTransform: "none", fontSize: "14px", lineHeight: 1.6 }}
+          initial={{ opacity: 0, y: 24 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: DUR.base, ease: EASE, delay: 1.25 }}
+        >
           Curvature Studio is a creative media production studio based in Saudi Arabia — crafting visually compelling content for global and regional brands.
-        </p>
-      </section>
+        </motion.p>
+        <motion.div
+          className="relative mt-10"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: DUR.base, ease: EASE, delay: 1.5 }}
+        >
+          <MotionNavLink to="/portfolio" className="inline-block text-[11px] border-b border-foreground pb-1">
+            VIEW OUR WORK ↗
+          </MotionNavLink>
+        </motion.div>
+      </motion.section>
 
       {/* Featured work */}
       <section className="border-t border-border px-6 md:px-12 py-16">
-        <div className="flex items-baseline justify-between mb-10">
+        <Reveal className="flex items-baseline justify-between mb-10">
           <p className="text-[11px] text-muted-foreground">SELECTED WORK</p>
-          <Link to="/portfolio" className="text-[11px] border-b border-foreground pb-0.5">VIEW ALL ↗</Link>
-        </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-12">
+          <MotionNavLink to="/portfolio" className="text-[11px] border-b border-foreground pb-0.5">VIEW ALL ↗</MotionNavLink>
+        </Reveal>
+        <Stagger className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-12" stagger={0.09}>
           {featured.map((p, i) => (
-            <div key={p.id} className="group">
+            <StaggerItem key={p.id}>
+              <HoverCard className="group rounded-sm transition-shadow duration-500 hover:shadow-[0_28px_60px_-30px_rgba(0,0,0,0.95)]">
               <div className="aspect-[4/3] overflow-hidden bg-white/5">
                 {p.cover_image && (isVideo(p.cover_image)
                   ? <video src={p.cover_image} className="w-full h-full object-cover" muted loop playsInline autoPlay />
-                  : <img src={p.cover_image} alt={p.title} loading="lazy" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.03]" />
+                  : <img src={p.cover_image} alt={p.title} loading="lazy" decoding="async" className="w-full h-full object-cover will-change-transform transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.06]" />
                 )}
               </div>
-              <div className="flex justify-between mt-4 text-[11px] gap-4">
+              <div className="flex justify-between mt-4 text-[11px] gap-4 transition-colors duration-500 group-hover:text-foreground">
                 <div className="flex gap-3 min-w-0">
                   <span className="text-muted-foreground shrink-0">{String(i + 1).padStart(2, "0")}</span>
                   <span className="truncate">{p.title}</span>
                 </div>
                 <span className="text-muted-foreground shrink-0">{p.year ?? ""}</span>
               </div>
-            </div>
+              </HoverCard>
+            </StaggerItem>
           ))}
-        </div>
+        </Stagger>
       </section>
 
       {/* Services */}
       <section className="border-t border-border px-6 md:px-12 py-16">
-        <p className="text-[11px] text-muted-foreground mb-10">SERVICES</p>
-        <ul className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-12">
+        <Reveal>
+          <p className="text-[11px] text-muted-foreground mb-10">SERVICES</p>
+        </Reveal>
+        <Stagger as="ul" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-12" stagger={0.07}>
           {(services as any[]).filter((s) => s.published).map((s, i) => (
-            <li key={s.id}>
+            <StaggerItem as="li" key={s.id}>
               <span className="text-[11px] text-muted-foreground">{String(i + 1).padStart(2, "0")}</span>
               <h3 className="display-md mt-3">{s.title}</h3>
               {s.description && (
@@ -81,17 +122,19 @@ function Index() {
                   {s.description}
                 </p>
               )}
-            </li>
+            </StaggerItem>
           ))}
-        </ul>
+        </Stagger>
       </section>
 
       {/* CTA */}
       <section className="border-t border-border px-6 md:px-12 py-40 text-center">
-        <h2 className="display-lg">LET'S BUILD<br />SOMETHING.</h2>
-        <Link to="/contact" className="inline-block mt-12 text-[11px] border-b border-foreground pb-1">
-          START A PROJECT ↗
-        </Link>
+        <RevealLines as="h2" className="display-lg" lines={["LET'S BUILD", "SOMETHING."]} inView />
+        <Reveal className="mt-12" delay={0.2}>
+          <MotionNavLink to="/contact" className="inline-block text-[11px] border-b border-foreground pb-1">
+            START A PROJECT ↗
+          </MotionNavLink>
+        </Reveal>
       </section>
 
       <SiteFooter />

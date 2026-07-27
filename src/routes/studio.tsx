@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { SiteHeader, SiteFooter } from "@/components/site-chrome";
 import { supabase } from "@/integrations/supabase/client";
 import { isVideo, mediaSrc } from "@/lib/media";
+import { HoverCard, Reveal, RevealLines, Stagger, StaggerItem } from "@/components/motion/primitives";
 
 export const Route = createFileRoute("/studio")({
   head: () => ({
@@ -32,8 +33,10 @@ function StudioPage() {
     <div className="min-h-screen bg-background text-foreground">
       <SiteHeader />
       <section className="px-6 md:px-12 pt-40 pb-16">
-        <p className="text-[11px] text-muted-foreground mb-6">STUDIO</p>
-        <h1 className="display-lg">FROM THE<br />STUDIO.</h1>
+        <Reveal>
+          <p className="text-[11px] text-muted-foreground mb-6">STUDIO</p>
+        </Reveal>
+        <RevealLines className="display-lg" lines={["FROM THE", "STUDIO."]} delay={0.15} />
       </section>
       <section className="border-t border-border px-6 md:px-12 py-16">
         {loading ? (
@@ -41,15 +44,16 @@ function StudioPage() {
         ) : items.length === 0 ? (
           <p className="text-[11px] text-muted-foreground">NO STUDIO CONTENT YET.</p>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-12">
+          <Stagger className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-12" stagger={0.08}>
             {items.map((p, i) => {
               const media = mediaSrc(p.cover_image ?? p.media_urls[0]) || null;
               return (
-                <div key={p.id} className="group">
+                <StaggerItem key={p.id}>
+                  <HoverCard className="group rounded-sm transition-shadow duration-500 hover:shadow-[0_28px_60px_-30px_rgba(0,0,0,0.95)]">
                   <div className="aspect-[4/3] overflow-hidden bg-white/5">
                     {media && (isVideo(media)
                       ? <video src={media} className="w-full h-full object-cover" muted loop playsInline autoPlay />
-                      : <img src={media} alt={p.title} loading="lazy" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.03]" />
+                      : <img src={media} alt={p.title} loading="lazy" decoding="async" className="w-full h-full object-cover will-change-transform transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.06]" />
                     )}
                   </div>
                   <div className="flex justify-between mt-4 text-[11px] gap-4">
@@ -58,10 +62,11 @@ function StudioPage() {
                       <span className="truncate">{p.title}</span>
                     </div>
                   </div>
-                </div>
+                  </HoverCard>
+                </StaggerItem>
               );
             })}
-          </div>
+          </Stagger>
         )}
       </section>
       <SiteFooter />
