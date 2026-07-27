@@ -62,6 +62,7 @@ export function SiteHeader() {
 export function SiteFooter() {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
+  const enabled = useMotionEnabled();
 
   useEffect(() => {
     if (!open) return;
@@ -73,10 +74,16 @@ export function SiteFooter() {
   }, [open]);
 
   return (
-    <footer className="border-t border-border px-6 md:px-12 py-10 flex flex-col md:flex-row md:justify-between gap-4 text-[10px] text-muted-foreground tracking-[0.15em]">
-      <p>© CURVATURE STUDIO — ALL RIGHTS RESERVED</p>
-      <p>SAUDI ARABIA — JEDDAH</p>
-      <div className="relative" ref={ref}>
+    <motion.footer
+      className="border-t border-border px-6 md:px-12 py-10 flex flex-col md:flex-row md:justify-between gap-4 text-[10px] text-muted-foreground tracking-[0.15em]"
+      initial={enabled ? "hidden" : false}
+      whileInView="visible"
+      viewport={viewportOnce}
+      variants={staggerParent(0.1)}
+    >
+      <motion.p variants={fadeUp}>© CURVATURE STUDIO — ALL RIGHTS RESERVED</motion.p>
+      <motion.p variants={fadeUp}>SAUDI ARABIA — JEDDAH</motion.p>
+      <motion.div className="relative" ref={ref} variants={fadeUp}>
         <button
           type="button"
           onClick={() => setOpen((v) => !v)}
@@ -86,11 +93,16 @@ export function SiteFooter() {
         >
           PROFILE ↗
         </button>
-        {open && (
-          <div
-            role="menu"
-            className="absolute right-0 bottom-full mb-2 min-w-[180px] border border-border bg-background/95 backdrop-blur-md text-[10px] tracking-[0.15em]"
-          >
+        <AnimatePresence>
+          {open && (
+            <motion.div
+              role="menu"
+              initial={{ opacity: 0, y: 8, scale: 0.98 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 6, scale: 0.98 }}
+              transition={{ duration: DUR.fast, ease: EASE }}
+              className="absolute right-0 bottom-full mb-2 min-w-[180px] border border-border bg-background/95 backdrop-blur-md text-[10px] tracking-[0.15em] origin-bottom-right"
+            >
             <Link
               to="/portfolio"
               onClick={() => setOpen(false)}
@@ -112,9 +124,10 @@ export function SiteFooter() {
             >
               EMPLOYEE LOGIN
             </Link>
-          </div>
-        )}
-      </div>
-    </footer>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </motion.div>
+    </motion.footer>
   );
 }
