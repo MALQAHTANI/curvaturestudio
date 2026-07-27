@@ -343,9 +343,23 @@ function SectionEditor({ table, label }: { table: "projects" | "studio_items"; l
   );
 }
 
-function ItemForm({ table, onDone }: { table: "projects" | "studio_items"; onDone: () => void }) {
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
+function ItemForm({
+  table,
+  item,
+  onDone,
+  onCancel,
+}: {
+  table: "projects" | "studio_items";
+  item?: Item;
+  onDone: () => void;
+  onCancel?: () => void;
+}) {
+  const isEdit = !!item;
+  const [title, setTitle] = useState(item?.title ?? "");
+  const [description, setDescription] = useState(item?.description ?? "");
+  const [existing, setExisting] = useState<string[]>(item?.media_urls ?? []);
+  const [cover, setCover] = useState<string | null>(item?.cover_image ?? item?.media_urls[0] ?? null);
+  const [published, setPublished] = useState<boolean>(item?.published ?? true);
   const [files, setFiles] = useState<File[]>([]);
   const [previews, setPreviews] = useState<{ url: string; video: boolean; name: string }[]>([]);
   const [rejected, setRejected] = useState<string[]>([]);
@@ -374,7 +388,7 @@ function ItemForm({ table, onDone }: { table: "projects" | "studio_items"; onDon
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     if (!title.trim()) { setError("Title is required."); return; }
-    if (files.length === 0) { setError("Add at least one image or video."); return; }
+    if (files.length === 0 && existing.length === 0) { setError("Add at least one image or video."); return; }
     setError(null); setUploading(true);
     try {
       const urls: string[] = [];
@@ -383,12 +397,18 @@ function ItemForm({ table, onDone }: { table: "projects" | "studio_items"; onDon
         urls.push(await uploadMedia(files[i]));
       }
       setProgress("Saving…");
-      const { error } = await supabase.from(table).insert({
+      const media = [...existing, ...urls];
+      const coverUrl = cover && media.includes(cover) ? cover : media[0];
+      const payload = {
         title: title.trim(),
         description: description.trim() || null,
-        cover_image: urls[0],
-        media_urls: urls,
-      });
+        cover_image: coverUrl,
+        media_urls: media,
+        published,
+      };
+      const { error } = isEdit
+        ? await supabase.from(table).update(payload).eq("id", item!.id)
+        : await supabase.from(table).insert(payload);
       if (error) throw error;
       onDone();
     } catch (err: any) {
@@ -418,6 +438,35 @@ function ItemForm({ table, onDone }: { table: "projects" | "studio_items"; onDon
       </div>
       <div>
         <label className="block text-[11px] text-muted-foreground mb-2">MEDIA (IMAGES / VIDEOS)</label>
+        {existing.length > 0 && (
+          <div className="mb-3 grid grid-cols-4 sm:grid-cols-6 gap-2">
+            {existing.map((m) => (
+              <div key={m} className="relative aspect-square bg-white/5 overflow-hidden border border-border">
+                <Thumb url={m} width={128} />
+                <button
+                  type="button"
+                  onClick={() => {
+                    setExisting((prev) => prev.filter((x) => x !== m));
+                    setCover((c) => (c === m ? null : c));
+                  }}
+                  aria-label="Remove media"
+                  className="absolute top-0 right-0 bg-background/80 text-destructive text-[10px] px-1 leading-4"
+                >
+                  ×
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setCover(m)}
+                  className={`absolute bottom-0 left-0 right-0 text-[8px] tracking-[0.15em] text-center py-0.5 ${
+                    cover === m ? "bg-foreground text-background" : "bg-background/80 text-muted-foreground"
+                  }`}
+                >
+                  {cover === m ? "COVER" : "SET COVER"}
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
         <input
           type="file"
           accept="image/*,video/*,.mp4,.mov,.m4v,.webm,.mkv,.avi,.ogv,.3gp,.heic,.heif"
@@ -453,12 +502,23 @@ function ItemForm({ table, onDone }: { table: "projects" | "studio_items"; onDon
       </div>
       {error && <p className="text-[11px] text-destructive normal-case tracking-normal" style={{ fontFamily: "Jost, sans-serif" }}>{error}</p>}
       {progress && <p className="text-[11px] text-muted-foreground">{progress}</p>}
-      <button
-        type="submit" disabled={uploading}
-        className="border border-foreground text-foreground px-6 py-2 text-[11px] tracking-[0.15em] hover:bg-foreground hover:text-background transition-colors disabled:opacity-50"
-      >
-        {uploading ? "..." : "SAVE ↗"}
-      </button>
+      <label className="flex items-center gap-2 text-[11px] text-muted-foreground">
+        <input type="checkbox" checked={published} onChange={(e) => setPublished(e.target.checked)} />
+        PUBLISHED
+      </label>
+      <div className="flex items-center gap-6">
+        <button
+          type="submit" disabled={uploading}
+          className="border border-foreground text-foreground px-6 py-2 text-[11px] tracking-[0.15em] hover:bg-foreground hover:text-background transition-colors disabled:opacity-50"
+        >
+          {uploading ? "..." : isEdit ? "UPDATE ↗" : "SAVE ↗"}
+        </button>
+        {onCancel && (
+          <button type="button" onClick={onCancel} className="text-[10px] tracking-[0.15em] text-muted-foreground hover:text-foreground">
+            CANCEL
+          </button>
+        )}
+      </div>
     </form>
   );
 }
