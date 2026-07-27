@@ -1,14 +1,18 @@
 import type { Transition, Variants } from "motion/react";
 
 /** Premium easing used site-wide. */
-export const EASE = [0.22, 1, 0.36, 1] as const;
+export const EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
 
-export const DUR = { fast: 0.5, base: 0.65, slow: 0.8 } as const;
+export const DUR: { fast: number; base: number; slow: number } = {
+  fast: 0.5,
+  base: 0.65,
+  slow: 0.8,
+};
 
-export const transition = (duration = DUR.base, delay = 0): Transition => ({
+export const transition = (duration: number = DUR.base, delay = 0): Transition => ({
   duration,
   delay,
-  ease: EASE as unknown as number[],
+  ease: EASE,
 });
 
 /** Fade + translateY reveal (GPU-only properties). */
