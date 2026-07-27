@@ -2,7 +2,7 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { SiteHeader, SiteFooter } from "@/components/site-chrome";
-import { uploadMedia, isVideo, acceptedMime } from "@/lib/media";
+import { uploadMedia, isVideo, acceptedMime, mediaSrc } from "@/lib/media";
 
 type Tab = "projects" | "studio" | "messages";
 type Message = {
@@ -220,17 +220,16 @@ function SectionEditor({ table, label }: { table: "projects" | "studio_items"; l
           {items.map((it) => (
             <li key={it.id} className="border border-border">
               <div className="aspect-[4/3] bg-white/5 overflow-hidden">
-                {it.cover_image ? (
-                  isVideo(it.cover_image) ? (
-                    <video src={it.cover_image} className="w-full h-full object-cover" muted />
+                {(() => {
+                  const raw = it.cover_image ?? it.media_urls[0] ?? null;
+                  if (!raw) return null;
+                  const src = mediaSrc(raw);
+                  return isVideo(raw) ? (
+                    <video src={src} className="w-full h-full object-cover" muted />
                   ) : (
-                    <img src={it.cover_image} alt={it.title} className="w-full h-full object-cover" />
-                  )
-                ) : it.media_urls[0] ? (
-                  isVideo(it.media_urls[0])
-                    ? <video src={it.media_urls[0]} className="w-full h-full object-cover" muted />
-                    : <img src={it.media_urls[0]} alt={it.title} className="w-full h-full object-cover" />
-                ) : null}
+                    <img src={src} alt={it.title} className="w-full h-full object-cover" />
+                  );
+                })()}
               </div>
               <div className="p-4">
                 <div className="text-[12px] normal-case tracking-normal truncate" style={{ fontFamily: "Jost, sans-serif" }}>{it.title}</div>

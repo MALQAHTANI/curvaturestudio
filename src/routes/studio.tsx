@@ -43,7 +43,7 @@ function StudioPage() {
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-12">
             {items.map((p, i) => {
-              const media = p.cover_image ?? p.media_urls[0];
+              const media = mediaSrc(p.cover_image ?? p.media_urls[0]) || null;
               return (
                 <div key={p.id} className="group">
                   <div className="aspect-[4/3] overflow-hidden bg-white/5">
