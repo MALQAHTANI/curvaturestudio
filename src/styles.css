@@ -348,3 +348,80 @@ html.has-custom-cursor * {
     cursor: auto !important;
   }
 }
+
+/* --- Editorial shell: 12-column rhythm, 1400px max, generous gutters --- */
+@utility shell {
+  width: 100%;
+  max-width: 1400px;
+  margin-inline: auto;
+  padding-inline: 24px;
+
+  @media (min-width: 768px) {
+    padding-inline: 48px;
+  }
+  @media (min-width: 1280px) {
+    padding-inline: 80px;
+  }
+}
+
+/* Layered, very soft luxury shadow. */
+@utility shadow-soft {
+  box-shadow:
+    0 4px 12px -8px color-mix(in oklab, black 60%, transparent),
+    0 24px 50px -24px color-mix(in oklab, black 70%, transparent),
+    0 60px 120px -50px color-mix(in oklab, black 80%, transparent);
+}
+
+/* Barely-there film grain so surfaces never read as flat. */
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 9996;
+  pointer-events: none;
+  opacity: 0.025;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+::selection {
+  background: color-mix(in oklab, var(--foreground) 88%, transparent);
+  color: var(--background);
+}
+
+/* Thin, rounded, brand-tinted scrollbar. */
+html {
+  scrollbar-width: thin;
+  scrollbar-color: color-mix(in oklab, var(--foreground) 30%, transparent) transparent;
+}
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  background: color-mix(in oklab, var(--foreground) 26%, transparent);
+}
+::-webkit-scrollbar-thumb:hover {
+  background: color-mix(in oklab, var(--foreground) 45%, transparent);
+}
+
+/* Keyboard focus: soft glow rather than a hard outline. */
+:where(a, button, input, textarea, select, [tabindex]):focus-visible {
+  outline: 1px solid color-mix(in oklab, var(--foreground) 55%, transparent);
+  outline-offset: 3px;
+  border-radius: 6px;
+  box-shadow: 0 0 0 6px color-mix(in oklab, var(--foreground) 10%, transparent);
+  transition: box-shadow 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@keyframes cs-scroll-hint {
+  0% { transform: translateY(-60%); opacity: 0; }
+  35% { opacity: 1; }
+  100% { transform: translateY(160%); opacity: 0; }
+}
+.scroll-hint-dot {
+  animation: cs-scroll-hint 2.2s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+}
