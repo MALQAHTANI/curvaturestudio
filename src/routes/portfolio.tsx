@@ -20,7 +20,7 @@ function Tile({ to, label }: { to: string; label: string }) {
       className="group relative flex items-center justify-center aspect-square md:aspect-auto md:h-[calc(100vh-6rem)] bg-white/[0.03] overflow-hidden"
     >
       <span
-        className="relative z-10 text-[12vw] md:text-[7vw] leading-none tracking-[-0.02em] text-foreground/85 transition-transform duration-700 group-hover:scale-[1.03]"
+        className="relative z-10 text-[8vw] md:text-[4.5vw] leading-none tracking-[-0.02em] text-foreground/85 transition-transform duration-700 group-hover:scale-[1.03]"
         style={{ fontFamily: "Jost, sans-serif", fontWeight: 500 }}
       >
         {label}
