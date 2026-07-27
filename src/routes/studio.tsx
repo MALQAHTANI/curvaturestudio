@@ -5,6 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { mediaSrc } from "@/lib/media";
 import { Reveal, RevealLines } from "@/components/motion/primitives";
 import { GalleryTile } from "@/components/motion/gallery-tile";
+import { Lightbox, type LightboxItem } from "@/components/lightbox";
 
 export const Route = createFileRoute("/studio")({
   head: () => ({
@@ -23,6 +24,7 @@ type Item = { id: string; title: string; cover_image: string | null; media_urls:
 function StudioPage() {
   const [items, setItems] = useState<Item[]>([]);
   const [loading, setLoading] = useState(true);
+  const [active, setActive] = useState<LightboxItem | null>(null);
 
   useEffect(() => {
     supabase.from("studio_items").select("id,title,cover_image,media_urls,published,sort_order")
@@ -49,6 +51,13 @@ function StudioPage() {
             {items.map((p, i) => {
               const media = mediaSrc(p.cover_image ?? p.media_urls[0]) || null;
               if (!media) return null;
+              const images = Array.from(
+                new Set(
+                  [media, ...((p.media_urls as string[]) ?? []).map((u) => mediaSrc(u))].filter(
+                    Boolean,
+                  ) as string[],
+                ),
+              );
               const offset = i % 3 === 1 ? "sm:mt-16" : i % 3 === 2 ? "lg:mt-28" : "";
               const ratio = i % 3 === 0 ? "aspect-[4/5]" : i % 3 === 1 ? "aspect-[4/3]" : "aspect-square";
               return (
@@ -57,6 +66,8 @@ function StudioPage() {
                     src={media}
                     title={p.title}
                     index={i}
+                    category="STUDIO"
+                    onOpen={() => setActive({ title: p.title, category: "STUDIO", images })}
                     className="block w-full text-left"
                     mediaClassName={`${ratio} w-full h-full object-cover bg-white/5`}
                   />
@@ -72,6 +83,7 @@ function StudioPage() {
           </div>
         )}
       </section>
+      <Lightbox item={active} onClose={() => setActive(null)} />
       <SiteFooter />
     </div>
   );

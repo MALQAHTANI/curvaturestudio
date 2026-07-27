@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { AnimatePresence, motion } from "motion/react";
+import { AnimatePresence, motion, useMotionValue } from "motion/react";
 import { isVideo } from "@/lib/media";
 import { DUR, EASE } from "@/lib/motion";
 import { useMotionEnabled } from "@/components/motion/use-motion-enabled";
@@ -22,11 +22,35 @@ export function Lightbox({
   startIndex?: number;
 }) {
   const [index, setIndex] = useState(0);
-  const [zoomed, setZoomed] = useState(false);
+  const [scale, setScale] = useState(1);
   const [dir, setDir] = useState(1);
   const touchX = useRef<number | null>(null);
   const enabled = useMotionEnabled();
   const [mounted, setMounted] = useState(false);
+  const panX = useMotionValue(0);
+  const panY = useMotionValue(0);
+
+  const MIN = 1;
+  const MAX = 4;
+  const clamp = (v: number) => Math.min(MAX, Math.max(MIN, Math.round(v * 100) / 100));
+  const resetZoom = useCallback(() => {
+    setScale(1);
+    panX.set(0);
+    panY.set(0);
+  }, [panX, panY]);
+  const zoomIn = useCallback(() => setScale((s) => clamp(s + 0.5)), []);
+  const zoomOut = useCallback(
+    () =>
+      setScale((s) => {
+        const n = clamp(s - 0.5);
+        if (n === 1) {
+          panX.set(0);
+          panY.set(0);
+        }
+        return n;
+      }),
+    [panX, panY],
+  );
 
   useEffect(() => setMounted(true), []);
 
@@ -46,7 +70,9 @@ export function Lightbox({
     setIndex(startIndex < (item.images.length ?? 0) ? startIndex : 0);
   }, [item, startIndex]);
 
-  useEffect(() => setZoomed(false), [index, item]);
+  useEffect(() => {
+    resetZoom();
+  }, [index, item, resetZoom]);
 
   // preload neighbours
   useEffect(() => {
@@ -68,13 +94,16 @@ export function Lightbox({
       if (e.key === "Escape") onClose();
       else if (e.key === "ArrowRight") next();
       else if (e.key === "ArrowLeft") prev();
+      else if (e.key === "+" || e.key === "=") zoomIn();
+      else if (e.key === "-" || e.key === "_") zoomOut();
+      else if (e.key === "0") resetZoom();
     };
     window.addEventListener("keydown", onKey);
     return () => {
       window.removeEventListener("keydown", onKey);
       document.body.style.overflow = prevOverflow;
     };
-  }, [item, onClose, next, prev]);
+  }, [item, onClose, next, prev, zoomIn, zoomOut, resetZoom]);
 
   const src = item?.images[index] ?? "";
 
@@ -123,9 +152,13 @@ export function Lightbox({
       <div
         className="relative flex flex-1 items-center justify-center px-3 md:px-16 py-6"
         onClick={(e) => e.stopPropagation()}
+        onWheel={(e) => {
+          if (!e.ctrlKey && !e.metaKey && scale === 1) return;
+          e.deltaY < 0 ? zoomIn() : zoomOut();
+        }}
         onTouchStart={(e) => (touchX.current = e.touches[0].clientX)}
         onTouchEnd={(e) => {
-          if (touchX.current === null) return;
+          if (touchX.current === null || scale > 1) return;
           const dx = e.changedTouches[0].clientX - touchX.current;
           if (Math.abs(dx) > 45) (dx < 0 ? next : prev)();
           touchX.current = null;
@@ -146,7 +179,7 @@ export function Lightbox({
         <AnimatePresence mode="wait" initial={false} custom={dir}>
         <motion.div
           key={src}
-          className="max-h-full max-w-full overflow-auto rounded-2xl"
+          className="flex max-h-full max-w-full items-center justify-center overflow-hidden rounded-2xl"
           initial={enabled ? { opacity: 0, x: dir * 48, scale: 0.96 } : false}
           animate={{ opacity: 1, x: 0, scale: 1 }}
           exit={enabled ? { opacity: 0, x: dir * -48, scale: 0.96 } : undefined}
@@ -156,19 +189,51 @@ export function Lightbox({
           {isVideo(src) ? (
             <video src={src} controls autoPlay playsInline className="max-h-[68vh] max-w-full rounded-2xl" />
           ) : (
-            <img
+            <motion.img
               src={src}
               alt={`${item.title} — ${index + 1}`}
               decoding="async"
-              onDoubleClick={() => setZoomed((z) => !z)}
-              className={`rounded-2xl object-contain transition-transform duration-500 ${
-                zoomed ? "max-h-none max-w-none scale-100 cursor-zoom-out" : "max-h-[68vh] max-w-full cursor-zoom-in"
+              draggable={false}
+              onDoubleClick={() => (scale > 1 ? resetZoom() : setScale(2))}
+              drag={scale > 1}
+              dragMomentum={false}
+              dragElastic={0.06}
+              style={{ x: panX, y: panY, scale, willChange: "transform" }}
+              transition={{ duration: 0.35, ease: EASE }}
+              className={`max-h-[68vh] max-w-full rounded-2xl object-contain ${
+                scale > 1 ? "cursor-grab active:cursor-grabbing" : "cursor-zoom-in"
               }`}
-              style={zoomed ? { height: "150vh" } : undefined}
             />
           )}
         </motion.div>
         </AnimatePresence>
+        {!isVideo(src) && (
+          <div className="absolute bottom-2 left-1/2 z-10 flex -translate-x-1/2 items-center gap-1 rounded-full border border-border bg-background/70 px-2 py-1 backdrop-blur">
+            <button
+              onClick={zoomOut}
+              aria-label="Zoom out"
+              disabled={scale <= MIN}
+              className="h-8 w-8 rounded-full text-foreground/80 transition-colors hover:text-foreground disabled:opacity-30"
+            >
+              −
+            </button>
+            <button
+              onClick={resetZoom}
+              aria-label="Reset zoom"
+              className="min-w-[52px] font-mono text-[11px] text-muted-foreground transition-colors hover:text-foreground"
+            >
+              {Math.round(scale * 100)}%
+            </button>
+            <button
+              onClick={zoomIn}
+              aria-label="Zoom in"
+              disabled={scale >= MAX}
+              className="h-8 w-8 rounded-full text-foreground/80 transition-colors hover:text-foreground disabled:opacity-30"
+            >
+              +
+            </button>
+          </div>
+        )}
         {total > 1 && (
           <motion.button
             onClick={next}
