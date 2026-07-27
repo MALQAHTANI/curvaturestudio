@@ -10,7 +10,7 @@ const NAV = [
 
 export function SiteHeader() {
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 md:px-12 py-5 bg-background/70 backdrop-blur-md border-b border-border">
+    <header className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 md:px-12 py-5 bg-background/40 backdrop-blur-md border-b border-border/60">
       <Link
         to="/"
         className="text-[15px] font-medium tracking-tight normal-case"
