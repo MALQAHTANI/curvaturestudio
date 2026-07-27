@@ -24,6 +24,15 @@ export function mediaSrc(url: string | null | undefined): string {
 
 export const MAX_UPLOAD_BYTES = 50 * 1024 * 1024; // حد الرفع في التخزين
 
+// مصغّرة مضغوطة من الخدمة — تجعل الصور الكبيرة تظهر فوراً في لوحة التحكم
+export function mediaThumb(url: string | null | undefined, width = 480): string {
+  const src = mediaSrc(url);
+  if (!src) return "";
+  if (!src.startsWith("/api/public/media/")) return src;
+  if (isVideo(src)) return src;
+  return `${src}?w=${width}`;
+}
+
 function extOf(name: string) {
   return name.toLowerCase().split(".").pop() ?? "";
 }
