@@ -105,7 +105,7 @@ function Contact() {
           <div className="space-y-8 text-[11px]">
             <div>
               <p className="text-muted-foreground mb-2">EMAIL</p>
-              <a href="mailto:info@curvaturestudio.com" className="hover:text-muted-foreground normal-case tracking-normal" style={{ ...formStyle, fontSize: "14px" }}>
+              <a href="mailto:info@curvaturestudio.com" className="no-underline normal-case tracking-normal" style={{ ...formStyle, fontSize: "14px" }}>
                 info@curvaturestudio.com
               </a>
             </div>
