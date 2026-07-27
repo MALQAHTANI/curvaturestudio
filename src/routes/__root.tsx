@@ -12,6 +12,9 @@ import { useEffect, type ReactNode } from "react";
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { AccessibilityWidget } from "../components/accessibility-widget";
+import { CustomCursor } from "../components/motion/custom-cursor";
+import { PageLoader } from "../components/motion/page-loader";
+import { PageTransition } from "../components/motion/page-transition";
 
 function NotFoundComponent() {
   return (
@@ -127,8 +130,12 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
+      <PageLoader />
+      <CustomCursor />
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-      <Outlet />
+      <PageTransition>
+        <Outlet />
+      </PageTransition>
       <AccessibilityWidget />
     </QueryClientProvider>
   );
