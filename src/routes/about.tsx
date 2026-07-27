@@ -28,6 +28,7 @@ function About() {
   const cls = (clients as any[]).filter((c) => c.published);
   const [shots, setShots] = useState<{ id: string; title: string; src: string }[]>([]);
   const [active, setActive] = useState<LightboxItem | null>(null);
+  const [startIndex, setStartIndex] = useState(0);
 
   useEffect(() => {
     supabase
@@ -130,13 +131,14 @@ function About() {
                   title={s.title}
                   category="IN FRAME"
                   index={i}
-                  onOpen={() =>
+                  onOpen={() => {
+                    setStartIndex(i);
                     setActive({
                       title: s.title,
                       category: "IN FRAME",
                       images: shots.map((x) => x.src),
-                    })
-                  }
+                    });
+                  }}
                   className="block w-full text-left"
                   mediaClassName={`${i % 2 === 0 ? "aspect-[4/5]" : "aspect-[4/3]"} w-full h-full object-cover bg-white/5`}
                 />
@@ -146,7 +148,7 @@ function About() {
         </section>
       )}
 
-      <Lightbox item={active} onClose={() => setActive(null)} />
+      <Lightbox item={active} startIndex={startIndex} onClose={() => setActive(null)} />
       <SiteFooter />
     </div>
   );
