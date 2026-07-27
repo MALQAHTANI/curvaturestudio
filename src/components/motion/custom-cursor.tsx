@@ -3,7 +3,7 @@ import { AnimatePresence, motion, useMotionValue, useSpring } from "motion/react
 import { EASE } from "@/lib/motion";
 import { useMotionEnabled } from "./use-motion-enabled";
 
-const INTERACTIVE = 'a, button, [role="button"], input, textarea, select, summary, [data-cursor]';
+const INTERACTIVE = 'a, button, [role="button"], input, textarea, select, summary, [data-cursor], img, video';
 
 export function CustomCursor() {
   const enabled = useMotionEnabled();

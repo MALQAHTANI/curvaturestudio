@@ -30,8 +30,8 @@ export function Reveal({
   return (
     <Comp
       className={className}
-      initial={{ opacity: 0, y: 40 }}
-      whileInView={{ opacity: 1, y: 0 }}
+      initial={{ opacity: 0, y: 40, scale: 0.96 }}
+      whileInView={{ opacity: 1, y: 0, scale: 1 }}
       viewport={viewportOnce}
       transition={transition(duration, delay)}
       style={{ willChange: "transform, opacity" }}
