@@ -68,6 +68,7 @@ function ProjectDetail() {
   const [project, setProject] = useState<Project | null>(null);
   const [loading, setLoading] = useState(true);
   const [active, setActive] = useState<LightboxItem | null>(null);
+  const [startIndex, setStartIndex] = useState(0);
 
   useEffect(() => {
     let alive = true;
@@ -161,7 +162,10 @@ function ProjectDetail() {
                 key={src + i}
                 type="button"
                 data-cursor="Zoom"
-                onClick={() => setActive({ title: project?.title ?? "", category: project?.category ?? "PROJECT", images: gallery, index: i } as LightboxItem)}
+                onClick={() => {
+                  setStartIndex(i);
+                  setActive({ title: project?.title ?? "", category: project?.category ?? "PROJECT", images: gallery });
+                }}
                 className={`${width} block overflow-hidden rounded-[22px] text-left`}
                 initial={{ opacity: 0, y: 60 }}
                 whileInView={{ opacity: 1, y: 0 }}
@@ -180,7 +184,7 @@ function ProjectDetail() {
         </Reveal>
       </section>
 
-      <Lightbox item={active} onClose={() => setActive(null)} />
+      <Lightbox item={active} startIndex={startIndex} onClose={() => setActive(null)} />
       <SiteFooter />
     </div>
   );
