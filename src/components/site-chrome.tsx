@@ -46,6 +46,12 @@ export function SiteHeader() {
       transition={{ duration: DUR.fast, ease: EASE }}
       style={{ willChange: "transform, opacity" }}
     >
+      <motion.div
+        initial={enabled ? { opacity: 0, y: 20 } : false}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: DUR.hero, ease: EASE, delay: 0.1 }}
+        className="shrink-0"
+      >
       <Link
         to="/"
         onClick={() => setMenuOpen(false)}
@@ -60,18 +66,26 @@ export function SiteHeader() {
           className="h-10 w-auto md:h-11 mix-blend-screen"
         />
       </Link>
+      </motion.div>
 
       <nav className="hidden sm:flex gap-6 md:gap-8 text-[11px]">
-        {NAV.map((n) => (
-          <Link
+        {NAV.map((n, i) => (
+          <motion.span
             key={n.to}
-            to={n.to}
-            className="nav-underline"
-            activeProps={{ className: "text-foreground is-active" }}
-            inactiveProps={{ className: "text-muted-foreground hover:text-foreground transition-colors" }}
+            initial={enabled ? { opacity: 0, y: 12 } : false}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: DUR.slow, ease: EASE, delay: 0.2 + i * 0.06 }}
+            style={{ willChange: "transform, opacity" }}
           >
-            {n.label}
-          </Link>
+            <Link
+              to={n.to}
+              className="nav-underline"
+              activeProps={{ className: "text-foreground is-active" }}
+              inactiveProps={{ className: "text-muted-foreground hover:text-foreground transition-colors" }}
+            >
+              {n.label}
+            </Link>
+          </motion.span>
         ))}
       </nav>
 
