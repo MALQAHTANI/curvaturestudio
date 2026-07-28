@@ -115,37 +115,29 @@ export function ProjectColumns({
                 </motion.div>
                 <motion.div
                   className="pointer-events-none absolute inset-0 bg-gradient-to-t from-background/90 via-background/10 to-transparent"
-                  animate={{ opacity: isOn ? 1 : 0.35 }}
+                  animate={{ opacity: isOn ? 1 : 0.85 }}
                   transition={{ duration: DUR.base, ease: EASE }}
                 />
                 <motion.div
-                  className="pointer-events-none absolute inset-x-0 bottom-0 p-6"
-                  animate={enabled ? { opacity: isOn ? 1 : 0, y: isOn ? 0 : 20 } : { opacity: 1 }}
+                  className="pointer-events-none absolute inset-x-0 bottom-0 p-4"
+                  animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: DUR.base, ease: EASE }}
                 >
                   <p
-                    className="truncate text-sm text-foreground normal-case tracking-normal"
-                    style={{ fontFamily: "Jost, sans-serif" }}
+                    className="text-[11px] leading-snug text-foreground normal-case tracking-normal line-clamp-2 xl:text-sm"
+                    style={{ fontFamily: "Jost, sans-serif", textShadow: "0 1px 10px rgba(0,0,0,0.75)" }}
                   >
                     {p.title}
                   </p>
                   <motion.p
-                    className="mt-1 text-[10px] uppercase tracking-[0.2em] text-muted-foreground"
-                    animate={enabled ? { opacity: isOn ? 1 : 0 } : { opacity: 1 }}
+                    className="mt-1 truncate text-[9px] uppercase tracking-[0.2em] text-foreground/70"
+                    style={{ textShadow: "0 1px 8px rgba(0,0,0,0.7)" }}
+                    animate={{ opacity: 1 }}
                     transition={{ duration: DUR.base, ease: EASE, delay: isOn ? 0.15 : 0 }}
                   >
                     {p.category || "PROJECT"}
                   </motion.p>
                 </motion.div>
-                {/* Vertical label while collapsed */}
-                <motion.span
-                  className="pointer-events-none absolute bottom-6 left-1/2 origin-bottom -translate-x-1/2 whitespace-nowrap text-[10px] uppercase tracking-[0.25em] text-foreground/80"
-                  style={{ writingMode: "vertical-rl", rotate: "180deg" }}
-                  animate={{ opacity: isOn ? 0 : 1 }}
-                  transition={{ duration: DUR.base, ease: EASE }}
-                >
-                  {p.title}
-                </motion.span>
               </Wrapper>
             </motion.div>
           );
@@ -163,12 +155,12 @@ export function ProjectColumns({
                 alt={p.title}
                 className="h-full w-full object-cover bg-white/5 transition-transform duration-500 group-hover:scale-105"
               />
-              <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-background/85 to-transparent" />
+              <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-background/90 via-background/20 to-transparent" />
               <div className="absolute inset-x-0 bottom-0 p-5">
-                <p className="truncate text-sm normal-case tracking-normal" style={{ fontFamily: "Jost, sans-serif" }}>
+                <p className="text-sm normal-case tracking-normal line-clamp-2" style={{ fontFamily: "Jost, sans-serif", textShadow: "0 1px 10px rgba(0,0,0,0.75)" }}>
                   {p.title}
                 </p>
-                <p className="mt-1 text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
+                <p className="mt-1 text-[10px] uppercase tracking-[0.2em] text-foreground/70" style={{ textShadow: "0 1px 8px rgba(0,0,0,0.7)" }}>
                   {p.category || "PROJECT"}
                 </p>
               </div>
