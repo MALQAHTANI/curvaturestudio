@@ -63,7 +63,7 @@ export function SiteHeader() {
           alt="Curvature Studio"
           width={896}
           height={220}
-          className="h-10 w-auto md:h-11 mix-blend-screen"
+          className="h-12 w-auto md:h-14 [filter:contrast(1.2)_brightness(1.15)_drop-shadow(0_0_0.6px_currentColor)]"
         />
       </Link>
       </motion.div>
