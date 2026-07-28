@@ -167,10 +167,11 @@ function ProjectDetail() {
                   setActive({ title: project?.title ?? "", category: project?.category ?? "PROJECT", images: gallery });
                 }}
                 className={`${width} block overflow-hidden rounded-[22px] text-left`}
-                initial={{ opacity: 0, y: 60 }}
-                whileInView={{ opacity: 1, y: 0 }}
+                initial={{ opacity: 0, y: 40, x: i % 2 === 0 ? -40 : 40 }}
+                whileInView={{ opacity: 1, y: 0, x: 0 }}
                 viewport={{ once: true, amount: 0.2 }}
-                transition={{ duration: 0.9, ease: EASE }}
+                transition={{ duration: DUR.slow, ease: EASE }}
+                style={{ willChange: "transform, opacity" }}
               >
                 <Media src={src} alt={`${project?.title ?? "Project"} — frame ${i + 1}`} className="w-full h-auto object-cover bg-white/5" />
               </motion.button>
