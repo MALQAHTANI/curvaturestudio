@@ -11,11 +11,13 @@ export function CustomCursor() {
   const [visible, setVisible] = useState(false);
   const [label, setLabel] = useState<string | null>(null);
   const [supported, setSupported] = useState(false);
+  const [pressed, setPressed] = useState(false);
 
   const x = useMotionValue(-100);
   const y = useMotionValue(-100);
-  const sx = useSpring(x, { stiffness: 500, damping: 40, mass: 0.4 });
-  const sy = useSpring(y, { stiffness: 500, damping: 40, mass: 0.4 });
+  // Outer ring trails the dot slightly.
+  const sx = useSpring(x, { stiffness: 300, damping: 32, mass: 0.5 });
+  const sy = useSpring(y, { stiffness: 300, damping: 32, mass: 0.5 });
 
   useEffect(() => {
     setSupported(window.matchMedia("(pointer: fine)").matches);
@@ -36,13 +38,19 @@ export function CustomCursor() {
       setLabel(labelled?.dataset?.cursor ?? null);
     };
     const onLeave = () => setVisible(false);
+    const onDown = () => setPressed(true);
+    const onUp = () => setPressed(false);
 
     window.addEventListener("mousemove", onMove, { passive: true });
     document.addEventListener("mouseleave", onLeave);
+    window.addEventListener("mousedown", onDown);
+    window.addEventListener("mouseup", onUp);
     return () => {
       document.documentElement.classList.remove("has-custom-cursor");
       window.removeEventListener("mousemove", onMove);
       document.removeEventListener("mouseleave", onLeave);
+      window.removeEventListener("mousedown", onDown);
+      window.removeEventListener("mouseup", onUp);
     };
   }, [supported, enabled, x, y]);
 
@@ -62,13 +70,14 @@ export function CustomCursor() {
           height: 26,
         }}
         animate={{
-          scale: label ? 4.2 : active ? 1.8 : 1,
+          scale: (label ? 3.4 : active ? 1.3 : 1) * (pressed ? 0.82 : 1),
           opacity: visible ? 1 : 0,
+          borderColor: active || label ? "var(--foreground)" : "color-mix(in oklab, var(--foreground) 45%, transparent)",
           backgroundColor: label
-            ? "color-mix(in oklab, var(--background) 82%, transparent)"
+            ? "color-mix(in oklab, var(--background) 78%, transparent)"
             : "color-mix(in oklab, var(--foreground) 6%, transparent)",
         }}
-        transition={{ duration: 0.45, ease: EASE }}
+        transition={{ duration: 0.25, ease: EASE }}
       >
       </motion.div>
       <motion.div
@@ -82,8 +91,8 @@ export function CustomCursor() {
               initial={{ opacity: 0, y: 6 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -4 }}
-              transition={{ duration: 0.3, ease: EASE }}
-              className="text-center text-[9px] uppercase leading-[1.4] tracking-[0.2em] text-foreground"
+              transition={{ duration: 0.25, ease: EASE }}
+              className="text-center text-[10px] uppercase leading-[1.4] tracking-[0.24em] text-foreground"
             >
               {label}
             </motion.span>
@@ -93,8 +102,8 @@ export function CustomCursor() {
       <motion.div
         className="absolute left-0 top-0 h-1 w-1 rounded-full bg-foreground"
         style={{ x, y, translateX: "-50%", translateY: "-50%", willChange: "transform" }}
-        animate={{ opacity: visible && !label ? 1 : 0 }}
-        transition={{ duration: 0.2 }}
+        animate={{ opacity: visible && !label ? 1 : 0, scale: pressed ? 0.6 : 1 }}
+        transition={{ duration: 0.2, ease: EASE }}
       />
     </div>
   );

@@ -28,22 +28,30 @@ export function PageTransition({ children }: { children: ReactNode }) {
           <motion.div
             key="veil"
             aria-hidden
-            className="pointer-events-none fixed inset-0 z-[9997] origin-bottom bg-background"
-            initial={{ scaleY: 0 }}
-            animate={{ scaleY: 1 }}
-            exit={{ scaleY: 0, originY: 0 }}
-            transition={{ duration: 0.45, ease: EASE }}
-            style={{ willChange: "transform" }}
+            className="pointer-events-none fixed inset-0 z-[9997] bg-background"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 0.35 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: DUR.slow, ease: EASE }}
           />
         )}
       </AnimatePresence>
       <AnimatePresence mode="wait" initial={false}>
         <motion.div
           key={pathname}
-          initial={{ opacity: 0, y: 16, scale: 0.99 }}
-          animate={{ opacity: 1, y: 0, scale: 1, transition: { duration: 0.6, ease: EASE } }}
-          exit={{ opacity: 0, y: -10, scale: 0.99, transition: { duration: 0.35, ease: EASE } }}
-          transition={{ duration: DUR.fast, ease: EASE }}
+          initial={{ opacity: 0, scale: 1.015, filter: "blur(10px)" }}
+          animate={{
+            opacity: 1,
+            scale: 1,
+            filter: "blur(0px)",
+            transition: { duration: DUR.slow, ease: EASE },
+          }}
+          exit={{
+            opacity: 0,
+            scale: 0.985,
+            filter: "blur(10px)",
+            transition: { duration: DUR.slow, ease: EASE },
+          }}
           style={{ willChange: "transform, opacity" }}
         >
           {children}
