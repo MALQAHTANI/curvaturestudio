@@ -56,6 +56,14 @@ function ProjectsGallery() {
     .filter((t) => !!t.coverImage);
   const tiles: Tile[] = dbTiles;
 
+  const columns: ColumnProject[] = tiles.map((t) => ({
+    id: t.id,
+    title: t.title,
+    category: t.category ?? "PROJECT",
+    cover: t.coverImage,
+  }));
+  const rows: ColumnProject[][] = [];
+  for (let i = 0; i < columns.length; i += 6) rows.push(columns.slice(i, i + 6));
 
   return (
     <div className="min-h-screen bg-background text-foreground">
