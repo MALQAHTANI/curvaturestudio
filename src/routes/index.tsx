@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { motion, useScroll, useTransform } from "motion/react";
 import { SiteHeader, SiteFooter } from "@/components/site-chrome";
 import projects from "@/data/projects.json";
