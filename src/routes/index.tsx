@@ -172,7 +172,8 @@ function Index() {
       </section>
 
       <SiteFooter />
-      <Lightbox item={active} onClose={() => setActive(null)} />
+      </div>
+      </div>
     </div>
   );
 }
