@@ -337,6 +337,10 @@ html.a11y-reduce-motion *::after {
   transform: scaleX(1);
   transform-origin: left;
 }
+.nav-underline.is-active::after {
+  transform: scaleX(1);
+  transform-origin: left;
+}
 
 html.has-custom-cursor,
 html.has-custom-cursor * {
