@@ -43,6 +43,8 @@ export function GalleryTile({
   // Weighted pointer parallax on the media itself — max 10px.
   const driftX = useSpring(useTransform(px, [-0.5, 0.5], [-10, 10]), DRIFT_SPRING);
   const driftY = useSpring(useTransform(py, [-0.5, 0.5], [-10, 10]), DRIFT_SPRING);
+  // Scroll drift + pointer drift share the same translate axis.
+  const totalY = useTransform<number, number>([y, driftY], ([a, b]) => a + b);
 
   const onPointerMove = (e: React.MouseEvent) => {
     if (!enabled || !ref.current) return;
@@ -66,7 +68,7 @@ export function GalleryTile({
       playsInline
       autoPlay
       preload="metadata"
-      style={enabled ? { y, x: driftX, translateY: driftY, willChange: "transform" } : undefined}
+      style={enabled ? { y: totalY, x: driftX, willChange: "transform" } : undefined}
       variants={{ hovered: { scale: 1.06, filter: "brightness(1.08)" } }}
       transition={{ duration: 0.6, ease: EASE }}
     />
@@ -77,7 +79,7 @@ export function GalleryTile({
       loading="lazy"
       decoding="async"
       className={mediaClassName}
-      style={enabled ? { y, x: driftX, translateY: driftY, willChange: "transform" } : undefined}
+      style={enabled ? { y: totalY, x: driftX, willChange: "transform" } : undefined}
       variants={{ hovered: { scale: 1.06 } }}
       transition={{ duration: 0.6, ease: EASE }}
     />
