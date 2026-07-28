@@ -122,7 +122,7 @@ export function GalleryTile({
     <motion.button
       ref={ref}
       type="button"
-      data-cursor="View"
+
       aria-label={`Open gallery: ${title}`}
       onClick={onOpen}
       onMouseMove={onPointerMove}

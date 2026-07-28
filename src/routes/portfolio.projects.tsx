@@ -85,7 +85,7 @@ function ProjectsGallery() {
               <Link
                 to="/project/$projectId"
                 params={{ projectId: t.id }}
-                data-cursor="View Project"
+
                 className="group relative block overflow-hidden rounded-[22px] bg-white/5"
                 aria-label={t.title}
               >

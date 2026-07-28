@@ -70,7 +70,7 @@ export function ProjectColumns({ items }: { items: ColumnProject[] }) {
               <Link
                 to="/project/$projectId"
                 params={{ projectId: p.id }}
-                data-cursor="View"
+
                 className="group block h-full w-full"
                 aria-label={p.title}
               >

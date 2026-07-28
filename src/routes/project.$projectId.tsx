@@ -161,7 +161,7 @@ function ProjectDetail() {
               <motion.button
                 key={src + i}
                 type="button"
-                data-cursor="Zoom"
+
                 onClick={() => {
                   setStartIndex(i);
                   setActive({ title: project?.title ?? "", category: project?.category ?? "PROJECT", images: gallery });
