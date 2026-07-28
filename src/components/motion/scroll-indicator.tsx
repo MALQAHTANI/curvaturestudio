@@ -16,7 +16,7 @@ export function ScrollIndicator() {
       style={{ opacity }}
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      transition={{ duration: 0.8, delay: 1.8 }}
+      transition={{ duration: 0.7, delay: 2.8 }}
     >
       <span className="text-[9px] tracking-[0.3em] text-muted-foreground">SCROLL</span>
       <span className="relative block h-10 w-[1px] overflow-hidden bg-foreground/15">

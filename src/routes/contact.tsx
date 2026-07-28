@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
+import { motion } from "motion/react";
 import { SiteHeader, SiteFooter } from "@/components/site-chrome";
 import { supabase } from "@/integrations/supabase/client";
 import { Reveal, RevealLines, Stagger, StaggerItem } from "@/components/motion/primitives";
@@ -51,7 +52,7 @@ function Contact() {
 
       {/* Full-screen looping background video */}
       <section className="relative flex h-[100svh] items-center justify-center overflow-hidden px-6 text-center">
-        <video
+        <motion.video
           className="absolute inset-0 h-full w-full object-cover"
           src={contactVideo.url}
           autoPlay
@@ -60,6 +61,13 @@ function Contact() {
           playsInline
           preload="auto"
           aria-hidden
+          initial={{ opacity: 0, scale: 1 }}
+          animate={{ opacity: 1, scale: 1.04 }}
+          transition={{
+            opacity: { duration: 1.2, ease: "easeOut" },
+            scale: { duration: 30, ease: "linear", repeat: Infinity, repeatType: "reverse" },
+          }}
+          style={{ willChange: "transform, opacity" }}
         />
         <div aria-hidden className="absolute inset-0 bg-background/70" />
         <div className="relative">

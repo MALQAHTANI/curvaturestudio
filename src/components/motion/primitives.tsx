@@ -1,7 +1,7 @@
 import { motion, type HTMLMotionProps } from "motion/react";
 import type { ReactNode } from "react";
 import { cn } from "@/lib/utils";
-import { DUR, fadeUp, lineUp, staggerParent, transition, viewportOnce } from "@/lib/motion";
+import { charUp, DUR, fadeUp, lineUp, staggerParent, transition, viewportOnce } from "@/lib/motion";
 import { useMotionEnabled } from "./use-motion-enabled";
 
 type DivProps = HTMLMotionProps<"div">;
@@ -11,7 +11,7 @@ export function Reveal({
   children,
   className,
   delay = 0,
-  duration = DUR.base,
+  duration = DUR.slow,
   as = "div",
   ...rest
 }: {
@@ -30,8 +30,8 @@ export function Reveal({
   return (
     <Comp
       className={className}
-      initial={{ opacity: 0, y: 40, scale: 0.96 }}
-      whileInView={{ opacity: 1, y: 0, scale: 1 }}
+      initial={{ opacity: 0, y: 25 }}
+      whileInView={{ opacity: 1, y: 0 }}
       viewport={viewportOnce}
       transition={transition(duration, delay)}
       style={{ willChange: "transform, opacity" }}
@@ -111,6 +111,7 @@ export function RevealLines({
   delay = 0,
   stagger = 0.1,
   inView = false,
+  chars = true,
 }: {
   lines: string[];
   className?: string;
@@ -118,6 +119,7 @@ export function RevealLines({
   delay?: number;
   stagger?: number;
   inView?: boolean;
+  chars?: boolean;
 }) {
   const enabled = useMotionEnabled();
   if (!enabled) {
@@ -134,6 +136,46 @@ export function RevealLines({
   const animateProps = inView
     ? { whileInView: "visible" as const, viewport: viewportOnce }
     : { animate: "visible" as const };
+
+  if (chars) {
+    // Per-character mask reveal — 20ms stagger, clipped from below.
+    let charIndex = 0;
+    return (
+      <Tag className={className}>
+        <motion.span
+          className="block"
+          initial="hidden"
+          variants={staggerParent(0, delay)}
+          {...animateProps}
+        >
+          {lines.map((line, li) => (
+            <span key={li} className="block overflow-hidden pb-[0.06em]">
+              {line.split(" ").map((word, wi, arr) => (
+                <span key={wi} className="inline-block whitespace-nowrap">
+                  {Array.from(word).map((ch) => {
+                    const d = delay + charIndex++ * 0.02;
+                    return (
+                      <motion.span
+                        key={`${ch}-${d}`}
+                        className="inline-block"
+                        variants={charUp}
+                        transition={transition(DUR.hero, d)}
+                        style={{ willChange: "transform" }}
+                      >
+                        {ch}
+                      </motion.span>
+                    );
+                  })}
+                  {wi < arr.length - 1 ? "\u00A0" : null}
+                </span>
+              ))}
+            </span>
+          ))}
+        </motion.span>
+      </Tag>
+    );
+  }
+
   return (
     <Tag className={className}>
       <motion.span

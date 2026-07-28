@@ -83,15 +83,15 @@ function Index() {
         className="sticky top-0 z-0 isolate overflow-hidden h-[100svh] flex flex-col justify-end px-6 md:px-12 pt-44 pb-24 md:pb-32"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ duration: DUR.slow, ease: EASE, delay: 0.5 }}
+        transition={{ duration: DUR.hero, ease: EASE, delay: 1.5 }}
         style={{ scale: heroScale, opacity: heroOpacity, willChange: "transform, opacity" }}
       >
-        <Parallax className="absolute inset-0 -z-10" distance={60}>
+        <Parallax className="absolute inset-0 -z-10" distance={40}>
           <motion.div
             className="absolute inset-0"
-            initial={{ scale: 1.06, opacity: 0 }}
+            initial={{ scale: 1.08, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
-            transition={{ duration: 2, ease: EASE, delay: 0.4 }}
+            transition={{ duration: 3, ease: EASE, delay: 0.3 }}
             style={{ willChange: "transform, opacity" }}
           >
             <div aria-hidden className="hero-bg" />
@@ -103,30 +103,29 @@ function Index() {
           className="relative text-[11px] text-muted-foreground mb-6"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: DUR.base, ease: EASE, delay: 0.65 }}
+          transition={{ duration: DUR.hero, ease: EASE, delay: 1.7 }}
         >
           CREATIVE MEDIA PRODUCTION — EST. 2016
         </motion.p>
         <RevealLines
           className="relative display-xl"
           lines={["CINEMATIC", "STORIES,", "CRAFTED."]}
-          delay={0.8}
-          stagger={0.1}
+          delay={1.85}
         />
         <motion.p
           className="relative mt-10 max-w-xl text-muted-foreground normal-case tracking-normal"
           style={{ fontFamily: "Jost, sans-serif", textTransform: "none", fontSize: "14px", lineHeight: 1.6 }}
-          initial={{ opacity: 0, y: 24 }}
+          initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: DUR.base, ease: EASE, delay: 1.25 }}
+          transition={{ duration: DUR.hero, ease: EASE, delay: 2.35 }}
         >
           Curvature Studio is a creative media production studio based in Saudi Arabia — crafting visually compelling content for global and regional brands.
         </motion.p>
         <motion.div
           className="relative mt-10"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: DUR.base, ease: EASE, delay: 1.5 }}
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: DUR.slow, ease: EASE, delay: 2.6 }}
         >
           <MotionNavLink to="/portfolio" className="inline-block text-[11px] border-b border-foreground pb-1">
             VIEW OUR WORK ↗

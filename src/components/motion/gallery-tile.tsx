@@ -1,7 +1,7 @@
 import { useRef, type ReactNode } from "react";
 import { motion, useMotionValue, useScroll, useSpring, useTransform } from "motion/react";
 import { isVideo } from "@/lib/media";
-import { DRIFT_SPRING, EASE, SPRING } from "@/lib/motion";
+import { DRIFT_SPRING, DUR, EASE, SPRING } from "@/lib/motion";
 import { useMotionEnabled } from "./use-motion-enabled";
 
 /**
@@ -38,8 +38,13 @@ export function GalleryTile({
   // Subtle 3D tilt following the pointer.
   const px = useMotionValue(0);
   const py = useMotionValue(0);
-  const rotateX = useSpring(useTransform(py, [-0.5, 0.5], [6, -6]), SPRING);
-  const rotateY = useSpring(useTransform(px, [-0.5, 0.5], [-6, 6]), SPRING);
+  const rotateX = useSpring(useTransform(py, [-0.5, 0.5], [4, -4]), SPRING);
+  const rotateY = useSpring(useTransform(px, [-0.5, 0.5], [-4, 4]), SPRING);
+  // Weighted pointer parallax on the media itself — max 10px.
+  const driftX = useSpring(useTransform(px, [-0.5, 0.5], [-10, 10]), DRIFT_SPRING);
+  const driftY = useSpring(useTransform(py, [-0.5, 0.5], [-10, 10]), DRIFT_SPRING);
+  // Scroll drift + pointer drift share the same translate axis.
+  const totalY = useTransform<number, number>([y, driftY], ([a, b]) => a + b);
 
   const onPointerMove = (e: React.MouseEvent) => {
     if (!enabled || !ref.current) return;
@@ -52,7 +57,7 @@ export function GalleryTile({
     py.set(0);
   };
 
-  const delay = Math.min(index % 6, 5) * 0.12; // 120ms stagger
+  const delay = Math.min(index % 6, 5) * 0.08; // 80ms stagger
 
   const media = isVideo(src) ? (
     <motion.video
@@ -63,9 +68,9 @@ export function GalleryTile({
       playsInline
       autoPlay
       preload="metadata"
-      style={enabled ? { y, willChange: "transform" } : undefined}
-      variants={{ hovered: { scale: 1.08 } }}
-      transition={{ duration: 0.7, ease: EASE }}
+      style={enabled ? { y: totalY, x: driftX, willChange: "transform" } : undefined}
+      variants={{ hovered: { scale: 1.06, filter: "brightness(1.08)" } }}
+      transition={{ duration: 0.6, ease: EASE }}
     />
   ) : (
     <motion.img
@@ -74,9 +79,9 @@ export function GalleryTile({
       loading="lazy"
       decoding="async"
       className={mediaClassName}
-      style={enabled ? { y, willChange: "transform" } : undefined}
-      variants={{ hovered: { scale: 1.08 } }}
-      transition={{ duration: 0.7, ease: EASE }}
+      style={enabled ? { y: totalY, x: driftX, willChange: "transform" } : undefined}
+      variants={{ hovered: { scale: 1.06 } }}
+      transition={{ duration: 0.6, ease: EASE }}
     />
   );
 
@@ -86,7 +91,7 @@ export function GalleryTile({
       initial={{ opacity: 0 }}
       animate={{ opacity: 0 }}
       variants={{ hovered: { opacity: 1 } }}
-      transition={{ duration: 0.5, ease: EASE }}
+      transition={{ duration: DUR.base, ease: EASE }}
     >
       {category && (
         <motion.span
@@ -94,17 +99,17 @@ export function GalleryTile({
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 0, y: 12 }}
           variants={{ hovered: { opacity: 1, y: 0 } }}
-          transition={{ duration: 0.5, ease: EASE, delay: 0.08 }}
+          transition={{ duration: DUR.base, ease: EASE, delay: 0.15 }}
         >
           {category}
         </motion.span>
       )}
       <motion.span
         className="block text-xs md:text-sm text-foreground"
-        initial={{ y: 18, opacity: 0.85 }}
-        animate={{ y: 18, opacity: 0.85 }}
+        initial={{ y: 20, opacity: 0 }}
+        animate={{ y: 20, opacity: 0 }}
         variants={{ hovered: { y: 0, opacity: 1 } }}
-        transition={{ duration: 0.5, ease: EASE }}
+        transition={{ duration: DUR.slow, ease: EASE }}
         style={{ fontFamily: "Jost, sans-serif" }}
       >
         {title}
@@ -117,18 +122,18 @@ export function GalleryTile({
     <motion.button
       ref={ref}
       type="button"
-      data-cursor="View Project"
+      data-cursor="View"
       aria-label={`Open gallery: ${title}`}
       onClick={onOpen}
       onMouseMove={onPointerMove}
       onMouseLeave={onPointerLeave}
       className={className}
-      initial={enabled ? { opacity: 0, y: 80, scale: 0.95, clipPath: "inset(100% 0% 0% 0%)" } : false}
+      initial={enabled ? { opacity: 0, y: 50, scale: 0.96, clipPath: "inset(100% 0% 0% 0%)" } : false}
       whileInView={
         enabled ? { opacity: 1, y: 0, scale: 1, clipPath: "inset(0% 0% 0% 0%)" } : undefined
       }
       viewport={{ once: true, amount: 0.15, margin: "0px 0px -10% 0px" }}
-      transition={{ duration: 0.9, ease: EASE, delay }}
+      transition={{ duration: DUR.slow, ease: EASE, delay }}
       whileHover={enabled ? "hovered" : undefined}
       animate={enabled ? undefined : { opacity: 1 }}
       style={{ willChange: "transform, opacity", perspective: 1200 }}
@@ -143,7 +148,7 @@ export function GalleryTile({
               "0 8px 20px -12px rgba(0,0,0,0.6), 0 30px 60px -24px rgba(0,0,0,0.75), 0 60px 120px -40px rgba(0,0,0,0.85)",
           },
         }}
-        transition={{ duration: 0.5, ease: EASE }}
+        transition={{ duration: DUR.base, ease: EASE }}
       >
         {media}
         {overlay}

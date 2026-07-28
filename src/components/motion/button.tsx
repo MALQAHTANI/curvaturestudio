@@ -64,7 +64,7 @@ export function MotionNavLink({
       onMouseLeave={m.onLeave}
       style={{ ...m.style, willChange: "transform" }}
       whileHover={{ scale: 1.03 }}
-      whileTap={{ scale: 0.97 }}
+      whileTap={{ scale: 0.98 }}
       transition={transition(DUR.fast)}
       {...rest}
     >
@@ -99,8 +99,11 @@ export function MotionButton({
       onMouseMove={m.onMove}
       onMouseLeave={m.onLeave}
       style={{ ...m.style, willChange: "transform" }}
-      whileHover={{ scale: 1.03 }}
-      whileTap={{ scale: 0.97 }}
+      whileHover={{
+        scale: 1.03,
+        boxShadow: "0 18px 40px -22px rgba(0,0,0,0.9), 0 0 0 1px color-mix(in oklab, var(--foreground) 22%, transparent)",
+      }}
+      whileTap={{ scale: 0.98 }}
       transition={transition(DUR.fast)}
       {...(rest as Record<string, unknown>)}
     >

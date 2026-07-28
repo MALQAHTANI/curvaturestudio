@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { motion } from "motion/react";
-import { EASE } from "@/lib/motion";
+import { DUR, EASE, viewportOnce } from "@/lib/motion";
 import { isVideo } from "@/lib/media";
 import { useMotionEnabled } from "@/components/motion/use-motion-enabled";
 
@@ -14,7 +14,18 @@ export type ColumnProject = {
 
 function Media({ src, alt, className }: { src: string; alt: string; className?: string }) {
   return isVideo(src) ? (
-    <video src={src} className={className} muted loop playsInline autoPlay preload="metadata" />
+    <motion.video
+      src={src}
+      className={className}
+      muted
+      loop
+      playsInline
+      autoPlay
+      preload="metadata"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: DUR.slow, ease: EASE }}
+    />
   ) : (
     <img src={src} alt={alt} loading="lazy" decoding="async" className={className} />
   );
@@ -44,22 +55,29 @@ export function ProjectColumns({ items }: { items: ColumnProject[] }) {
               key={p.id}
               className="relative min-w-0 overflow-hidden rounded-[18px]"
               onMouseEnter={() => setHovered(i)}
+              initial={enabled ? { opacity: 0, y: 50, scale: 0.96 } : false}
+              whileInView={{ opacity: 1, y: 0, scale: 1 }}
+              viewport={viewportOnce}
               animate={{ flexGrow: grow }}
-              initial={false}
-              transition={{ duration: 0.35, ease: EASE }}
+              transition={{
+                duration: DUR.slow,
+                ease: EASE,
+                delay: enabled ? 0.06 + i * 0.08 : 0,
+                flexGrow: { duration: DUR.slow, ease: EASE, delay: 0 },
+              }}
               style={{ flexBasis: 0, flexGrow: 1, willChange: "flex-grow" }}
             >
               <Link
                 to="/project/$projectId"
                 params={{ projectId: p.id }}
-                data-cursor="View Project"
+                data-cursor="View"
                 className="group block h-full w-full"
                 aria-label={p.title}
               >
                 <motion.div
                   className="h-full w-full"
                   animate={{ scale: isOn ? 1.06 : 1 }}
-                  transition={{ duration: 0.35, ease: EASE }}
+                  transition={{ duration: DUR.slow, ease: EASE }}
                   style={{ willChange: "transform" }}
                 >
                   <Media src={p.cover} alt={p.title} className="h-full w-full object-cover bg-white/5" />
@@ -67,12 +85,12 @@ export function ProjectColumns({ items }: { items: ColumnProject[] }) {
                 <motion.div
                   className="pointer-events-none absolute inset-0 bg-gradient-to-t from-background/90 via-background/10 to-transparent"
                   animate={{ opacity: isOn ? 1 : 0.35 }}
-                  transition={{ duration: 0.35, ease: EASE }}
+                  transition={{ duration: DUR.base, ease: EASE }}
                 />
                 <motion.div
                   className="pointer-events-none absolute inset-x-0 bottom-0 p-6"
-                  animate={enabled ? { opacity: isOn ? 1 : 0, y: isOn ? 0 : 14 } : { opacity: 1 }}
-                  transition={{ duration: 0.35, ease: EASE }}
+                  animate={enabled ? { opacity: isOn ? 1 : 0, y: isOn ? 0 : 20 } : { opacity: 1 }}
+                  transition={{ duration: DUR.base, ease: EASE }}
                 >
                   <p
                     className="truncate text-sm text-foreground normal-case tracking-normal"
@@ -80,16 +98,20 @@ export function ProjectColumns({ items }: { items: ColumnProject[] }) {
                   >
                     {p.title}
                   </p>
-                  <p className="mt-1 text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
+                  <motion.p
+                    className="mt-1 text-[10px] uppercase tracking-[0.2em] text-muted-foreground"
+                    animate={enabled ? { opacity: isOn ? 1 : 0 } : { opacity: 1 }}
+                    transition={{ duration: DUR.base, ease: EASE, delay: isOn ? 0.15 : 0 }}
+                  >
                     {p.category || "PROJECT"}
-                  </p>
+                  </motion.p>
                 </motion.div>
                 {/* Vertical label while collapsed */}
                 <motion.span
                   className="pointer-events-none absolute bottom-6 left-1/2 origin-bottom -translate-x-1/2 whitespace-nowrap text-[10px] uppercase tracking-[0.25em] text-foreground/80"
                   style={{ writingMode: "vertical-rl", rotate: "180deg" }}
                   animate={{ opacity: isOn ? 0 : 1 }}
-                  transition={{ duration: 0.35, ease: EASE }}
+                  transition={{ duration: DUR.base, ease: EASE }}
                 >
                   {p.title}
                 </motion.span>
