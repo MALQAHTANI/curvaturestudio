@@ -4,7 +4,6 @@ import { createPortal } from "react-dom";
 import { AnimatePresence, motion, useMotionValueEvent, useScroll } from "motion/react";
 import { DUR, EASE, fadeUp, staggerParent, viewportOnce } from "@/lib/motion";
 import { useMotionEnabled } from "@/components/motion/use-motion-enabled";
-import logoSrc from "@/assets/logo.png";
 
 const NAV = [
   { to: "/studio", label: "STUDIO" },
@@ -58,13 +57,12 @@ export function SiteHeader() {
         className="block shrink-0"
         aria-label="Curvature Studio"
       >
-        <img
-          src={logoSrc}
-          alt="Curvature Studio"
-          width={896}
-          height={220}
-          className="h-12 w-auto md:h-14 [filter:contrast(1.2)_brightness(1.15)_drop-shadow(0_0_0.6px_currentColor)]"
-        />
+        <span
+          className="block select-none bg-transparent text-foreground text-[15px] leading-none tracking-[0.02em] md:text-[18px]"
+          style={{ fontFamily: "Jost, sans-serif", fontWeight: 600, textTransform: "uppercase" }}
+        >
+          Curvature Studio
+        </span>
       </Link>
       </motion.div>
 
