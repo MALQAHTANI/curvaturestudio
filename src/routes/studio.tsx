@@ -4,7 +4,7 @@ import { SiteHeader, SiteFooter } from "@/components/site-chrome";
 import { supabase } from "@/integrations/supabase/client";
 import { mediaSrc } from "@/lib/media";
 import { Reveal, RevealLines } from "@/components/motion/primitives";
-import { GalleryTile } from "@/components/motion/gallery-tile";
+import { ProjectColumns, type ColumnProject } from "@/components/project-columns";
 import { Lightbox, type LightboxItem } from "@/components/lightbox";
 
 export const Route = createFileRoute("/studio")({
@@ -32,6 +32,23 @@ function StudioPage() {
       .then(({ data }) => { setItems((data as any) ?? []); setLoading(false); });
   }, []);
 
+  const entries = items
+    .map((p) => {
+      const media = mediaSrc(p.cover_image ?? p.media_urls?.[0]) || null;
+      if (!media) return null;
+      const images = Array.from(
+        new Set(
+          [media, ...((p.media_urls as string[]) ?? []).map((u) => mediaSrc(u))].filter(
+            Boolean,
+          ) as string[],
+        ),
+      );
+      return { col: { id: p.id, title: p.title, category: "STUDIO", cover: media } as ColumnProject, images, title: p.title };
+    })
+    .filter(Boolean) as { col: ColumnProject; images: string[]; title: string }[];
+  const rows: typeof entries[] = [];
+  for (let i = 0; i < entries.length; i += 6) rows.push(entries.slice(i, i + 6));
+
   return (
     <div className="min-h-screen bg-background text-foreground">
       <SiteHeader />
@@ -47,39 +64,16 @@ function StudioPage() {
         ) : items.length === 0 ? (
           <p className="text-[11px] text-muted-foreground">NO STUDIO CONTENT YET.</p>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-10 md:gap-x-16 gap-y-24 md:gap-y-32">
-            {items.map((p, i) => {
-              const media = mediaSrc(p.cover_image ?? p.media_urls[0]) || null;
-              if (!media) return null;
-              const images = Array.from(
-                new Set(
-                  [media, ...((p.media_urls as string[]) ?? []).map((u) => mediaSrc(u))].filter(
-                    Boolean,
-                  ) as string[],
-                ),
-              );
-              const offset = i % 3 === 1 ? "sm:mt-16" : i % 3 === 2 ? "lg:mt-28" : "";
-              const ratio = i % 3 === 0 ? "aspect-[4/5]" : i % 3 === 1 ? "aspect-[4/3]" : "aspect-square";
-              return (
-                <div key={p.id} className={offset}>
-                  <GalleryTile
-                    src={media}
-                    title={p.title}
-                    index={i}
-                    category="STUDIO"
-                    onOpen={() => setActive({ title: p.title, category: "STUDIO", images })}
-                    className="block w-full text-left"
-                    mediaClassName={`${ratio} w-full h-full object-cover bg-white/5`}
-                  />
-                  <div className="flex justify-between mt-6 text-[11px] gap-4">
-                    <div className="flex gap-3 min-w-0">
-                      <span className="text-muted-foreground shrink-0">{String(i + 1).padStart(2, "0")}</span>
-                      <span className="truncate">{p.title}</span>
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
+          <div className="space-y-6 lg:space-y-[3px]">
+            {rows.map((row, r) => (
+              <ProjectColumns
+                key={r}
+                items={row.map((e) => e.col)}
+                onSelect={(_item, i) =>
+                  setActive({ title: row[i].title, category: "STUDIO", images: row[i].images })
+                }
+              />
+            ))}
           </div>
         )}
       </section>
