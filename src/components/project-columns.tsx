@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import { Link } from "@tanstack/react-router";
 import { motion } from "motion/react";
 import { DUR, EASE, viewportOnce } from "@/lib/motion";
@@ -36,9 +36,46 @@ function Media({ src, alt, className }: { src: string; alt: string; className?: 
  * horizontally while its neighbours shrink; tablet/mobile falls back to
  * stacked cards.
  */
-export function ProjectColumns({ items }: { items: ColumnProject[] }) {
+export function ProjectColumns({
+  items,
+  onSelect,
+}: {
+  items: ColumnProject[];
+  onSelect?: (item: ColumnProject, index: number) => void;
+}) {
   const [hovered, setHovered] = useState<number | null>(null);
   const enabled = useMotionEnabled();
+
+  const Wrapper = ({
+    item,
+    index,
+    className,
+    children,
+  }: {
+    item: ColumnProject;
+    index: number;
+    className: string;
+    children: ReactNode;
+  }) =>
+    onSelect ? (
+      <button
+        type="button"
+        onClick={() => onSelect(item, index)}
+        className={`${className} text-left`}
+        aria-label={item.title}
+      >
+        {children}
+      </button>
+    ) : (
+      <Link
+        to="/project/$projectId"
+        params={{ projectId: item.id }}
+        className={className}
+        aria-label={item.title}
+      >
+        {children}
+      </Link>
+    );
 
   return (
     <>
@@ -67,13 +104,7 @@ export function ProjectColumns({ items }: { items: ColumnProject[] }) {
               }}
               style={{ flexBasis: 0, flexGrow: 1, willChange: "flex-grow" }}
             >
-              <Link
-                to="/project/$projectId"
-                params={{ projectId: p.id }}
-
-                className="group block h-full w-full"
-                aria-label={p.title}
-              >
+              <Wrapper item={p} index={i} className="group block h-full w-full">
                 <motion.div
                   className="h-full w-full"
                   animate={{ scale: isOn ? 1.06 : 1 }}
@@ -115,7 +146,7 @@ export function ProjectColumns({ items }: { items: ColumnProject[] }) {
                 >
                   {p.title}
                 </motion.span>
-              </Link>
+              </Wrapper>
             </motion.div>
           );
         })}
@@ -123,13 +154,9 @@ export function ProjectColumns({ items }: { items: ColumnProject[] }) {
 
       {/* Tablet / mobile: stacked cards */}
       <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:hidden">
-        {items.map((p) => (
-          <Link
-            key={p.id}
-            to="/project/$projectId"
-            params={{ projectId: p.id }}
-            className="group block overflow-hidden rounded-[18px]"
-          >
+        {items.map((p, i) => (
+          <div key={p.id}>
+          <Wrapper item={p} index={i} className="group block w-full overflow-hidden rounded-[18px]">
             <div className="relative aspect-[4/5] w-full overflow-hidden">
               <Media
                 src={p.cover}
@@ -146,7 +173,8 @@ export function ProjectColumns({ items }: { items: ColumnProject[] }) {
                 </p>
               </div>
             </div>
-          </Link>
+          </Wrapper>
+          </div>
         ))}
       </div>
     </>
