@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as StudioRouteImport } from './routes/studio'
 import { Route as PortfolioRouteImport } from './routes/portfolio'
+import { Route as NewsRouteImport } from './routes/news'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AboutRouteImport } from './routes/about'
@@ -29,6 +30,11 @@ const StudioRoute = StudioRouteImport.update({
 const PortfolioRoute = PortfolioRouteImport.update({
   id: '/portfolio',
   path: '/portfolio',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const NewsRoute = NewsRouteImport.update({
+  id: '/news',
+  path: '/news',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ContactRoute = ContactRouteImport.update({
@@ -81,6 +87,7 @@ export interface FileRoutesByFullPath {
   '/about': typeof AboutRoute
   '/auth': typeof AuthRoute
   '/contact': typeof ContactRoute
+  '/news': typeof NewsRoute
   '/portfolio': typeof PortfolioRouteWithChildren
   '/studio': typeof StudioRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
@@ -93,6 +100,7 @@ export interface FileRoutesByTo {
   '/about': typeof AboutRoute
   '/auth': typeof AuthRoute
   '/contact': typeof ContactRoute
+  '/news': typeof NewsRoute
   '/portfolio': typeof PortfolioRouteWithChildren
   '/studio': typeof StudioRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
@@ -107,6 +115,7 @@ export interface FileRoutesById {
   '/about': typeof AboutRoute
   '/auth': typeof AuthRoute
   '/contact': typeof ContactRoute
+  '/news': typeof NewsRoute
   '/portfolio': typeof PortfolioRouteWithChildren
   '/studio': typeof StudioRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
@@ -121,6 +130,7 @@ export interface FileRouteTypes {
     | '/about'
     | '/auth'
     | '/contact'
+    | '/news'
     | '/portfolio'
     | '/studio'
     | '/dashboard'
@@ -133,6 +143,7 @@ export interface FileRouteTypes {
     | '/about'
     | '/auth'
     | '/contact'
+    | '/news'
     | '/portfolio'
     | '/studio'
     | '/dashboard'
@@ -146,6 +157,7 @@ export interface FileRouteTypes {
     | '/about'
     | '/auth'
     | '/contact'
+    | '/news'
     | '/portfolio'
     | '/studio'
     | '/_authenticated/dashboard'
@@ -160,6 +172,7 @@ export interface RootRouteChildren {
   AboutRoute: typeof AboutRoute
   AuthRoute: typeof AuthRoute
   ContactRoute: typeof ContactRoute
+  NewsRoute: typeof NewsRoute
   PortfolioRoute: typeof PortfolioRouteWithChildren
   StudioRoute: typeof StudioRoute
   ProjectProjectIdRoute: typeof ProjectProjectIdRoute
@@ -180,6 +193,13 @@ declare module '@tanstack/react-router' {
       path: '/portfolio'
       fullPath: '/portfolio'
       preLoaderRoute: typeof PortfolioRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/news': {
+      id: '/news'
+      path: '/news'
+      fullPath: '/news'
+      preLoaderRoute: typeof NewsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/contact': {
@@ -277,6 +297,7 @@ const rootRouteChildren: RootRouteChildren = {
   AboutRoute: AboutRoute,
   AuthRoute: AuthRoute,
   ContactRoute: ContactRoute,
+  NewsRoute: NewsRoute,
   PortfolioRoute: PortfolioRouteWithChildren,
   StudioRoute: StudioRoute,
   ProjectProjectIdRoute: ProjectProjectIdRoute,
