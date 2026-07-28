@@ -1,8 +1,7 @@
 import { useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { motion } from "motion/react";
-import { DUR, EASE, tileIn } from "@/lib/motion";
-import { viewportOnce } from "@/lib/motion";
+import { DUR, EASE, viewportOnce } from "@/lib/motion";
 import { isVideo } from "@/lib/media";
 import { useMotionEnabled } from "@/components/motion/use-motion-enabled";
 
@@ -86,7 +85,7 @@ export function ProjectColumns({ items }: { items: ColumnProject[] }) {
                 <motion.div
                   className="pointer-events-none absolute inset-0 bg-gradient-to-t from-background/90 via-background/10 to-transparent"
                   animate={{ opacity: isOn ? 1 : 0.35 }}
-                  transition={{ duration: DUR.medium ?? DUR.base, ease: EASE }}
+                  transition={{ duration: DUR.base, ease: EASE }}
                 />
                 <motion.div
                   className="pointer-events-none absolute inset-x-0 bottom-0 p-6"
