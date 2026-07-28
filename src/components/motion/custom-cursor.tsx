@@ -1,15 +1,14 @@
 import { useEffect, useState } from "react";
-import { AnimatePresence, motion, useMotionValue, useSpring } from "motion/react";
+import { motion, useMotionValue, useSpring } from "motion/react";
 import { EASE } from "@/lib/motion";
 import { useMotionEnabled } from "./use-motion-enabled";
 
-const INTERACTIVE = 'a, button, [role="button"], input, textarea, select, summary, [data-cursor], img, video';
+const INTERACTIVE = 'a, button, [role="button"], input, textarea, select, summary, img, video';
 
 export function CustomCursor() {
   const enabled = useMotionEnabled();
   const [active, setActive] = useState(false);
   const [visible, setVisible] = useState(false);
-  const [label, setLabel] = useState<string | null>(null);
   const [supported, setSupported] = useState(false);
   const [pressed, setPressed] = useState(false);
 
@@ -33,9 +32,7 @@ export function CustomCursor() {
       setVisible(true);
       const el = e.target as HTMLElement | null;
       const target = el?.closest?.(INTERACTIVE) as HTMLElement | null;
-      const labelled = el?.closest?.("[data-cursor]") as HTMLElement | null;
       setActive(!!target);
-      setLabel(labelled?.dataset?.cursor ?? null);
     };
     const onLeave = () => setVisible(false);
     const onDown = () => setPressed(true);
@@ -70,39 +67,18 @@ export function CustomCursor() {
           height: 26,
         }}
         animate={{
-          scale: (label ? 3.4 : active ? 1.3 : 1) * (pressed ? 0.82 : 1),
+          scale: (active ? 1.3 : 1) * (pressed ? 0.82 : 1),
           opacity: visible ? 1 : 0,
-          borderColor: active || label ? "var(--foreground)" : "color-mix(in oklab, var(--foreground) 45%, transparent)",
-          backgroundColor: label
-            ? "color-mix(in oklab, var(--background) 78%, transparent)"
-            : "color-mix(in oklab, var(--foreground) 6%, transparent)",
+          borderColor: active ? "var(--foreground)" : "color-mix(in oklab, var(--foreground) 45%, transparent)",
+          backgroundColor: "color-mix(in oklab, var(--foreground) 6%, transparent)",
         }}
         transition={{ duration: 0.25, ease: EASE }}
       >
       </motion.div>
       <motion.div
-        className="absolute left-0 top-0 flex w-28 items-center justify-center"
-        style={{ x: sx, y: sy, translateX: "-50%", translateY: "-50%", willChange: "transform" }}
-      >
-        <AnimatePresence>
-          {label && (
-            <motion.span
-              key={label}
-              initial={{ opacity: 0, y: 6 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -4 }}
-              transition={{ duration: 0.25, ease: EASE }}
-              className="text-center text-[10px] uppercase leading-[1.4] tracking-[0.24em] text-foreground"
-            >
-              {label}
-            </motion.span>
-          )}
-        </AnimatePresence>
-      </motion.div>
-      <motion.div
         className="absolute left-0 top-0 h-1 w-1 rounded-full bg-foreground"
         style={{ x, y, translateX: "-50%", translateY: "-50%", willChange: "transform" }}
-        animate={{ opacity: visible && !label ? 1 : 0, scale: pressed ? 0.6 : 1 }}
+        animate={{ opacity: visible ? 1 : 0, scale: pressed ? 0.6 : 1 }}
         transition={{ duration: 0.2, ease: EASE }}
       />
     </div>

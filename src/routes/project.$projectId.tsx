@@ -87,10 +87,10 @@ function ProjectDetail() {
     };
   }, [projectId]);
 
+  const hero = mediaSrc(project?.cover_image ?? project?.media_urls?.[0]) || "";
   const gallery = Array.from(
     new Set(((project?.media_urls ?? []) as string[]).map((u) => mediaSrc(u)).filter(Boolean)),
-  );
-  const hero = mediaSrc(project?.cover_image ?? project?.media_urls?.[0]) || "";
+  ).filter((src) => src !== hero);
   const year = project?.year ?? (project ? new Date(project.created_at).getFullYear().toString() : null);
 
   return (
@@ -153,30 +153,29 @@ function ProjectDetail() {
 
       {/* Editorial gallery */}
       <section className="border-t border-border px-6 md:px-12 py-24 md:py-40">
-        <div className="flex flex-col gap-28 md:gap-48">
-          {gallery.map((src, i) => {
-            const mod = i % 3;
-            const width = mod === 0 ? "w-full" : mod === 1 ? "w-full md:w-[62%]" : "w-full md:w-[78%] md:ml-auto";
-            return (
-              <motion.button
-                key={src + i}
-                type="button"
-                data-cursor="Zoom"
-                onClick={() => {
-                  setStartIndex(i);
-                  setActive({ title: project?.title ?? "", category: project?.category ?? "PROJECT", images: gallery });
-                }}
-                className={`${width} block overflow-hidden rounded-[22px] text-left`}
-                initial={{ opacity: 0, y: 40, x: i % 2 === 0 ? -40 : 40 }}
-                whileInView={{ opacity: 1, y: 0, x: 0 }}
-                viewport={{ once: true, amount: 0.2 }}
-                transition={{ duration: DUR.slow, ease: EASE }}
-                style={{ willChange: "transform, opacity" }}
-              >
-                <Media src={src} alt={`${project?.title ?? "Project"} — frame ${i + 1}`} className="w-full h-auto object-cover bg-white/5" />
-              </motion.button>
-            );
-          })}
+        <div className="columns-1 sm:columns-2 lg:columns-3 gap-10 md:gap-16 [column-fill:_balance]">
+          {gallery.map((src, i) => (
+            <motion.button
+              key={src + i}
+              type="button"
+              onClick={() => {
+                setStartIndex(i);
+                setActive({ title: project?.title ?? "", category: project?.category ?? "PROJECT", images: gallery });
+              }}
+              className="group mb-10 md:mb-16 block w-full break-inside-avoid overflow-hidden rounded-[22px] bg-white/5 text-left"
+              initial={{ opacity: 0, y: 60 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: 0.15, margin: "0px 0px -10% 0px" }}
+              transition={{ duration: DUR.slow, ease: EASE, delay: (i % 3) * 0.08 }}
+              style={{ willChange: "transform, opacity" }}
+            >
+              <Media
+                src={src}
+                alt={`${project?.title ?? "Project"} — frame ${i + 1}`}
+                className="w-full h-auto object-cover transition-transform duration-500 ease-out group-hover:scale-[1.05]"
+              />
+            </motion.button>
+          ))}
         </div>
         <Reveal className="mt-32 text-center">
           <Link to="/portfolio" className="text-[11px] border-b border-foreground pb-1">

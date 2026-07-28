@@ -255,32 +255,6 @@ export function Lightbox({
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: DUR.base, ease: EASE, delay: 0.08 }}
       >
-        {total > 1 && (
-          <div className="mb-4 flex justify-center gap-2 overflow-x-auto px-1 py-1">
-            {item.images.map((thumb, i) => (
-              <motion.button
-                key={thumb + i}
-                onClick={() => {
-                  setDir(i > index ? 1 : -1);
-                  setIndex(i);
-                }}
-                aria-label={`Image ${i + 1}`}
-                whileHover={{ scale: 1.06, y: -2 }}
-                whileTap={{ scale: 0.96 }}
-                transition={{ duration: DUR.fast, ease: EASE }}
-                className={`h-12 w-16 shrink-0 overflow-hidden rounded-lg border transition-opacity ${
-                  i === index ? "border-foreground opacity-100" : "border-border opacity-50 hover:opacity-90"
-                }`}
-              >
-                {isVideo(thumb) ? (
-                  <video src={thumb} className="h-full w-full object-cover" muted playsInline />
-                ) : (
-                  <img src={thumb} alt="" loading="lazy" decoding="async" className="h-full w-full object-cover" />
-                )}
-              </motion.button>
-            ))}
-          </div>
-        )}
         {item.description && (
           <p className="mx-auto mb-3 max-w-2xl text-xs text-muted-foreground">{item.description}</p>
         )}
