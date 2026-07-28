@@ -1,17 +1,16 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
-import { motion } from "motion/react";
+import { useEffect, useRef, useState } from "react";
+import { motion, useScroll, useTransform } from "motion/react";
 import { SiteHeader, SiteFooter } from "@/components/site-chrome";
 import projects from "@/data/projects.json";
 import services from "@/data/services.json";
 import { supabase } from "@/integrations/supabase/client";
 import { mediaSrc } from "@/lib/media";
 import { Reveal, RevealLines, Stagger, StaggerItem } from "@/components/motion/primitives";
-import { GalleryTile } from "@/components/motion/gallery-tile";
 import { Parallax } from "@/components/motion/parallax";
 import { MotionNavLink } from "@/components/motion/button";
 import { ScrollIndicator } from "@/components/motion/scroll-indicator";
-import { Lightbox, type LightboxItem } from "@/components/lightbox";
+import { ProjectColumns, type ColumnProject } from "@/components/project-columns";
 import { DUR, EASE } from "@/lib/motion";
 
 export const Route = createFileRoute("/")({
