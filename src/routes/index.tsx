@@ -1,17 +1,16 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { motion } from "motion/react";
+import { motion, useScroll, useTransform } from "motion/react";
 import { SiteHeader, SiteFooter } from "@/components/site-chrome";
 import projects from "@/data/projects.json";
 import services from "@/data/services.json";
 import { supabase } from "@/integrations/supabase/client";
 import { mediaSrc } from "@/lib/media";
 import { Reveal, RevealLines, Stagger, StaggerItem } from "@/components/motion/primitives";
-import { GalleryTile } from "@/components/motion/gallery-tile";
 import { Parallax } from "@/components/motion/parallax";
 import { MotionNavLink } from "@/components/motion/button";
 import { ScrollIndicator } from "@/components/motion/scroll-indicator";
-import { Lightbox, type LightboxItem } from "@/components/lightbox";
+import { ProjectColumns, type ColumnProject } from "@/components/project-columns";
 import { DUR, EASE } from "@/lib/motion";
 
 export const Route = createFileRoute("/")({
@@ -36,13 +35,22 @@ export const Route = createFileRoute("/")({
 });
 
 function Index() {
-  const [active, setActive] = useState<LightboxItem | null>(null);
+  const { scrollY } = useScroll();
+  const [vh, setVh] = useState(900);
+  useEffect(() => {
+    const read = () => setVh(window.innerHeight);
+    read();
+    window.addEventListener("resize", read);
+    return () => window.removeEventListener("resize", read);
+  }, []);
+  const heroScale = useTransform(scrollY, [0, vh], [1, 0.94]);
+  const heroOpacity = useTransform(scrollY, [0, vh * 0.85], [1, 0.25]);
   const staticFeatured = (projects as any[])
     .filter((p) => p.published && p.cover_image && !p.cover_image.includes("88e8419e"))
     .slice(0, 6);
   const [dbItems, setDbItems] = useState<any[]>([]);
   useEffect(() => {
-    supabase.from("projects").select("id,title,description,cover_image,media_urls,sort_order,created_at")
+    supabase.from("projects").select("id,title,description,category,cover_image,media_urls,sort_order,created_at")
       .eq("published", true).order("sort_order", { ascending: true }).order("created_at", { ascending: false }).limit(6)
       .then(({ data }) =>
         setDbItems(
@@ -61,17 +69,22 @@ function Index() {
       );
   }, []);
   const featured = [...dbItems, ...staticFeatured].slice(0, 6);
+  const columns: ColumnProject[] = featured
+    .filter((p) => p.cover_image)
+    .map((p) => ({ id: p.id, title: p.title, category: p.category ?? "PROJECT", cover: p.cover_image }));
 
   return (
     <div className="min-h-screen bg-background text-foreground">
       <SiteHeader />
 
-      {/* Hero */}
+      {/* Hero — stays pinned while the work section slides over it */}
+      <div className="relative">
       <motion.section
-        className="relative isolate overflow-hidden min-h-[100svh] flex flex-col justify-end px-6 md:px-12 pt-44 pb-24 md:pb-32"
+        className="sticky top-0 z-0 isolate overflow-hidden h-[100svh] flex flex-col justify-end px-6 md:px-12 pt-44 pb-24 md:pb-32"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: DUR.slow, ease: EASE, delay: 0.5 }}
+        style={{ scale: heroScale, opacity: heroOpacity, willChange: "transform, opacity" }}
       >
         <Parallax className="absolute inset-0 -z-10" distance={60}>
           <motion.div
@@ -122,55 +135,16 @@ function Index() {
         <ScrollIndicator />
       </motion.section>
 
-      {/* Featured work — editorial rhythm, sticky index column */}
-      <section className="border-t border-border px-6 md:px-12 py-32 md:py-52">
-        <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,14rem)_minmax(0,1fr)] gap-y-12 lg:gap-x-16">
-          <div className="lg:sticky lg:top-28 lg:self-start">
-            <Reveal className="flex items-baseline justify-between lg:block">
-              <p className="text-[11px] text-muted-foreground">SELECTED WORK</p>
-              <MotionNavLink to="/portfolio" className="text-[11px] border-b border-foreground pb-0.5 lg:mt-6 lg:inline-block">
-                VIEW ALL ↗
-              </MotionNavLink>
-            </Reveal>
-          </div>
-          <Stagger className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 md:gap-x-16 gap-y-24 md:gap-y-32" stagger={0.09}>
-            {featured.map((p, i) => {
-              const offset = i % 4 === 1 ? "sm:mt-24" : i % 4 === 2 ? "sm:-mt-8" : i % 4 === 3 ? "sm:mt-16" : "";
-              const ratio = i % 3 === 0 ? "aspect-[4/5]" : i % 3 === 1 ? "aspect-[16/11]" : "aspect-square";
-              return (
-                <StaggerItem key={p.id} className={offset}>
-                  <div className="group">
-                    {p.cover_image && (
-                      <GalleryTile
-                        src={p.cover_image}
-                        title={p.title}
-                        category="PROJECT"
-                        index={i}
-                        onOpen={() =>
-                          setActive({
-                            title: p.title,
-                            category: "PROJECT",
-                            description: p.description ?? undefined,
-                            images: p.gallery?.length ? p.gallery : [p.cover_image],
-                          })
-                        }
-                        className="block w-full text-left"
-                        mediaClassName={`${ratio} w-full h-full object-cover bg-white/5`}
-                      />
-                    )}
-                    <div className="flex justify-between mt-6 text-[11px] gap-4 transition-colors duration-500 group-hover:text-foreground">
-                      <div className="flex gap-3 min-w-0">
-                        <span className="text-muted-foreground shrink-0">{String(i + 1).padStart(2, "0")}</span>
-                        <span className="truncate">{p.title}</span>
-                      </div>
-                      <span className="text-muted-foreground shrink-0">{p.year ?? ""}</span>
-                    </div>
-                  </div>
-                </StaggerItem>
-              );
-            })}
-          </Stagger>
-        </div>
+      {/* Everything below rides over the pinned hero as one continuous canvas */}
+      <div className="relative z-10 bg-background rounded-t-[28px] shadow-[0_-40px_80px_-40px_rgba(0,0,0,0.9)]">
+      <section className="px-6 md:px-12 py-24 md:py-36">
+        <Reveal className="mb-12 flex items-baseline justify-between gap-6">
+          <p className="text-[11px] text-muted-foreground">SELECTED WORK</p>
+          <MotionNavLink to="/portfolio" className="text-[11px] border-b border-foreground pb-0.5">
+            VIEW ALL ↗
+          </MotionNavLink>
+        </Reveal>
+        <ProjectColumns items={columns} />
       </section>
 
       {/* Services */}
@@ -204,7 +178,8 @@ function Index() {
       </section>
 
       <SiteFooter />
-      <Lightbox item={active} onClose={() => setActive(null)} />
+      </div>
+      </div>
     </div>
   );
 }

@@ -63,6 +63,11 @@ type Item = {
   media_urls: string[];
   published: boolean;
   sort_order: number;
+  category?: string | null;
+  client?: string | null;
+  year?: string | null;
+  services?: string[] | null;
+  tools?: string[] | null;
 };
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
@@ -357,6 +362,11 @@ function ItemForm({
   const isEdit = !!item;
   const [title, setTitle] = useState(item?.title ?? "");
   const [description, setDescription] = useState(item?.description ?? "");
+  const [category, setCategory] = useState(item?.category ?? "");
+  const [client, setClient] = useState(item?.client ?? "");
+  const [year, setYear] = useState(item?.year ?? "");
+  const [services, setServices] = useState((item?.services ?? []).join(", "));
+  const [tools, setTools] = useState((item?.tools ?? []).join(", "));
   const [existing, setExisting] = useState<string[]>(item?.media_urls ?? []);
   const [cover, setCover] = useState<string | null>(item?.cover_image ?? item?.media_urls[0] ?? null);
   const [published, setPublished] = useState<boolean>(item?.published ?? true);
@@ -406,9 +416,21 @@ function ItemForm({
         media_urls: media,
         published,
       };
+      const csv = (v: string) => v.split(",").map((s) => s.trim()).filter(Boolean);
+      const fullPayload =
+        table === "projects"
+          ? {
+              ...payload,
+              category: category.trim() || null,
+              client: client.trim() || null,
+              year: year.trim() || null,
+              services: csv(services),
+              tools: csv(tools),
+            }
+          : payload;
       const { error } = isEdit
-        ? await supabase.from(table).update(payload).eq("id", item!.id)
-        : await supabase.from(table).insert(payload);
+        ? await supabase.from(table).update(fullPayload as never).eq("id", item!.id)
+        : await supabase.from(table).insert(fullPayload as never);
       if (error) throw error;
       onDone();
     } catch (err: any) {
@@ -436,6 +458,29 @@ function ItemForm({
           style={{ fontFamily: "Jost, sans-serif" }}
         />
       </div>
+      {table === "projects" && (
+        <div className="grid gap-4 sm:grid-cols-2">
+          {[
+            { label: "CATEGORY", value: category, set: setCategory, ph: "Commercial" },
+            { label: "CLIENT", value: client, set: setClient, ph: "Client name" },
+            { label: "YEAR", value: year, set: setYear, ph: "2026" },
+            { label: "SERVICES (COMMA SEPARATED)", value: services, set: setServices, ph: "Direction, Production" },
+            { label: "TOOLS (COMMA SEPARATED)", value: tools, set: setTools, ph: "RED Komodo, DaVinci" },
+          ].map((f) => (
+            <div key={f.label}>
+              <label className="block text-[11px] text-muted-foreground mb-2">{f.label}</label>
+              <input
+                value={f.value}
+                onChange={(e) => f.set(e.target.value)}
+                placeholder={f.ph}
+                maxLength={300}
+                className="w-full bg-transparent border border-border px-3 py-2 text-sm normal-case tracking-normal focus:outline-none focus:border-foreground"
+                style={{ fontFamily: "Jost, sans-serif" }}
+              />
+            </div>
+          ))}
+        </div>
+      )}
       <div>
         <label className="block text-[11px] text-muted-foreground mb-2">MEDIA (IMAGES / VIDEOS)</label>
         {existing.length > 0 && (

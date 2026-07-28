@@ -46,6 +46,8 @@ export type Database = {
       }
       projects: {
         Row: {
+          category: string | null
+          client: string | null
           cover_image: string | null
           created_at: string
           created_by: string | null
@@ -53,11 +55,16 @@ export type Database = {
           id: string
           media_urls: string[]
           published: boolean
+          services: string[]
           sort_order: number
           title: string
+          tools: string[]
           updated_at: string
+          year: string | null
         }
         Insert: {
+          category?: string | null
+          client?: string | null
           cover_image?: string | null
           created_at?: string
           created_by?: string | null
@@ -65,11 +72,16 @@ export type Database = {
           id?: string
           media_urls?: string[]
           published?: boolean
+          services?: string[]
           sort_order?: number
           title: string
+          tools?: string[]
           updated_at?: string
+          year?: string | null
         }
         Update: {
+          category?: string | null
+          client?: string | null
           cover_image?: string | null
           created_at?: string
           created_by?: string | null
@@ -77,9 +89,12 @@ export type Database = {
           id?: string
           media_urls?: string[]
           published?: boolean
+          services?: string[]
           sort_order?: number
           title?: string
+          tools?: string[]
           updated_at?: string
+          year?: string | null
         }
         Relationships: []
       }

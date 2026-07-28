@@ -4,11 +4,12 @@ import { createPortal } from "react-dom";
 import { AnimatePresence, motion, useMotionValueEvent, useScroll } from "motion/react";
 import { DUR, EASE, fadeUp, staggerParent, viewportOnce } from "@/lib/motion";
 import { useMotionEnabled } from "@/components/motion/use-motion-enabled";
+import logoSrc from "@/assets/logo.png";
 
 const NAV = [
-  { to: "/", label: "HOME" },
+  { to: "/studio", label: "STUDIO" },
   { to: "/portfolio", label: "PORTFOLIO" },
-  { to: "/about", label: "ABOUT" },
+  { to: "/news", label: "NEWS" },
   { to: "/contact", label: "CONTACT" },
 ] as const;
 
@@ -48,11 +49,16 @@ export function SiteHeader() {
       <Link
         to="/"
         onClick={() => setMenuOpen(false)}
-        className="nav-underline text-[15px] font-medium tracking-tight normal-case"
-        style={{ fontFamily: "Jost, sans-serif", letterSpacing: "-0.01em" }}
+        className="block shrink-0"
         aria-label="Curvature Studio"
       >
-        Curvature Studio
+        <img
+          src={logoSrc}
+          alt="Curvature Studio"
+          width={896}
+          height={220}
+          className="h-10 w-auto md:h-11 mix-blend-screen"
+        />
       </Link>
 
       <nav className="hidden sm:flex gap-6 md:gap-8 text-[11px]">
@@ -61,7 +67,7 @@ export function SiteHeader() {
             key={n.to}
             to={n.to}
             className="nav-underline"
-            activeProps={{ className: "text-foreground" }}
+            activeProps={{ className: "text-foreground is-active" }}
             inactiveProps={{ className: "text-muted-foreground hover:text-foreground transition-colors" }}
           >
             {n.label}
