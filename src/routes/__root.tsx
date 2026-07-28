@@ -16,7 +16,7 @@ import { CustomCursor } from "../components/motion/custom-cursor";
 import { PageLoader } from "../components/motion/page-loader";
 import { PageTransition } from "../components/motion/page-transition";
 import { SmoothScroll } from "../components/motion/smooth-scroll";
-import { ScrollProgress } from "../components/motion/scroll-progress";
+import { ScrollRail } from "../components/motion/scroll-rail";
 import { ScrollToTop } from "../components/motion/scroll-to-top";
 
 function NotFoundComponent() {
@@ -134,7 +134,7 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       <SmoothScroll />
-      <ScrollProgress />
+      <ScrollRail />
       <PageLoader />
       <CustomCursor />
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
