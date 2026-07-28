@@ -88,17 +88,16 @@ export function GalleryTile({
   const overlay = (
     <motion.span
       className="pointer-events-none absolute inset-x-0 bottom-0 bg-gradient-to-t from-background/90 to-transparent px-5 pb-5 pt-16 backdrop-blur-[1px]"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 0 }}
-      variants={{ hovered: { opacity: 1 } }}
+      initial={{ opacity: 1 }}
+      animate={{ opacity: 1 }}
       transition={{ duration: DUR.base, ease: EASE }}
     >
       {category && (
         <motion.span
-          className="mb-1 block text-[10px] uppercase tracking-[0.2em] text-muted-foreground"
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 0, y: 12 }}
-          variants={{ hovered: { opacity: 1, y: 0 } }}
+          className="mb-1 block text-[10px] uppercase tracking-[0.2em] text-foreground/70"
+          initial={{ opacity: 1, y: 0 }}
+          animate={{ opacity: 1, y: 0 }}
+          style={{ textShadow: "0 1px 8px rgba(0,0,0,0.6)" }}
           transition={{ duration: DUR.base, ease: EASE, delay: 0.15 }}
         >
           {category}
@@ -106,11 +105,10 @@ export function GalleryTile({
       )}
       <motion.span
         className="block text-xs md:text-sm text-foreground"
-        initial={{ y: 20, opacity: 0 }}
-        animate={{ y: 20, opacity: 0 }}
-        variants={{ hovered: { y: 0, opacity: 1 } }}
+        initial={{ y: 0, opacity: 1 }}
+        animate={{ y: 0, opacity: 1 }}
         transition={{ duration: DUR.slow, ease: EASE }}
-        style={{ fontFamily: "Jost, sans-serif" }}
+        style={{ fontFamily: "Jost, sans-serif", textShadow: "0 1px 10px rgba(0,0,0,0.7)" }}
       >
         {title}
       </motion.span>
