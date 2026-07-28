@@ -35,10 +35,16 @@ export const Route = createFileRoute("/")({
 });
 
 function Index() {
-  const heroRef = useRef<HTMLDivElement>(null);
-  const { scrollYProgress } = useScroll({ target: heroRef, offset: ["start start", "end start"] });
-  const heroScale = useTransform(scrollYProgress, [0, 1], [1, 0.94]);
-  const heroOpacity = useTransform(scrollYProgress, [0, 0.9], [1, 0.25]);
+  const { scrollY } = useScroll();
+  const [vh, setVh] = useState(900);
+  useEffect(() => {
+    const read = () => setVh(window.innerHeight);
+    read();
+    window.addEventListener("resize", read);
+    return () => window.removeEventListener("resize", read);
+  }, []);
+  const heroScale = useTransform(scrollY, [0, vh], [1, 0.94]);
+  const heroOpacity = useTransform(scrollY, [0, vh * 0.85], [1, 0.25]);
   const staticFeatured = (projects as any[])
     .filter((p) => p.published && p.cover_image && !p.cover_image.includes("88e8419e"))
     .slice(0, 6);
@@ -72,7 +78,7 @@ function Index() {
       <SiteHeader />
 
       {/* Hero — stays pinned while the work section slides over it */}
-      <div ref={heroRef} className="relative">
+      <div className="relative">
       <motion.section
         className="sticky top-0 z-0 isolate overflow-hidden h-[100svh] flex flex-col justify-end px-6 md:px-12 pt-44 pb-24 md:pb-32"
         initial={{ opacity: 0 }}
