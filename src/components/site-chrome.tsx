@@ -4,7 +4,6 @@ import { createPortal } from "react-dom";
 import { AnimatePresence, motion, useMotionValueEvent, useScroll } from "motion/react";
 import { DUR, EASE, fadeUp, staggerParent, viewportOnce } from "@/lib/motion";
 import { useMotionEnabled } from "@/components/motion/use-motion-enabled";
-import logoSrc from "@/assets/logo.png";
 
 const NAV = [
   { to: "/studio", label: "STUDIO" },
