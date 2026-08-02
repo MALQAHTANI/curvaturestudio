@@ -17,8 +17,10 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ClientsIndexRouteImport } from './routes/clients.index'
 import { Route as ProjectProjectIdRouteImport } from './routes/project.$projectId'
 import { Route as PortfolioProjectsRouteImport } from './routes/portfolio.projects'
+import { Route as ClientsClientIdRouteImport } from './routes/clients.$clientId'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as ApiPublicMediaSplatRouteImport } from './routes/api/public/media/$'
 
@@ -61,6 +63,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ClientsIndexRoute = ClientsIndexRouteImport.update({
+  id: '/clients/',
+  path: '/clients/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ProjectProjectIdRoute = ProjectProjectIdRouteImport.update({
   id: '/project/$projectId',
   path: '/project/$projectId',
@@ -70,6 +77,11 @@ const PortfolioProjectsRoute = PortfolioProjectsRouteImport.update({
   id: '/projects',
   path: '/projects',
   getParentRoute: () => PortfolioRoute,
+} as any)
+const ClientsClientIdRoute = ClientsClientIdRouteImport.update({
+  id: '/clients/$clientId',
+  path: '/clients/$clientId',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   id: '/dashboard',
@@ -91,8 +103,10 @@ export interface FileRoutesByFullPath {
   '/portfolio': typeof PortfolioRouteWithChildren
   '/studio': typeof StudioRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/clients/$clientId': typeof ClientsClientIdRoute
   '/portfolio/projects': typeof PortfolioProjectsRoute
   '/project/$projectId': typeof ProjectProjectIdRoute
+  '/clients/': typeof ClientsIndexRoute
   '/api/public/media/$': typeof ApiPublicMediaSplatRoute
 }
 export interface FileRoutesByTo {
@@ -104,8 +118,10 @@ export interface FileRoutesByTo {
   '/portfolio': typeof PortfolioRouteWithChildren
   '/studio': typeof StudioRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/clients/$clientId': typeof ClientsClientIdRoute
   '/portfolio/projects': typeof PortfolioProjectsRoute
   '/project/$projectId': typeof ProjectProjectIdRoute
+  '/clients': typeof ClientsIndexRoute
   '/api/public/media/$': typeof ApiPublicMediaSplatRoute
 }
 export interface FileRoutesById {
@@ -119,8 +135,10 @@ export interface FileRoutesById {
   '/portfolio': typeof PortfolioRouteWithChildren
   '/studio': typeof StudioRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
+  '/clients/$clientId': typeof ClientsClientIdRoute
   '/portfolio/projects': typeof PortfolioProjectsRoute
   '/project/$projectId': typeof ProjectProjectIdRoute
+  '/clients/': typeof ClientsIndexRoute
   '/api/public/media/$': typeof ApiPublicMediaSplatRoute
 }
 export interface FileRouteTypes {
@@ -134,8 +152,10 @@ export interface FileRouteTypes {
     | '/portfolio'
     | '/studio'
     | '/dashboard'
+    | '/clients/$clientId'
     | '/portfolio/projects'
     | '/project/$projectId'
+    | '/clients/'
     | '/api/public/media/$'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -147,8 +167,10 @@ export interface FileRouteTypes {
     | '/portfolio'
     | '/studio'
     | '/dashboard'
+    | '/clients/$clientId'
     | '/portfolio/projects'
     | '/project/$projectId'
+    | '/clients'
     | '/api/public/media/$'
   id:
     | '__root__'
@@ -161,8 +183,10 @@ export interface FileRouteTypes {
     | '/portfolio'
     | '/studio'
     | '/_authenticated/dashboard'
+    | '/clients/$clientId'
     | '/portfolio/projects'
     | '/project/$projectId'
+    | '/clients/'
     | '/api/public/media/$'
   fileRoutesById: FileRoutesById
 }
@@ -175,7 +199,9 @@ export interface RootRouteChildren {
   NewsRoute: typeof NewsRoute
   PortfolioRoute: typeof PortfolioRouteWithChildren
   StudioRoute: typeof StudioRoute
+  ClientsClientIdRoute: typeof ClientsClientIdRoute
   ProjectProjectIdRoute: typeof ProjectProjectIdRoute
+  ClientsIndexRoute: typeof ClientsIndexRoute
   ApiPublicMediaSplatRoute: typeof ApiPublicMediaSplatRoute
 }
 
@@ -237,6 +263,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/clients/': {
+      id: '/clients/'
+      path: '/clients'
+      fullPath: '/clients/'
+      preLoaderRoute: typeof ClientsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/project/$projectId': {
       id: '/project/$projectId'
       path: '/project/$projectId'
@@ -250,6 +283,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/portfolio/projects'
       preLoaderRoute: typeof PortfolioProjectsRouteImport
       parentRoute: typeof PortfolioRoute
+    }
+    '/clients/$clientId': {
+      id: '/clients/$clientId'
+      path: '/clients/$clientId'
+      fullPath: '/clients/$clientId'
+      preLoaderRoute: typeof ClientsClientIdRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/_authenticated/dashboard': {
       id: '/_authenticated/dashboard'
@@ -300,7 +340,9 @@ const rootRouteChildren: RootRouteChildren = {
   NewsRoute: NewsRoute,
   PortfolioRoute: PortfolioRouteWithChildren,
   StudioRoute: StudioRoute,
+  ClientsClientIdRoute: ClientsClientIdRoute,
   ProjectProjectIdRoute: ProjectProjectIdRoute,
+  ClientsIndexRoute: ClientsIndexRoute,
   ApiPublicMediaSplatRoute: ApiPublicMediaSplatRoute,
 }
 export const routeTree = rootRouteImport
