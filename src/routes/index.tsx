@@ -172,6 +172,7 @@ function Index() {
       {/* CTA */}
       <section className="border-t border-border px-6 md:px-12 py-48 md:py-64 text-center">
         <RevealLines as="h2" className="display-lg" lines={["LET'S BUILD", "SOMETHING."]} inView />
+        <RevealLines as="h2" className="display-lg" lines={["LET'S BUILD", "SOMETHING."]} inView />
         <Reveal className="mt-12" delay={0.2}>
           <MotionNavLink to="/contact" className="inline-block text-[11px] border-b border-foreground pb-1">
             START A PROJECT ↗
