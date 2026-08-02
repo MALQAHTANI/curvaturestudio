@@ -8,6 +8,7 @@ import { useMotionEnabled } from "@/components/motion/use-motion-enabled";
 const NAV = [
   { to: "/studio", label: "STUDIO" },
   { to: "/portfolio", label: "PORTFOLIO" },
+  { to: "/clients", label: "CLIENTS" },
   { to: "/news", label: "NEWS" },
   { to: "/contact", label: "CONTACT" },
 ] as const;

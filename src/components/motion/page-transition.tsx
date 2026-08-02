@@ -1,6 +1,6 @@
 import { useRouterState } from "@tanstack/react-router";
 import { AnimatePresence, motion } from "motion/react";
-import { useEffect, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { DUR, EASE } from "@/lib/motion";
 import { useMotionEnabled } from "./use-motion-enabled";
 
@@ -12,6 +12,8 @@ export function PageTransition({ children }: { children: ReactNode }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const isLoading = useRouterState({ select: (s) => s.status === "pending" });
   const enabled = useMotionEnabled();
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
 
   // Always land at the top of a new scene.
   useEffect(() => {
@@ -24,7 +26,7 @@ export function PageTransition({ children }: { children: ReactNode }) {
   return (
     <>
       <AnimatePresence>
-        {isLoading && (
+        {mounted && isLoading && (
           <motion.div
             key="veil"
             aria-hidden

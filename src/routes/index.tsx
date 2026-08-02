@@ -12,8 +12,6 @@ import { MotionNavLink } from "@/components/motion/button";
 import { ScrollIndicator } from "@/components/motion/scroll-indicator";
 import { ProjectColumns, type ColumnProject } from "@/components/project-columns";
 import { DUR, EASE } from "@/lib/motion";
-import { ClientCard } from "@/components/client-card";
-import { useClientProjects } from "@/lib/use-client-projects";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -74,7 +72,6 @@ function Index() {
   const columns: ColumnProject[] = featured
     .filter((p) => p.cover_image)
     .map((p) => ({ id: p.id, title: p.title, category: p.category ?? "PROJECT", cover: p.cover_image }));
-  const { items: clientProjects } = useClientProjects(6);
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -169,40 +166,7 @@ function Index() {
         </Stagger>
       </section>
 
-      {/* Our Clients — featured client projects */}
-      {clientProjects.length > 0 && (
-        <section className="border-t border-border px-6 md:px-12 py-32 md:py-48">
-          <Reveal className="mb-6 flex items-baseline justify-between gap-6">
-            <p className="text-[11px] text-muted-foreground">OUR CLIENTS</p>
-            <MotionNavLink to="/clients" className="text-[11px] border-b border-foreground pb-0.5">
-              SEE MORE ↗
-            </MotionNavLink>
-          </Reveal>
-          <Reveal delay={0.1}>
-            <h2 className="text-2xl md:text-4xl">Featured Projects</h2>
-            <p
-              className="mt-6 max-w-xl text-muted-foreground normal-case tracking-normal"
-              style={{ fontFamily: "Jost, sans-serif", fontSize: "14px", lineHeight: 1.7 }}
-            >
-              A selection of brands we've built cinematic worlds for — each card opens the full case study.
-            </p>
-          </Reveal>
-          <div className="mt-16 grid grid-cols-1 gap-8 md:gap-10 sm:grid-cols-2 lg:grid-cols-3">
-            {clientProjects.map((p, i) => (
-              <ClientCard key={p.id} project={p} index={i} aspect="aspect-[4/3]" />
-            ))}
-          </div>
-          <Reveal className="mt-20 text-center" delay={0.1}>
-            <MotionNavLink
-              to="/clients"
-              className="inline-block rounded-full border border-foreground/40 px-8 py-3 text-[11px] uppercase tracking-[0.22em] transition-colors duration-300 hover:border-foreground"
-            >
-              See More ↗
-            </MotionNavLink>
-          </Reveal>
-        </section>
-      )}
-
+      {/* Clients live on their own dedicated page — linked from the header */}
       {/* CTA */}
       <section className="border-t border-border px-6 md:px-12 py-48 md:py-64 text-center">
         <RevealLines as="h2" className="display-lg" lines={["LET'S BUILD", "SOMETHING."]} inView />
