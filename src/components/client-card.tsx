@@ -20,7 +20,7 @@ function Media({ src, alt, className }: { src: string; alt: string; className?: 
 export function ClientCard({
   project,
   index = 0,
-  aspect = "aspect-[4/3]",
+  aspect = "aspect-[4/5]",
 }: {
   project: ClientProject;
   index?: number;

@@ -25,7 +25,8 @@ export const Route = createFileRoute("/clients/")({
   component: ClientsIndex,
 });
 
-const ASPECTS = ["aspect-[4/5]", "aspect-[4/3]", "aspect-[3/4]", "aspect-[1/1]", "aspect-[5/4]", "aspect-[3/2]"];
+// Portrait / square only — never wide rectangles.
+const ASPECTS = ["aspect-[4/5]", "aspect-[1/1]", "aspect-[3/4]", "aspect-[4/5]", "aspect-[1/1]", "aspect-[3/4]"];
 
 function ClientsIndex() {
   const { items, loading } = useClientProjects();
@@ -55,11 +56,9 @@ function ClientsIndex() {
         {!loading && items.length === 0 && (
           <p className="text-[11px] text-muted-foreground">NO PROJECTS PUBLISHED YET.</p>
         )}
-        <div className="columns-1 sm:columns-2 lg:columns-3 gap-6 md:gap-10 [column-fill:_balance]">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-10">
           {items.map((p, i) => (
-            <div key={p.id} className="mb-6 md:mb-10 break-inside-avoid">
-              <ClientCard project={p} index={i} aspect={ASPECTS[i % ASPECTS.length]} />
-            </div>
+            <ClientCard key={p.id} project={p} index={i} aspect={ASPECTS[i % ASPECTS.length]} />
           ))}
         </div>
       </section>
