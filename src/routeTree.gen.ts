@@ -20,6 +20,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as ClientsIndexRouteImport } from './routes/clients.index'
 import { Route as ProjectProjectIdRouteImport } from './routes/project.$projectId'
 import { Route as PortfolioProjectsRouteImport } from './routes/portfolio.projects'
+import { Route as ClientsClientIdRouteImport } from './routes/clients.$clientId'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as ApiPublicMediaSplatRouteImport } from './routes/api/public/media/$'
 
@@ -77,6 +78,11 @@ const PortfolioProjectsRoute = PortfolioProjectsRouteImport.update({
   path: '/projects',
   getParentRoute: () => PortfolioRoute,
 } as any)
+const ClientsClientIdRoute = ClientsClientIdRouteImport.update({
+  id: '/clients/$clientId',
+  path: '/clients/$clientId',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
@@ -97,6 +103,7 @@ export interface FileRoutesByFullPath {
   '/portfolio': typeof PortfolioRouteWithChildren
   '/studio': typeof StudioRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/clients/$clientId': typeof ClientsClientIdRoute
   '/portfolio/projects': typeof PortfolioProjectsRoute
   '/project/$projectId': typeof ProjectProjectIdRoute
   '/clients/': typeof ClientsIndexRoute
@@ -111,6 +118,7 @@ export interface FileRoutesByTo {
   '/portfolio': typeof PortfolioRouteWithChildren
   '/studio': typeof StudioRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/clients/$clientId': typeof ClientsClientIdRoute
   '/portfolio/projects': typeof PortfolioProjectsRoute
   '/project/$projectId': typeof ProjectProjectIdRoute
   '/clients': typeof ClientsIndexRoute
@@ -127,6 +135,7 @@ export interface FileRoutesById {
   '/portfolio': typeof PortfolioRouteWithChildren
   '/studio': typeof StudioRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
+  '/clients/$clientId': typeof ClientsClientIdRoute
   '/portfolio/projects': typeof PortfolioProjectsRoute
   '/project/$projectId': typeof ProjectProjectIdRoute
   '/clients/': typeof ClientsIndexRoute
@@ -143,6 +152,7 @@ export interface FileRouteTypes {
     | '/portfolio'
     | '/studio'
     | '/dashboard'
+    | '/clients/$clientId'
     | '/portfolio/projects'
     | '/project/$projectId'
     | '/clients/'
@@ -157,6 +167,7 @@ export interface FileRouteTypes {
     | '/portfolio'
     | '/studio'
     | '/dashboard'
+    | '/clients/$clientId'
     | '/portfolio/projects'
     | '/project/$projectId'
     | '/clients'
@@ -172,6 +183,7 @@ export interface FileRouteTypes {
     | '/portfolio'
     | '/studio'
     | '/_authenticated/dashboard'
+    | '/clients/$clientId'
     | '/portfolio/projects'
     | '/project/$projectId'
     | '/clients/'
@@ -187,6 +199,7 @@ export interface RootRouteChildren {
   NewsRoute: typeof NewsRoute
   PortfolioRoute: typeof PortfolioRouteWithChildren
   StudioRoute: typeof StudioRoute
+  ClientsClientIdRoute: typeof ClientsClientIdRoute
   ProjectProjectIdRoute: typeof ProjectProjectIdRoute
   ClientsIndexRoute: typeof ClientsIndexRoute
   ApiPublicMediaSplatRoute: typeof ApiPublicMediaSplatRoute
@@ -271,6 +284,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PortfolioProjectsRouteImport
       parentRoute: typeof PortfolioRoute
     }
+    '/clients/$clientId': {
+      id: '/clients/$clientId'
+      path: '/clients/$clientId'
+      fullPath: '/clients/$clientId'
+      preLoaderRoute: typeof ClientsClientIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/dashboard': {
       id: '/_authenticated/dashboard'
       path: '/dashboard'
@@ -320,6 +340,7 @@ const rootRouteChildren: RootRouteChildren = {
   NewsRoute: NewsRoute,
   PortfolioRoute: PortfolioRouteWithChildren,
   StudioRoute: StudioRoute,
+  ClientsClientIdRoute: ClientsClientIdRoute,
   ProjectProjectIdRoute: ProjectProjectIdRoute,
   ClientsIndexRoute: ClientsIndexRoute,
   ApiPublicMediaSplatRoute: ApiPublicMediaSplatRoute,

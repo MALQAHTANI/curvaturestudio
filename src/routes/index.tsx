@@ -12,6 +12,8 @@ import { MotionNavLink } from "@/components/motion/button";
 import { ScrollIndicator } from "@/components/motion/scroll-indicator";
 import { ProjectColumns, type ColumnProject } from "@/components/project-columns";
 import { DUR, EASE } from "@/lib/motion";
+import { ClientCard } from "@/components/client-card";
+import { useClientProjects } from "@/lib/use-client-projects";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -72,6 +74,7 @@ function Index() {
   const columns: ColumnProject[] = featured
     .filter((p) => p.cover_image)
     .map((p) => ({ id: p.id, title: p.title, category: p.category ?? "PROJECT", cover: p.cover_image }));
+  const { items: clientProjects } = useClientProjects(6);
 
   return (
     <div className="min-h-screen bg-background text-foreground">
