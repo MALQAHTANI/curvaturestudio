@@ -183,7 +183,7 @@ function ClientCaseStudy() {
           <Reveal>
             <p className="text-[11px] text-muted-foreground mb-12">GALLERY</p>
           </Reveal>
-          <div className="columns-1 sm:columns-2 lg:columns-3 gap-8 md:gap-12 [column-fill:_balance]">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-12">
             {gallery.map((src, i) => (
               <motion.button
                 key={src + i}
@@ -196,7 +196,7 @@ function ClientCaseStudy() {
                     images: gallery,
                   });
                 }}
-                className="group mb-8 md:mb-12 block w-full break-inside-avoid overflow-hidden rounded-[22px] bg-foreground/[0.04] text-left"
+                className="group relative block aspect-[4/5] w-full overflow-hidden rounded-[22px] bg-foreground/[0.04] text-left"
                 initial={{ opacity: 0, y: 60 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, amount: 0.15, margin: "0px 0px -10% 0px" }}
@@ -206,7 +206,7 @@ function ClientCaseStudy() {
                 <Media
                   src={src}
                   alt={`${name} — frame ${i + 1}`}
-                  className="w-full h-auto object-cover transition-transform duration-500 ease-out group-hover:scale-[1.05]"
+                  className="h-full w-full object-cover transition-transform duration-500 ease-out group-hover:scale-[1.05]"
                 />
               </motion.button>
             ))}
