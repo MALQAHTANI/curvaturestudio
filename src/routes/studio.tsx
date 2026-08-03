@@ -4,7 +4,7 @@ import { SiteHeader, SiteFooter } from "@/components/site-chrome";
 import { supabase } from "@/integrations/supabase/client";
 import { mediaSrc } from "@/lib/media";
 import { Reveal, RevealLines } from "@/components/motion/primitives";
-import { ProjectColumns, type ColumnProject } from "@/components/project-columns";
+import { MediaGrid, type GridTile } from "@/components/media-grid";
 import { Lightbox, type LightboxItem } from "@/components/lightbox";
 
 export const Route = createFileRoute("/studio")({
@@ -43,11 +43,9 @@ function StudioPage() {
           ) as string[],
         ),
       );
-      return { col: { id: p.id, title: p.title, category: "STUDIO", cover: media } as ColumnProject, images, title: p.title };
+      return { col: { id: p.id, title: p.title, category: "STUDIO", cover: media } as GridTile, images, title: p.title };
     })
-    .filter(Boolean) as { col: ColumnProject; images: string[]; title: string }[];
-  const rows: typeof entries[] = [];
-  for (let i = 0; i < entries.length; i += 6) rows.push(entries.slice(i, i + 6));
+    .filter(Boolean) as { col: GridTile; images: string[]; title: string }[];
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -58,23 +56,18 @@ function StudioPage() {
         </Reveal>
         <RevealLines className="display-lg" lines={["FROM THE", "STUDIO."]} delay={0.15} />
       </section>
-      <section className="border-t border-border px-6 md:px-12 py-24 md:py-48">
+      <section className="border-t border-border px-6 md:px-12 py-20 md:py-32">
         {loading ? (
           <p className="text-[11px] text-muted-foreground">LOADING…</p>
         ) : items.length === 0 ? (
           <p className="text-[11px] text-muted-foreground">NO STUDIO CONTENT YET.</p>
         ) : (
-          <div className="space-y-6 lg:space-y-[3px]">
-            {rows.map((row, r) => (
-              <ProjectColumns
-                key={r}
-                items={row.map((e) => e.col)}
-                onSelect={(_item, i) =>
-                  setActive({ title: row[i].title, category: "STUDIO", images: row[i].images })
-                }
-              />
-            ))}
-          </div>
+          <MediaGrid
+            items={entries.map((e) => e.col)}
+            onSelect={(_item, i) =>
+              setActive({ title: entries[i].title, category: "STUDIO", images: entries[i].images })
+            }
+          />
         )}
       </section>
       <Lightbox item={active} onClose={() => setActive(null)} />

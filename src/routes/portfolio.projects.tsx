@@ -4,7 +4,7 @@ import { SiteHeader, SiteFooter } from "@/components/site-chrome";
 import { supabase } from "@/integrations/supabase/client";
 import { mediaSrc } from "@/lib/media";
 import { Reveal, RevealLines } from "@/components/motion/primitives";
-import { ProjectColumns, type ColumnProject } from "@/components/project-columns";
+import { MediaGrid, type GridTile } from "@/components/media-grid";
 
 export const Route = createFileRoute("/portfolio/projects")({
   head: () => ({
@@ -56,14 +56,12 @@ function ProjectsGallery() {
     .filter((t) => !!t.coverImage);
   const tiles: Tile[] = dbTiles;
 
-  const columns: ColumnProject[] = tiles.map((t) => ({
+  const grid: GridTile[] = tiles.map((t) => ({
     id: t.id,
     title: t.title,
     category: t.category ?? "PROJECT",
     cover: t.coverImage,
   }));
-  const rows: ColumnProject[][] = [];
-  for (let i = 0; i < columns.length; i += 6) rows.push(columns.slice(i, i + 6));
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -78,12 +76,8 @@ function ProjectsGallery() {
           delay={0.15}
         />
       </section>
-      <section className="border-t border-border px-6 md:px-12 py-24 md:py-48">
-        <div className="space-y-6 lg:space-y-[3px]">
-          {rows.map((row, r) => (
-            <ProjectColumns key={r} items={row} />
-          ))}
-        </div>
+      <section className="border-t border-border px-6 md:px-12 py-20 md:py-32">
+        <MediaGrid items={grid} />
       </section>
       <SiteFooter />
     </div>

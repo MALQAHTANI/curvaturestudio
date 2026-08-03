@@ -45,7 +45,32 @@ function Fallback({ label }: { label: string }) {
   );
 }
 
-type Tab = "projects" | "studio" | "messages";
+type Tab = "projects" | "studio" | "clients" | "events" | "messages";
+const TAB_LABELS: Record<Tab, string> = {
+  projects: "PROJECTS",
+  studio: "STUDIO",
+  clients: "CLIENTS",
+  events: "EVENTS",
+  messages: "MESSAGES",
+};
+type Registration = {
+  id: string;
+  event_name: string | null;
+  name: string;
+  email: string;
+  phone: string | null;
+  note: string | null;
+  read: boolean;
+  created_at: string;
+};
+type ClientRow = {
+  id: string;
+  name: string;
+  logo_url: string | null;
+  website: string | null;
+  sort_order: number;
+  published: boolean;
+};
 type Message = {
   id: string;
   name: string;
@@ -126,19 +151,23 @@ function Dashboard() {
 
         {isEmployee && (
           <>
-            <div className="flex gap-2 border-b border-border mb-8">
-              {(["projects", "studio", "messages"] as Tab[]).map((t) => (
+            <div className="flex flex-wrap gap-2 border-b border-border mb-8">
+              {(["projects", "studio", "clients", "events", "messages"] as Tab[]).map((t) => (
                 <button
                   key={t}
                   onClick={() => setTab(t)}
                   className={`px-4 py-3 text-[11px] tracking-[0.15em] -mb-px border-b ${tab === t ? "text-foreground border-foreground" : "text-muted-foreground border-transparent hover:text-foreground"}`}
                 >
-                  {t === "projects" ? "PROJECTS" : t === "studio" ? "STUDIO" : "MESSAGES"}
+                  {TAB_LABELS[t]}
                 </button>
               ))}
             </div>
             {tab === "messages" ? (
               <MessagesPanel />
+            ) : tab === "events" ? (
+              <EventsPanel />
+            ) : tab === "clients" ? (
+              <ClientsPanel />
             ) : (
               <SectionEditor
                 key={tab}
@@ -213,6 +242,206 @@ function MessagesPanel() {
                   {m.read ? "MARK UNREAD ↗" : "MARK READ ↗"}
                 </button>
                 <button onClick={() => remove(m.id)} className="text-destructive hover:opacity-70">DELETE ↗</button>
+              </div>
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  );
+}
+
+function EventsPanel() {
+  const [rows, setRows] = useState<Registration[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  async function refresh() {
+    setLoading(true);
+    const { data } = await (supabase.from("event_registrations" as never) as any)
+      .select("*")
+      .order("created_at", { ascending: false });
+    setRows((data as Registration[]) ?? []);
+    setLoading(false);
+  }
+  useEffect(() => { refresh(); }, []);
+
+  async function toggleRead(r: Registration) {
+    await (supabase.from("event_registrations" as never) as any).update({ read: !r.read }).eq("id", r.id);
+    refresh();
+  }
+  async function remove(id: string) {
+    if (!confirm("Delete this registration?")) return;
+    await (supabase.from("event_registrations" as never) as any).delete().eq("id", id);
+    refresh();
+  }
+
+  const unread = rows.filter((r) => !r.read).length;
+
+  return (
+    <div>
+      <p className="text-[11px] text-muted-foreground mb-6">
+        {rows.length} REGISTRATIONS · {unread} NEW · FORM AT /events
+      </p>
+      {loading ? (
+        <p className="text-[11px] text-muted-foreground">LOADING…</p>
+      ) : rows.length === 0 ? (
+        <p className="text-[11px] text-muted-foreground">No registrations yet.</p>
+      ) : (
+        <ul className="space-y-4">
+          {rows.map((r) => (
+            <li key={r.id} className={`border p-5 ${r.read ? "border-border" : "border-foreground"}`}>
+              <div className="flex flex-wrap items-start justify-between gap-3">
+                <div className="normal-case tracking-normal" style={{ fontFamily: "Jost, sans-serif" }}>
+                  <div className="text-[14px]">{r.name}</div>
+                  <a href={`mailto:${r.email}`} className="text-[12px] text-muted-foreground hover:text-foreground">{r.email}</a>
+                  {r.phone && <div className="text-[12px] text-muted-foreground">{r.phone}</div>}
+                  {r.event_name && <div className="text-[12px] text-muted-foreground">{r.event_name}</div>}
+                </div>
+                <div className="text-[10px] text-muted-foreground tracking-[0.15em]">
+                  {new Date(r.created_at).toLocaleString()}
+                </div>
+              </div>
+              {r.note && (
+                <p
+                  className="mt-4 text-[13px] whitespace-pre-wrap normal-case tracking-normal"
+                  style={{ fontFamily: "Jost, sans-serif", lineHeight: 1.6 }}
+                >
+                  {r.note}
+                </p>
+              )}
+              <div className="mt-4 flex gap-6 text-[10px] tracking-[0.15em]">
+                <button onClick={() => toggleRead(r)} className="hover:opacity-70">
+                  {r.read ? "MARK NEW ↗" : "MARK HANDLED ↗"}
+                </button>
+                <button onClick={() => remove(r.id)} className="text-destructive hover:opacity-70">DELETE ↗</button>
+              </div>
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  );
+}
+
+function ClientsPanel() {
+  const [rows, setRows] = useState<ClientRow[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [name, setName] = useState("");
+  const [website, setWebsite] = useState("");
+  const [logo, setLogo] = useState<File | null>(null);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const table = () => supabase.from("clients" as never) as any;
+
+  async function refresh() {
+    setLoading(true);
+    const { data } = await table().select("*").order("sort_order", { ascending: true });
+    setRows((data as ClientRow[]) ?? []);
+    setLoading(false);
+  }
+  useEffect(() => { refresh(); }, []);
+
+  async function add(e: React.FormEvent) {
+    e.preventDefault();
+    if (!name.trim()) { setError("Client name is required."); return; }
+    setError(null); setBusy(true);
+    try {
+      let logo_url: string | null = null;
+      if (logo) {
+        if (!acceptedMime(logo)) throw new Error("Unsupported logo format.");
+        logo_url = await uploadMedia(logo);
+      }
+      const { error: err } = await table().insert({
+        name: name.trim(),
+        website: website.trim() || null,
+        logo_url,
+        sort_order: rows.length,
+      });
+      if (err) throw new Error(err.message);
+      setName(""); setWebsite(""); setLogo(null);
+      refresh();
+    } catch (e: any) {
+      setError(e?.message ?? "Couldn't save the client.");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function replaceLogo(id: string, file: File) {
+    setError(null); setBusy(true);
+    try {
+      if (!acceptedMime(file)) throw new Error("Unsupported logo format.");
+      const url = await uploadMedia(file);
+      await table().update({ logo_url: url }).eq("id", id);
+      refresh();
+    } catch (e: any) {
+      setError(e?.message ?? "Upload failed.");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function togglePublished(c: ClientRow) {
+    await table().update({ published: !c.published }).eq("id", c.id);
+    refresh();
+  }
+  async function remove(id: string) {
+    if (!confirm("Delete this client?")) return;
+    await table().delete().eq("id", id);
+    refresh();
+  }
+
+  const input =
+    "w-full border border-border bg-transparent px-3 py-2 text-[13px] normal-case tracking-normal focus:border-foreground focus:outline-none";
+
+  return (
+    <div>
+      <form onSubmit={add} className="mb-10 grid gap-4 border border-border p-5 md:grid-cols-4" style={{ fontFamily: "Jost, sans-serif" }}>
+        <input value={name} onChange={(e) => setName(e.target.value)} placeholder="Client name" className={input} />
+        <input value={website} onChange={(e) => setWebsite(e.target.value)} placeholder="Website (optional)" className={input} />
+        <input
+          type="file"
+          accept="image/*"
+          onChange={(e) => setLogo(e.target.files?.[0] ?? null)}
+          className="text-[11px] text-muted-foreground"
+        />
+        <button type="submit" disabled={busy} className="border border-foreground px-4 py-2 text-[10px] tracking-[0.15em] disabled:opacity-50">
+          {busy ? "SAVING…" : "ADD CLIENT ↗"}
+        </button>
+      </form>
+      {error && <p className="mb-6 text-[11px] text-destructive">{error}</p>}
+
+      {loading ? (
+        <p className="text-[11px] text-muted-foreground">LOADING…</p>
+      ) : rows.length === 0 ? (
+        <p className="text-[11px] text-muted-foreground">No clients yet.</p>
+      ) : (
+        <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {rows.map((c) => (
+            <li key={c.id} className="border border-border p-4">
+              <div className="flex h-24 items-center justify-center overflow-hidden bg-white/5">
+                {c.logo_url ? (
+                  <img src={mediaThumb(c.logo_url, 320)} alt={c.name} className="max-h-20 max-w-[80%] object-contain" />
+                ) : (
+                  <span className="text-[10px] tracking-[0.15em] text-muted-foreground">NO LOGO</span>
+                )}
+              </div>
+              <p className="mt-3 text-[13px] normal-case tracking-normal" style={{ fontFamily: "Jost, sans-serif" }}>{c.name}</p>
+              <div className="mt-3 flex flex-wrap items-center gap-4 text-[10px] tracking-[0.15em]">
+                <label className="cursor-pointer hover:opacity-70">
+                  {c.logo_url ? "REPLACE LOGO ↗" : "UPLOAD LOGO ↗"}
+                  <input
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={(e) => { const f = e.target.files?.[0]; if (f) replaceLogo(c.id, f); }}
+                  />
+                </label>
+                <button onClick={() => togglePublished(c)} className="hover:opacity-70">
+                  {c.published ? "PUBLISHED" : "HIDDEN"}
+                </button>
+                <button onClick={() => remove(c.id)} className="text-destructive hover:opacity-70">DELETE ↗</button>
               </div>
             </li>
           ))}

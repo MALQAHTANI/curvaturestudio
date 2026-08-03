@@ -5,13 +5,17 @@ import { SiteHeader, SiteFooter } from "@/components/site-chrome";
 import projects from "@/data/projects.json";
 import services from "@/data/services.json";
 import { supabase } from "@/integrations/supabase/client";
-import { mediaSrc } from "@/lib/media";
+import { isVideo, mediaSrc } from "@/lib/media";
 import { Reveal, RevealLines, Stagger, StaggerItem } from "@/components/motion/primitives";
 import { Parallax } from "@/components/motion/parallax";
 import { MotionNavLink } from "@/components/motion/button";
 import { ScrollIndicator } from "@/components/motion/scroll-indicator";
 import { ProjectColumns, type ColumnProject } from "@/components/project-columns";
 import { DUR, EASE } from "@/lib/motion";
+import ctaVideo from "@/assets/contact-bg.mp4.asset.json";
+
+/** Background media behind "LET'S BUILD SOMETHING." — accepts any image or video URL. */
+const CTA_MEDIA: string = ctaVideo.url;
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -167,10 +171,32 @@ function Index() {
       </section>
 
       {/* Clients live on their own dedicated page — linked from the header */}
-      {/* CTA */}
-      <section className="border-t border-border px-6 md:px-12 py-48 md:py-64 text-center">
-        <RevealLines as="h2" className="display-lg" lines={["LET'S BUILD", "SOMETHING."]} inView />
-        <Reveal className="mt-12" delay={0.2}>
+      {/* CTA — background media slot: swap CTA_MEDIA for any image or video asset */}
+      <section className="relative isolate overflow-hidden border-t border-border px-6 md:px-12 py-48 md:py-64 text-center">
+        {isVideo(CTA_MEDIA) ? (
+          <video
+            className="absolute inset-0 -z-10 h-full w-full object-cover"
+            src={CTA_MEDIA}
+            autoPlay
+            muted
+            loop
+            playsInline
+            preload="metadata"
+            aria-hidden
+          />
+        ) : (
+          <img
+            className="absolute inset-0 -z-10 h-full w-full object-cover"
+            src={CTA_MEDIA}
+            alt=""
+            loading="lazy"
+            decoding="async"
+            aria-hidden
+          />
+        )}
+        <div aria-hidden className="absolute inset-0 -z-10 bg-background/75" />
+        <RevealLines as="h2" className="relative display-lg" lines={["LET'S BUILD", "SOMETHING."]} inView />
+        <Reveal className="relative mt-12" delay={0.2}>
           <MotionNavLink to="/contact" className="inline-block text-[11px] border-b border-foreground pb-1">
             START A PROJECT ↗
           </MotionNavLink>
