@@ -14,6 +14,39 @@ export type Database = {
   }
   public: {
     Tables: {
+      clients: {
+        Row: {
+          created_at: string
+          id: string
+          logo_url: string | null
+          name: string
+          published: boolean
+          sort_order: number
+          updated_at: string
+          website: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          logo_url?: string | null
+          name: string
+          published?: boolean
+          sort_order?: number
+          updated_at?: string
+          website?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          logo_url?: string | null
+          name?: string
+          published?: boolean
+          sort_order?: number
+          updated_at?: string
+          website?: string | null
+        }
+        Relationships: []
+      }
       contact_messages: {
         Row: {
           company: string | null
@@ -40,6 +73,39 @@ export type Database = {
           id?: string
           message?: string
           name?: string
+          read?: boolean
+        }
+        Relationships: []
+      }
+      event_registrations: {
+        Row: {
+          created_at: string
+          email: string
+          event_name: string | null
+          id: string
+          name: string
+          note: string | null
+          phone: string | null
+          read: boolean
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          event_name?: string | null
+          id?: string
+          name: string
+          note?: string | null
+          phone?: string | null
+          read?: boolean
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          event_name?: string | null
+          id?: string
+          name?: string
+          note?: string | null
+          phone?: string | null
           read?: boolean
         }
         Relationships: []
