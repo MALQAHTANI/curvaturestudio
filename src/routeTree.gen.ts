@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as StudioRouteImport } from './routes/studio'
 import { Route as PortfolioRouteImport } from './routes/portfolio'
 import { Route as NewsRouteImport } from './routes/news'
+import { Route as EventsRouteImport } from './routes/events'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AboutRouteImport } from './routes/about'
@@ -37,6 +38,11 @@ const PortfolioRoute = PortfolioRouteImport.update({
 const NewsRoute = NewsRouteImport.update({
   id: '/news',
   path: '/news',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EventsRoute = EventsRouteImport.update({
+  id: '/events',
+  path: '/events',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ContactRoute = ContactRouteImport.update({
@@ -99,6 +105,7 @@ export interface FileRoutesByFullPath {
   '/about': typeof AboutRoute
   '/auth': typeof AuthRoute
   '/contact': typeof ContactRoute
+  '/events': typeof EventsRoute
   '/news': typeof NewsRoute
   '/portfolio': typeof PortfolioRouteWithChildren
   '/studio': typeof StudioRoute
@@ -114,6 +121,7 @@ export interface FileRoutesByTo {
   '/about': typeof AboutRoute
   '/auth': typeof AuthRoute
   '/contact': typeof ContactRoute
+  '/events': typeof EventsRoute
   '/news': typeof NewsRoute
   '/portfolio': typeof PortfolioRouteWithChildren
   '/studio': typeof StudioRoute
@@ -131,6 +139,7 @@ export interface FileRoutesById {
   '/about': typeof AboutRoute
   '/auth': typeof AuthRoute
   '/contact': typeof ContactRoute
+  '/events': typeof EventsRoute
   '/news': typeof NewsRoute
   '/portfolio': typeof PortfolioRouteWithChildren
   '/studio': typeof StudioRoute
@@ -148,6 +157,7 @@ export interface FileRouteTypes {
     | '/about'
     | '/auth'
     | '/contact'
+    | '/events'
     | '/news'
     | '/portfolio'
     | '/studio'
@@ -163,6 +173,7 @@ export interface FileRouteTypes {
     | '/about'
     | '/auth'
     | '/contact'
+    | '/events'
     | '/news'
     | '/portfolio'
     | '/studio'
@@ -179,6 +190,7 @@ export interface FileRouteTypes {
     | '/about'
     | '/auth'
     | '/contact'
+    | '/events'
     | '/news'
     | '/portfolio'
     | '/studio'
@@ -196,6 +208,7 @@ export interface RootRouteChildren {
   AboutRoute: typeof AboutRoute
   AuthRoute: typeof AuthRoute
   ContactRoute: typeof ContactRoute
+  EventsRoute: typeof EventsRoute
   NewsRoute: typeof NewsRoute
   PortfolioRoute: typeof PortfolioRouteWithChildren
   StudioRoute: typeof StudioRoute
@@ -226,6 +239,13 @@ declare module '@tanstack/react-router' {
       path: '/news'
       fullPath: '/news'
       preLoaderRoute: typeof NewsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/events': {
+      id: '/events'
+      path: '/events'
+      fullPath: '/events'
+      preLoaderRoute: typeof EventsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/contact': {
@@ -337,6 +357,7 @@ const rootRouteChildren: RootRouteChildren = {
   AboutRoute: AboutRoute,
   AuthRoute: AuthRoute,
   ContactRoute: ContactRoute,
+  EventsRoute: EventsRoute,
   NewsRoute: NewsRoute,
   PortfolioRoute: PortfolioRouteWithChildren,
   StudioRoute: StudioRoute,

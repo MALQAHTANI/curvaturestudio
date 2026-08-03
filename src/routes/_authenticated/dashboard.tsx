@@ -45,7 +45,32 @@ function Fallback({ label }: { label: string }) {
   );
 }
 
-type Tab = "projects" | "studio" | "messages";
+type Tab = "projects" | "studio" | "clients" | "events" | "messages";
+const TAB_LABELS: Record<Tab, string> = {
+  projects: "PROJECTS",
+  studio: "STUDIO",
+  clients: "CLIENTS",
+  events: "EVENTS",
+  messages: "MESSAGES",
+};
+type Registration = {
+  id: string;
+  event_name: string | null;
+  name: string;
+  email: string;
+  phone: string | null;
+  note: string | null;
+  read: boolean;
+  created_at: string;
+};
+type ClientRow = {
+  id: string;
+  name: string;
+  logo_url: string | null;
+  website: string | null;
+  sort_order: number;
+  published: boolean;
+};
 type Message = {
   id: string;
   name: string;
@@ -126,19 +151,23 @@ function Dashboard() {
 
         {isEmployee && (
           <>
-            <div className="flex gap-2 border-b border-border mb-8">
-              {(["projects", "studio", "messages"] as Tab[]).map((t) => (
+            <div className="flex flex-wrap gap-2 border-b border-border mb-8">
+              {(["projects", "studio", "clients", "events", "messages"] as Tab[]).map((t) => (
                 <button
                   key={t}
                   onClick={() => setTab(t)}
                   className={`px-4 py-3 text-[11px] tracking-[0.15em] -mb-px border-b ${tab === t ? "text-foreground border-foreground" : "text-muted-foreground border-transparent hover:text-foreground"}`}
                 >
-                  {t === "projects" ? "PROJECTS" : t === "studio" ? "STUDIO" : "MESSAGES"}
+                  {TAB_LABELS[t]}
                 </button>
               ))}
             </div>
             {tab === "messages" ? (
               <MessagesPanel />
+            ) : tab === "events" ? (
+              <EventsPanel />
+            ) : tab === "clients" ? (
+              <ClientsPanel />
             ) : (
               <SectionEditor
                 key={tab}
