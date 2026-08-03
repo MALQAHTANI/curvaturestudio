@@ -5,7 +5,7 @@ import { SiteHeader, SiteFooter } from "@/components/site-chrome";
 import projects from "@/data/projects.json";
 import services from "@/data/services.json";
 import { supabase } from "@/integrations/supabase/client";
-import { mediaSrc } from "@/lib/media";
+import { isVideo, mediaSrc } from "@/lib/media";
 import { Reveal, RevealLines, Stagger, StaggerItem } from "@/components/motion/primitives";
 import { Parallax } from "@/components/motion/parallax";
 import { MotionNavLink } from "@/components/motion/button";
@@ -13,6 +13,9 @@ import { ScrollIndicator } from "@/components/motion/scroll-indicator";
 import { ProjectColumns, type ColumnProject } from "@/components/project-columns";
 import { DUR, EASE } from "@/lib/motion";
 import ctaVideo from "@/assets/contact-bg.mp4.asset.json";
+
+/** Background media behind "LET'S BUILD SOMETHING." — accepts any image or video URL. */
+const CTA_MEDIA: string = ctaVideo.url;
 
 export const Route = createFileRoute("/")({
   head: () => ({
