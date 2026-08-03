@@ -104,21 +104,13 @@ function Contact() {
             <p className="normal-case tracking-normal" style={{ ...formStyle, fontSize: "14px", lineHeight: 1.7 }}>
               Saudi Arabia — Jeddah
             </p>
-            <div>
-              <p className="text-muted-foreground mb-2">CAREERS</p>
-              <a href="mailto:careers@curvaturestudio.com" className="normal-case tracking-normal nav-underline" style={{ ...formStyle, fontSize: "14px" }}>
-                careers@curvaturestudio.com
-              </a>
-            </div>
           </StaggerItem>
           <StaggerItem className="space-y-8 text-[11px]">
             <p className="text-muted-foreground">SOCIAL MEDIA</p>
             <ul className="space-y-3">
               {[
                 { label: "INSTAGRAM", href: "https://instagram.com/curvaturestudio" },
-                { label: "BEHANCE", href: "https://behance.net/curvaturestudio" },
                 { label: "LINKEDIN", href: "https://linkedin.com/company/curvaturestudio" },
-                { label: "DRIBBBLE", href: "https://dribbble.com/curvaturestudio" },
               ].map((s) => (
                 <li key={s.label}>
                   <a

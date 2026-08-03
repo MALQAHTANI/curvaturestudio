@@ -6,9 +6,9 @@ import { DUR, EASE, fadeUp, staggerParent, viewportOnce } from "@/lib/motion";
 import { useMotionEnabled } from "@/components/motion/use-motion-enabled";
 
 const NAV = [
-  { to: "/studio", label: "STUDIO" },
   { to: "/portfolio", label: "PORTFOLIO" },
-  { to: "/clients", label: "CLIENTS" },
+  { to: "/clients", label: "CLIENT" },
+  { to: "/studio", label: "THE STUDIO" },
   { to: "/news", label: "NEWS" },
   { to: "/contact", label: "CONTACT" },
 ] as const;
