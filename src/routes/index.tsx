@@ -13,9 +13,7 @@ import { ScrollIndicator } from "@/components/motion/scroll-indicator";
 import { ProjectColumns, type ColumnProject } from "@/components/project-columns";
 import { DUR, EASE } from "@/lib/motion";
 import ctaVideo from "@/assets/contact-bg.mp4.asset.json";
-
-/** Background media behind "LET'S BUILD SOMETHING." — accepts any image or video URL. */
-const CTA_MEDIA: string = ctaVideo.url;
+import { useSiteMedia } from "@/lib/use-site-media";
 
 export const Route = createFileRoute("/")({
   head: () => ({
