@@ -37,6 +37,7 @@ export const Route = createFileRoute("/")({
 });
 
 function Index() {
+  const ctaMedia = useSiteMedia("home_cta", ctaVideo.url);
   const { scrollY } = useScroll();
   const [vh, setVh] = useState(900);
   useEffect(() => {
