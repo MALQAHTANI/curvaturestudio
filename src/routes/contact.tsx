@@ -6,6 +6,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { Reveal, RevealLines, Stagger, StaggerItem } from "@/components/motion/primitives";
 import { MotionButton } from "@/components/motion/button";
 import contactVideo from "@/assets/contact-bg.mp4.asset.json";
+import { useSiteMedia } from "@/lib/use-site-media";
+import { isVideo } from "@/lib/media";
 
 export const Route = createFileRoute("/contact")({
   head: () => ({
@@ -21,6 +23,7 @@ export const Route = createFileRoute("/contact")({
 
 function Contact() {
   const [sent, setSent] = useState(false);
+  const bg = useSiteMedia("contact_hero", contactVideo.url);
   const [sending, setSending] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const formStyle = { fontFamily: "Jost, sans-serif", textTransform: "none" as const };
