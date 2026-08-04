@@ -38,6 +38,7 @@ export const Route = createFileRoute("/")({
 
 function Index() {
   const ctaMedia = useSiteMedia("home_cta", ctaVideo.url);
+  const heroMedia = useSiteMedia("home_hero", "");
   const { scrollY } = useScroll();
   const [vh, setVh] = useState(900);
   useEffect(() => {
@@ -100,6 +101,29 @@ function Index() {
             <div aria-hidden className="hero-bg" />
             <div aria-hidden className="hero-globe" />
             <div aria-hidden className="hero-sweep" />
+            {heroMedia &&
+              (isVideo(heroMedia) ? (
+                <video
+                  key={heroMedia}
+                  className="absolute inset-0 h-full w-full object-cover"
+                  src={heroMedia}
+                  autoPlay
+                  muted
+                  loop
+                  playsInline
+                  preload="auto"
+                  aria-hidden
+                />
+              ) : (
+                <img
+                  key={heroMedia}
+                  className="absolute inset-0 h-full w-full object-cover"
+                  src={heroMedia}
+                  alt=""
+                  aria-hidden
+                />
+              ))}
+            {heroMedia && <div aria-hidden className="absolute inset-0 bg-background/70" />}
           </motion.div>
         </Parallax>
         <motion.p
