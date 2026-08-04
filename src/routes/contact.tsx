@@ -55,23 +55,41 @@ function Contact() {
 
       {/* Full-screen looping background video */}
       <section className="relative flex h-[100svh] items-center justify-center overflow-hidden px-6 text-center">
-        <motion.video
-          className="absolute inset-0 h-full w-full object-cover"
-          src={contactVideo.url}
-          autoPlay
-          muted
-          loop
-          playsInline
-          preload="auto"
-          aria-hidden
-          initial={{ opacity: 0, scale: 1 }}
-          animate={{ opacity: 1, scale: 1.04 }}
-          transition={{
-            opacity: { duration: 1.2, ease: "easeOut" },
-            scale: { duration: 30, ease: "linear", repeat: Infinity, repeatType: "reverse" },
-          }}
-          style={{ willChange: "transform, opacity" }}
-        />
+        {isVideo(bg) ? (
+          <motion.video
+            key={bg}
+            className="absolute inset-0 h-full w-full object-cover"
+            src={bg}
+            autoPlay
+            muted
+            loop
+            playsInline
+            preload="auto"
+            aria-hidden
+            initial={{ opacity: 0, scale: 1 }}
+            animate={{ opacity: 1, scale: 1.04 }}
+            transition={{
+              opacity: { duration: 1.2, ease: "easeOut" },
+              scale: { duration: 30, ease: "linear", repeat: Infinity, repeatType: "reverse" },
+            }}
+            style={{ willChange: "transform, opacity" }}
+          />
+        ) : bg ? (
+          <motion.img
+            key={bg}
+            className="absolute inset-0 h-full w-full object-cover"
+            src={bg}
+            alt=""
+            aria-hidden
+            initial={{ opacity: 0, scale: 1 }}
+            animate={{ opacity: 1, scale: 1.04 }}
+            transition={{
+              opacity: { duration: 1.2, ease: "easeOut" },
+              scale: { duration: 30, ease: "linear", repeat: Infinity, repeatType: "reverse" },
+            }}
+            style={{ willChange: "transform, opacity" }}
+          />
+        ) : null}
         <div aria-hidden className="absolute inset-0 bg-background/70" />
         <div className="relative">
           <Reveal>
