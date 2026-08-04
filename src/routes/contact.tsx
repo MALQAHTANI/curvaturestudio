@@ -6,6 +6,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { Reveal, RevealLines, Stagger, StaggerItem } from "@/components/motion/primitives";
 import { MotionButton } from "@/components/motion/button";
 import contactVideo from "@/assets/contact-bg.mp4.asset.json";
+import { useSiteMedia } from "@/lib/use-site-media";
+import { isVideo } from "@/lib/media";
 
 export const Route = createFileRoute("/contact")({
   head: () => ({
@@ -21,6 +23,7 @@ export const Route = createFileRoute("/contact")({
 
 function Contact() {
   const [sent, setSent] = useState(false);
+  const bg = useSiteMedia("contact_hero", contactVideo.url);
   const [sending, setSending] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const formStyle = { fontFamily: "Jost, sans-serif", textTransform: "none" as const };
@@ -52,23 +55,41 @@ function Contact() {
 
       {/* Full-screen looping background video */}
       <section className="relative flex h-[100svh] items-center justify-center overflow-hidden px-6 text-center">
-        <motion.video
-          className="absolute inset-0 h-full w-full object-cover"
-          src={contactVideo.url}
-          autoPlay
-          muted
-          loop
-          playsInline
-          preload="auto"
-          aria-hidden
-          initial={{ opacity: 0, scale: 1 }}
-          animate={{ opacity: 1, scale: 1.04 }}
-          transition={{
-            opacity: { duration: 1.2, ease: "easeOut" },
-            scale: { duration: 30, ease: "linear", repeat: Infinity, repeatType: "reverse" },
-          }}
-          style={{ willChange: "transform, opacity" }}
-        />
+        {isVideo(bg) ? (
+          <motion.video
+            key={bg}
+            className="absolute inset-0 h-full w-full object-cover"
+            src={bg}
+            autoPlay
+            muted
+            loop
+            playsInline
+            preload="auto"
+            aria-hidden
+            initial={{ opacity: 0, scale: 1 }}
+            animate={{ opacity: 1, scale: 1.04 }}
+            transition={{
+              opacity: { duration: 1.2, ease: "easeOut" },
+              scale: { duration: 30, ease: "linear", repeat: Infinity, repeatType: "reverse" },
+            }}
+            style={{ willChange: "transform, opacity" }}
+          />
+        ) : bg ? (
+          <motion.img
+            key={bg}
+            className="absolute inset-0 h-full w-full object-cover"
+            src={bg}
+            alt=""
+            aria-hidden
+            initial={{ opacity: 0, scale: 1 }}
+            animate={{ opacity: 1, scale: 1.04 }}
+            transition={{
+              opacity: { duration: 1.2, ease: "easeOut" },
+              scale: { duration: 30, ease: "linear", repeat: Infinity, repeatType: "reverse" },
+            }}
+            style={{ willChange: "transform, opacity" }}
+          />
+        ) : null}
         <div aria-hidden className="absolute inset-0 bg-background/70" />
         <div className="relative">
           <Reveal>
