@@ -4,7 +4,7 @@ import { createPortal } from "react-dom";
 import { AnimatePresence, motion, useMotionValueEvent, useScroll } from "motion/react";
 import { DUR, EASE, fadeUp, staggerParent, viewportOnce } from "@/lib/motion";
 import { useMotionEnabled } from "@/components/motion/use-motion-enabled";
-import logoAsset from "@/assets/curvature-logo.png.asset.json";
+import logoSrc from "@/assets/curvature-logo-white.png";
 
 const NAV = [
   { to: "/portfolio", label: "PORTFOLIO" },
@@ -60,9 +60,9 @@ export function SiteHeader() {
         aria-label="Curvature Studio"
       >
         <img
-          src={logoAsset.url}
+          src={logoSrc}
           alt="Curvature Studio"
-          className="block h-[44px] w-auto select-none brightness-0 invert md:h-[58px]"
+          className="block h-[44px] w-auto select-none md:h-[58px]"
           style={{ backgroundColor: "transparent" }}
         />
       </Link>
