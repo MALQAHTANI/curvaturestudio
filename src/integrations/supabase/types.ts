@@ -81,6 +81,7 @@ export type Database = {
         Row: {
           created_at: string
           email: string
+          event_id: string | null
           event_name: string | null
           id: string
           name: string
@@ -91,6 +92,7 @@ export type Database = {
         Insert: {
           created_at?: string
           email: string
+          event_id?: string | null
           event_name?: string | null
           id?: string
           name: string
@@ -101,12 +103,57 @@ export type Database = {
         Update: {
           created_at?: string
           email?: string
+          event_id?: string | null
           event_name?: string | null
           id?: string
           name?: string
           note?: string | null
           phone?: string | null
           read?: boolean
+        }
+        Relationships: [
+          {
+            foreignKeyName: "event_registrations_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      events: {
+        Row: {
+          cover_image: string | null
+          created_at: string
+          description: string | null
+          event_date: string | null
+          id: string
+          name: string
+          published: boolean
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          cover_image?: string | null
+          created_at?: string
+          description?: string | null
+          event_date?: string | null
+          id?: string
+          name: string
+          published?: boolean
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          cover_image?: string | null
+          created_at?: string
+          description?: string | null
+          event_date?: string | null
+          id?: string
+          name?: string
+          published?: boolean
+          sort_order?: number
+          updated_at?: string
         }
         Relationships: []
       }
