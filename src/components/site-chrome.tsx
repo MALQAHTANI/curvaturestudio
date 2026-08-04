@@ -155,18 +155,7 @@ export function SiteHeader() {
 }
 
 export function SiteFooter() {
-  const [open, setOpen] = useState(false);
-  const ref = useRef<HTMLDivElement>(null);
   const enabled = useMotionEnabled();
-
-  useEffect(() => {
-    if (!open) return;
-    const onClick = (e: MouseEvent) => {
-      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
-    };
-    document.addEventListener("mousedown", onClick);
-    return () => document.removeEventListener("mousedown", onClick);
-  }, [open]);
 
   return (
     <motion.footer
@@ -178,7 +167,7 @@ export function SiteFooter() {
     >
       <motion.p variants={fadeUp}>© CURVATURE STUDIO — ALL RIGHTS RESERVED</motion.p>
       <motion.p variants={fadeUp}>SAUDI ARABIA — JEDDAH</motion.p>
-      <motion.div className="relative" ref={ref} variants={fadeUp}>
+      <motion.div className="relative" variants={fadeUp}>
         <Link
           to="/auth"
           className="hover:text-foreground transition-colors tracking-[0.15em]"
