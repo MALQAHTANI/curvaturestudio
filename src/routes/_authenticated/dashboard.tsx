@@ -45,13 +45,14 @@ function Fallback({ label }: { label: string }) {
   );
 }
 
-type Tab = "projects" | "studio" | "clients" | "events" | "messages";
+type Tab = "projects" | "studio" | "clients" | "events" | "messages" | "backgrounds";
 const TAB_LABELS: Record<Tab, string> = {
   projects: "PROJECTS",
   studio: "STUDIO",
   clients: "CLIENTS",
   events: "EVENTS",
   messages: "MESSAGES",
+  backgrounds: "BACKGROUNDS",
 };
 type Registration = {
   id: string;
@@ -161,7 +162,7 @@ function Dashboard() {
         {isEmployee && (
           <>
             <div className="flex flex-wrap gap-2 border-b border-border mb-8">
-              {(["projects", "studio", "clients", "events", "messages"] as Tab[]).map((t) => (
+              {(["projects", "studio", "clients", "events", "messages", "backgrounds"] as Tab[]).map((t) => (
                 <button
                   key={t}
                   onClick={() => setTab(t)}
@@ -171,7 +172,9 @@ function Dashboard() {
                 </button>
               ))}
             </div>
-            {tab === "messages" ? (
+            {tab === "backgrounds" ? (
+              <BackgroundsPanel />
+            ) : tab === "messages" ? (
               <MessagesPanel />
             ) : tab === "events" ? (
               <EventsPanel />
