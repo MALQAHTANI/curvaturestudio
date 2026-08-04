@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { SiteHeader, SiteFooter } from "@/components/site-chrome";
 import { supabase } from "@/integrations/supabase/client";
 import { Reveal, RevealLines } from "@/components/motion/primitives";
@@ -22,7 +22,18 @@ function EventsPage() {
   const [sent, setSent] = useState(false);
   const [sending, setSending] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [events, setEvents] = useState<{ id: string; name: string }[]>([]);
   const formStyle = { fontFamily: "Jost, sans-serif", textTransform: "none" as const };
+
+  useEffect(() => {
+    (async () => {
+      const { data } = await (supabase.from("events" as never) as any)
+        .select("id,name")
+        .eq("published", true)
+        .order("sort_order", { ascending: true });
+      setEvents((data as { id: string; name: string }[]) ?? []);
+    })();
+  }, []);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -96,7 +107,16 @@ function EventsPage() {
               </div>
               <div className="space-y-2">
                 <label className={labelCls} style={{ fontFamily: "JetBrains Mono, monospace" }}>Event</label>
-                <input name="event_name" type="text" className={field} />
+                {events.length > 0 ? (
+                  <select name="event_name" className={field} defaultValue="">
+                    <option value="">Select an event</option>
+                    {events.map((ev) => (
+                      <option key={ev.id} value={ev.name}>{ev.name}</option>
+                    ))}
+                  </select>
+                ) : (
+                  <input name="event_name" type="text" className={field} />
+                )}
               </div>
             </div>
             <div className="space-y-2">
