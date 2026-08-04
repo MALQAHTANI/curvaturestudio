@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { AnimatePresence, motion, useMotionValueEvent, useScroll } from "motion/react";
 import { DUR, EASE, fadeUp, staggerParent, viewportOnce } from "@/lib/motion";
