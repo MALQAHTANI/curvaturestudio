@@ -1013,3 +1013,172 @@ function ItemForm({
     </form>
   );
 }
+type BackgroundRow = {
+  id: string;
+  slot: string;
+  label: string;
+  media_url: string | null;
+};
+
+/** Manage the image/video backgrounds used across the site (add / replace / delete). */
+function BackgroundsPanel() {
+  const [rows, setRows] = useState<BackgroundRow[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [busy, setBusy] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [newLabel, setNewLabel] = useState("");
+  const [newSlot, setNewSlot] = useState("");
+
+  async function refresh() {
+    setLoading(true);
+    const { data } = await supabase
+      .from("site_media")
+      .select("id, slot, label, media_url")
+      .order("label", { ascending: true });
+    setRows((data as BackgroundRow[]) ?? []);
+    setLoading(false);
+  }
+
+  useEffect(() => {
+    refresh();
+  }, []);
+
+  async function upload(row: BackgroundRow, file: File) {
+    setError(null);
+    if (!acceptedMime(file)) {
+      setError("Unsupported file format. Only images and videos are accepted.");
+      return;
+    }
+    setBusy(row.id);
+    try {
+      const url = await uploadMedia(file);
+      const { error: err } = await supabase.from("site_media").update({ media_url: url }).eq("id", row.id);
+      if (err) throw new Error(err.message);
+      await refresh();
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Upload failed.");
+    }
+    setBusy(null);
+  }
+
+  async function clearMedia(row: BackgroundRow) {
+    if (!confirm(`Remove the media from "${row.label}"? The default background will be used.`)) return;
+    setBusy(row.id);
+    await supabase.from("site_media").update({ media_url: null }).eq("id", row.id);
+    await refresh();
+    setBusy(null);
+  }
+
+  async function removeSlot(row: BackgroundRow) {
+    if (!confirm(`Delete the background slot "${row.label}"?`)) return;
+    setBusy(row.id);
+    await supabase.from("site_media").delete().eq("id", row.id);
+    await refresh();
+    setBusy(null);
+  }
+
+  async function addSlot(e: React.FormEvent) {
+    e.preventDefault();
+    setError(null);
+    const label = newLabel.trim();
+    const slot = newSlot.trim().toLowerCase().replace(/[^a-z0-9_]+/g, "_");
+    if (!label || !slot) {
+      setError("Enter a name and a slot key.");
+      return;
+    }
+    setBusy("new");
+    const { error: err } = await supabase.from("site_media").insert({ label, slot });
+    setBusy(null);
+    if (err) {
+      setError(err.message);
+      return;
+    }
+    setNewLabel("");
+    setNewSlot("");
+    refresh();
+  }
+
+  const field =
+    "w-full border border-border bg-transparent px-3 py-2 text-[12px] normal-case tracking-normal focus:border-foreground focus:outline-none";
+
+  return (
+    <div className="space-y-8">
+      <form
+        onSubmit={addSlot}
+        className="flex flex-wrap items-end gap-3 border border-border p-5"
+        style={{ fontFamily: "Jost, sans-serif" }}
+      >
+        <div className="min-w-[180px] flex-1 space-y-2">
+          <label className="block text-[10px] tracking-[0.15em] text-muted-foreground">NAME</label>
+          <input value={newLabel} onChange={(e) => setNewLabel(e.target.value)} className={field} placeholder="About page background" />
+        </div>
+        <div className="min-w-[180px] flex-1 space-y-2">
+          <label className="block text-[10px] tracking-[0.15em] text-muted-foreground">SLOT KEY</label>
+          <input value={newSlot} onChange={(e) => setNewSlot(e.target.value)} className={field} placeholder="about_hero" />
+        </div>
+        <button
+          type="submit"
+          disabled={busy === "new"}
+          className="border border-border px-5 py-2 text-[10px] tracking-[0.15em] hover:bg-foreground hover:text-background disabled:opacity-50"
+        >
+          {busy === "new" ? "ADDING…" : "ADD SLOT"}
+        </button>
+      </form>
+
+      {error && (
+        <p className="text-[11px] normal-case tracking-normal text-destructive" style={{ fontFamily: "Jost, sans-serif" }}>
+          {error}
+        </p>
+      )}
+
+      {loading ? (
+        <p className="text-[11px] text-muted-foreground">LOADING…</p>
+      ) : rows.length === 0 ? (
+        <p className="text-[11px] text-muted-foreground">NO BACKGROUND SLOTS YET</p>
+      ) : (
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {rows.map((row) => (
+            <div key={row.id} className="border border-border">
+              <div className="aspect-video w-full overflow-hidden bg-foreground/5">
+                {row.media_url ? (
+                  <Thumb url={row.media_url} alt={row.label} />
+                ) : (
+                  <Fallback label="DEFAULT" />
+                )}
+              </div>
+              <div className="space-y-3 p-4">
+                <p className="text-[12px] normal-case tracking-normal" style={{ fontFamily: "Jost, sans-serif" }}>
+                  {row.label}
+                </p>
+                <p className="text-[9px] tracking-[0.15em] text-muted-foreground">{row.slot}</p>
+                <div className="flex flex-wrap gap-3 text-[10px] tracking-[0.15em]">
+                  <label className="cursor-pointer border border-border px-3 py-2 hover:bg-foreground hover:text-background">
+                    {busy === row.id ? "WORKING…" : row.media_url ? "REPLACE" : "UPLOAD"}
+                    <input
+                      type="file"
+                      accept="image/*,video/*"
+                      className="hidden"
+                      onChange={(e) => {
+                        const f = e.target.files?.[0];
+                        e.target.value = "";
+                        if (f) upload(row, f);
+                      }}
+                    />
+                  </label>
+                  {row.media_url && (
+                    <button onClick={() => clearMedia(row)} className="border border-border px-3 py-2 hover:bg-foreground hover:text-background">
+                      REMOVE MEDIA
+                    </button>
+                  )}
+                  <button onClick={() => removeSlot(row)} className="px-3 py-2 text-destructive hover:underline">
+                    DELETE SLOT
+                  </button>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
