@@ -169,12 +169,12 @@ function Index() {
       </section>
 
       {/* Clients live on their own dedicated page — linked from the header */}
-      {/* CTA — background media slot: swap CTA_MEDIA for any image or video asset */}
+      {/* CTA — background media slot: swap ctaMedia for any image or video asset */}
       <section className="relative isolate overflow-hidden border-t border-border px-6 md:px-12 py-48 md:py-64 text-center">
-        {isVideo(CTA_MEDIA) ? (
+        {isVideo(ctaMedia) ? (
           <video
             className="absolute inset-0 -z-10 h-full w-full object-cover"
-            src={CTA_MEDIA}
+            src={ctaMedia}
             autoPlay
             muted
             loop
@@ -185,7 +185,7 @@ function Index() {
         ) : (
           <img
             className="absolute inset-0 -z-10 h-full w-full object-cover"
-            src={CTA_MEDIA}
+            src={ctaMedia}
             alt=""
             loading="lazy"
             decoding="async"
