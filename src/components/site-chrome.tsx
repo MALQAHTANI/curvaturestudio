@@ -62,7 +62,7 @@ export function SiteHeader() {
         <img
           src={logoAsset.url}
           alt="Curvature Studio"
-          className="block h-[26px] w-auto select-none md:h-[32px]"
+          className="block h-[44px] w-auto select-none brightness-0 invert md:h-[58px]"
           style={{ backgroundColor: "transparent" }}
         />
       </Link>
