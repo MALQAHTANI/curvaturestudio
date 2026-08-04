@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { AnimatePresence, motion, useMotionValueEvent, useScroll } from "motion/react";
 import { DUR, EASE, fadeUp, staggerParent, viewportOnce } from "@/lib/motion";
@@ -155,18 +155,7 @@ export function SiteHeader() {
 }
 
 export function SiteFooter() {
-  const [open, setOpen] = useState(false);
-  const ref = useRef<HTMLDivElement>(null);
   const enabled = useMotionEnabled();
-
-  useEffect(() => {
-    if (!open) return;
-    const onClick = (e: MouseEvent) => {
-      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
-    };
-    document.addEventListener("mousedown", onClick);
-    return () => document.removeEventListener("mousedown", onClick);
-  }, [open]);
 
   return (
     <motion.footer
@@ -178,50 +167,13 @@ export function SiteFooter() {
     >
       <motion.p variants={fadeUp}>© CURVATURE STUDIO — ALL RIGHTS RESERVED</motion.p>
       <motion.p variants={fadeUp}>SAUDI ARABIA — JEDDAH</motion.p>
-      <motion.div className="relative" ref={ref} variants={fadeUp}>
-        <button
-          type="button"
-          onClick={() => setOpen((v) => !v)}
+      <motion.div className="relative" variants={fadeUp}>
+        <Link
+          to="/auth"
           className="hover:text-foreground transition-colors tracking-[0.15em]"
-          aria-haspopup="menu"
-          aria-expanded={open}
         >
-          PROFILE ↗
-        </button>
-        <AnimatePresence>
-          {open && (
-            <motion.div
-              role="menu"
-              initial={{ opacity: 0, y: 8, scale: 0.98 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: 6, scale: 0.98 }}
-              transition={{ duration: DUR.fast, ease: EASE }}
-              className="absolute right-0 bottom-full mb-2 min-w-[180px] border border-border bg-background/95 backdrop-blur-md text-[10px] tracking-[0.15em] origin-bottom-right"
-            >
-            <Link
-              to="/portfolio"
-              onClick={() => setOpen(false)}
-              className="block px-4 py-3 text-muted-foreground hover:text-foreground hover:bg-white/5 border-b border-border"
-            >
-              PROJECTS
-            </Link>
-            <Link
-              to="/studio"
-              onClick={() => setOpen(false)}
-              className="block px-4 py-3 text-muted-foreground hover:text-foreground hover:bg-white/5 border-b border-border"
-            >
-              STUDIO
-            </Link>
-            <Link
-              to="/auth"
-              onClick={() => setOpen(false)}
-              className="block px-4 py-3 text-muted-foreground hover:text-foreground hover:bg-white/5"
-            >
-              EMPLOYEE LOGIN
-            </Link>
-            </motion.div>
-          )}
-        </AnimatePresence>
+          EMPLOYEE LOGIN ↗
+        </Link>
       </motion.div>
     </motion.footer>
   );
