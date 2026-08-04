@@ -63,6 +63,15 @@ type Registration = {
   read: boolean;
   created_at: string;
 };
+type EventRow = {
+  id: string;
+  name: string;
+  description: string | null;
+  event_date: string | null;
+  cover_image: string | null;
+  sort_order: number;
+  published: boolean;
+};
 type ClientRow = {
   id: string;
   name: string;
@@ -254,6 +263,17 @@ function MessagesPanel() {
 function EventsPanel() {
   const [rows, setRows] = useState<Registration[]>([]);
   const [loading, setLoading] = useState(true);
+  const [events, setEvents] = useState<EventRow[]>([]);
+  const [evName, setEvName] = useState("");
+  const [evDate, setEvDate] = useState("");
+  const [evDesc, setEvDesc] = useState("");
+  const [evFile, setEvFile] = useState<File | null>(null);
+  const [savingEvent, setSavingEvent] = useState(false);
+  const [editingEvent, setEditingEvent] = useState<string | null>(null);
+  const [showRegForm, setShowRegForm] = useState(false);
+  const [reg, setReg] = useState({ name: "", email: "", phone: "", event_name: "", note: "" });
+  const [savingReg, setSavingReg] = useState(false);
+  const [err, setErr] = useState<string | null>(null);
 
   async function refresh() {
     setLoading(true);
@@ -261,9 +281,85 @@ function EventsPanel() {
       .select("*")
       .order("created_at", { ascending: false });
     setRows((data as Registration[]) ?? []);
+    const { data: ev } = await (supabase.from("events" as never) as any)
+      .select("*")
+      .order("sort_order", { ascending: true })
+      .order("created_at", { ascending: false });
+    setEvents((ev as EventRow[]) ?? []);
     setLoading(false);
   }
   useEffect(() => { refresh(); }, []);
+
+  function resetEventForm() {
+    setEditingEvent(null);
+    setEvName("");
+    setEvDate("");
+    setEvDesc("");
+    setEvFile(null);
+  }
+
+  async function saveEvent(e: React.FormEvent) {
+    e.preventDefault();
+    if (!evName.trim()) { setErr("Event name is required."); return; }
+    setErr(null);
+    setSavingEvent(true);
+    try {
+      let cover: string | null = null;
+      if (evFile) cover = await uploadMedia(evFile);
+      const payload: Record<string, unknown> = {
+        name: evName.trim().slice(0, 200),
+        event_date: evDate || null,
+        description: evDesc.trim() ? evDesc.trim().slice(0, 2000) : null,
+      };
+      if (cover) payload.cover_image = cover;
+      const table = supabase.from("events" as never) as any;
+      const { error } = editingEvent
+        ? await table.update(payload).eq("id", editingEvent)
+        : await table.insert(payload);
+      if (error) throw error;
+      resetEventForm();
+      await refresh();
+    } catch (e2: any) {
+      setErr(e2?.message ?? "Couldn't save the event.");
+    }
+    setSavingEvent(false);
+  }
+
+  async function toggleEventPublished(ev: EventRow) {
+    await (supabase.from("events" as never) as any).update({ published: !ev.published }).eq("id", ev.id);
+    refresh();
+  }
+  async function removeEvent(id: string) {
+    if (!confirm("Delete this event?")) return;
+    await (supabase.from("events" as never) as any).delete().eq("id", id);
+    refresh();
+  }
+  function startEdit(ev: EventRow) {
+    setEditingEvent(ev.id);
+    setEvName(ev.name);
+    setEvDate(ev.event_date ?? "");
+    setEvDesc(ev.description ?? "");
+    setEvFile(null);
+  }
+
+  async function addRegistration(e: React.FormEvent) {
+    e.preventDefault();
+    if (!reg.name.trim() || !reg.email.trim()) { setErr("Name and email are required."); return; }
+    setErr(null);
+    setSavingReg(true);
+    const { error } = await (supabase.from("event_registrations" as never) as any).insert({
+      name: reg.name.trim().slice(0, 120),
+      email: reg.email.trim().slice(0, 255),
+      phone: reg.phone.trim() ? reg.phone.trim().slice(0, 40) : null,
+      event_name: reg.event_name.trim() ? reg.event_name.trim().slice(0, 200) : null,
+      note: reg.note.trim() ? reg.note.trim().slice(0, 2000) : null,
+    });
+    setSavingReg(false);
+    if (error) { setErr("Couldn't add the registration."); return; }
+    setReg({ name: "", email: "", phone: "", event_name: "", note: "" });
+    setShowRegForm(false);
+    refresh();
+  }
 
   async function toggleRead(r: Registration) {
     await (supabase.from("event_registrations" as never) as any).update({ read: !r.read }).eq("id", r.id);
@@ -276,12 +372,130 @@ function EventsPanel() {
   }
 
   const unread = rows.filter((r) => !r.read).length;
+  const field =
+    "w-full border border-border bg-transparent px-3 py-2 text-[12px] normal-case tracking-normal focus:border-foreground focus:outline-none";
+  const labelCls = "block mb-2 text-[10px] tracking-[0.15em] text-muted-foreground";
 
   return (
     <div>
+      {err && <p className="mb-6 text-[11px] text-destructive">{err}</p>}
+
+      {/* ---- EVENTS ---- */}
+      <h3 className="mb-4 text-[11px] tracking-[0.2em]">EVENTS · {events.length}</h3>
+      <form
+        onSubmit={saveEvent}
+        className="mb-8 grid gap-4 border border-border p-5 md:grid-cols-2"
+        style={{ fontFamily: "Jost, sans-serif" }}
+      >
+        <div>
+          <label className={labelCls} style={{ fontFamily: "JetBrains Mono, monospace" }}>EVENT NAME</label>
+          <input className={field} value={evName} onChange={(e) => setEvName(e.target.value)} />
+        </div>
+        <div>
+          <label className={labelCls} style={{ fontFamily: "JetBrains Mono, monospace" }}>DATE</label>
+          <input type="date" className={field} value={evDate} onChange={(e) => setEvDate(e.target.value)} />
+        </div>
+        <div className="md:col-span-2">
+          <label className={labelCls} style={{ fontFamily: "JetBrains Mono, monospace" }}>DESCRIPTION</label>
+          <textarea rows={2} className={`${field} resize-none`} value={evDesc} onChange={(e) => setEvDesc(e.target.value)} />
+        </div>
+        <div className="md:col-span-2">
+          <label className={labelCls} style={{ fontFamily: "JetBrains Mono, monospace" }}>COVER (IMAGE OR VIDEO)</label>
+          <input
+            type="file"
+            accept="image/*,video/*"
+            className="text-[11px]"
+            onChange={(e) => setEvFile(e.target.files?.[0] ?? null)}
+          />
+        </div>
+        <div className="flex gap-6 text-[10px] tracking-[0.15em] md:col-span-2">
+          <button type="submit" disabled={savingEvent} className="hover:opacity-70 disabled:opacity-40">
+            {savingEvent ? "SAVING…" : editingEvent ? "UPDATE EVENT ↗" : "ADD EVENT ↗"}
+          </button>
+          {editingEvent && (
+            <button type="button" onClick={resetEventForm} className="text-muted-foreground hover:opacity-70">
+              CANCEL ↗
+            </button>
+          )}
+        </div>
+      </form>
+
+      {events.length > 0 && (
+        <ul className="mb-12 space-y-3">
+          {events.map((ev) => (
+            <li key={ev.id} className="flex flex-wrap items-center gap-4 border border-border p-4">
+              <div className="h-14 w-14 shrink-0 overflow-hidden bg-foreground/5">
+                {ev.cover_image ? <Thumb url={ev.cover_image} alt={ev.name} width={160} /> : <Fallback label="—" />}
+              </div>
+              <div className="min-w-0 flex-1 normal-case tracking-normal" style={{ fontFamily: "Jost, sans-serif" }}>
+                <div className="truncate text-[14px]">{ev.name}</div>
+                <div className="text-[11px] text-muted-foreground">
+                  {ev.event_date ?? "No date"} · {ev.published ? "Published" : "Hidden"}
+                </div>
+              </div>
+              <div className="flex gap-5 text-[10px] tracking-[0.15em]">
+                <button onClick={() => startEdit(ev)} className="hover:opacity-70">EDIT ↗</button>
+                <button onClick={() => toggleEventPublished(ev)} className="hover:opacity-70">
+                  {ev.published ? "HIDE ↗" : "PUBLISH ↗"}
+                </button>
+                <button onClick={() => removeEvent(ev.id)} className="text-destructive hover:opacity-70">DELETE ↗</button>
+              </div>
+            </li>
+          ))}
+        </ul>
+      )}
+
+      {/* ---- REGISTRATIONS ---- */}
       <p className="text-[11px] text-muted-foreground mb-6">
         {rows.length} REGISTRATIONS · {unread} NEW · FORM AT /events
       </p>
+      <div className="mb-6 text-[10px] tracking-[0.15em]">
+        <button onClick={() => setShowRegForm((v) => !v)} className="hover:opacity-70">
+          {showRegForm ? "CLOSE FORM ↗" : "ADD REGISTRATION ↗"}
+        </button>
+      </div>
+      {showRegForm && (
+        <form
+          onSubmit={addRegistration}
+          className="mb-8 grid gap-4 border border-border p-5 md:grid-cols-2"
+          style={{ fontFamily: "Jost, sans-serif" }}
+        >
+          <div>
+            <label className={labelCls} style={{ fontFamily: "JetBrains Mono, monospace" }}>FULL NAME</label>
+            <input className={field} value={reg.name} onChange={(e) => setReg({ ...reg, name: e.target.value })} />
+          </div>
+          <div>
+            <label className={labelCls} style={{ fontFamily: "JetBrains Mono, monospace" }}>EMAIL</label>
+            <input type="email" className={field} value={reg.email} onChange={(e) => setReg({ ...reg, email: e.target.value })} />
+          </div>
+          <div>
+            <label className={labelCls} style={{ fontFamily: "JetBrains Mono, monospace" }}>PHONE</label>
+            <input className={field} value={reg.phone} onChange={(e) => setReg({ ...reg, phone: e.target.value })} />
+          </div>
+          <div>
+            <label className={labelCls} style={{ fontFamily: "JetBrains Mono, monospace" }}>EVENT</label>
+            <select
+              className={field}
+              value={reg.event_name}
+              onChange={(e) => setReg({ ...reg, event_name: e.target.value })}
+            >
+              <option value="">—</option>
+              {events.map((ev) => (
+                <option key={ev.id} value={ev.name}>{ev.name}</option>
+              ))}
+            </select>
+          </div>
+          <div className="md:col-span-2">
+            <label className={labelCls} style={{ fontFamily: "JetBrains Mono, monospace" }}>NOTE</label>
+            <textarea rows={2} className={`${field} resize-none`} value={reg.note} onChange={(e) => setReg({ ...reg, note: e.target.value })} />
+          </div>
+          <div className="md:col-span-2 text-[10px] tracking-[0.15em]">
+            <button type="submit" disabled={savingReg} className="hover:opacity-70 disabled:opacity-40">
+              {savingReg ? "SAVING…" : "SAVE REGISTRATION ↗"}
+            </button>
+          </div>
+        </form>
+      )}
       {loading ? (
         <p className="text-[11px] text-muted-foreground">LOADING…</p>
       ) : rows.length === 0 ? (
