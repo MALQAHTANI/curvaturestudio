@@ -1,0 +1,13 @@
+# Protect server-side configuration and allow only the intended endpoints.
+<FilesMatch "^(config\.local\.php|config\.example\.php|lib\.php)$">
+  Require all denied
+</FilesMatch>
+
+# Pass the Authorization header through to PHP (CGI/FastCGI setups drop it).
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteCond %{HTTP:Authorization} .
+  RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
+</IfModule>
+
+Options -Indexes

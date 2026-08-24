@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { db as supabase } from "@/lib/db";
 import { mediaSrc } from "@/lib/media";
 
 /** خلفية موضع معيّن (صورة أو فيديو) تُدار من لوحة التحكم، مع بديل ثابت. */

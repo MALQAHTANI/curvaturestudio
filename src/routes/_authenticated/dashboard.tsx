@@ -1,6 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { db as supabase } from "@/lib/db";
 import { SiteHeader, SiteFooter } from "@/components/site-chrome";
 import { uploadMedia, isVideo, acceptedMime, mediaSrc, mediaThumb } from "@/lib/media";
 import { Lightbox, type LightboxItem } from "@/components/lightbox";
