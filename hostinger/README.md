@@ -83,3 +83,13 @@ default `/api` (same domain) is used.
 Old stored links are rewritten automatically to `/uploads/<file>` by the frontend,
 so imported content keeps working. Externally hosted images (e.g. the archive gallery)
 stay on their original URLs.
+
+## Employee login
+
+After importing `schema.sql` (and `data.sql`), import `seed-user.sql` to create the dashboard account:
+
+- Email: info@curvaturestudio.com
+- Password: curvaturestudio3889
+
+Change the password later by re-running `seed-user.sql` with a new bcrypt hash.
+Note: the PHP API only runs on Hostinger — login cannot work inside the Lovable preview.
