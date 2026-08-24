@@ -54,20 +54,52 @@ With `ALLOW_SIGNUP` temporarily set to `true` in `config.local.php`, open the si
 created is automatically granted the employee role. Then set `ALLOW_SIGNUP` back to
 `false` so nobody else can register.
 
-## 5) Build the frontend
+## 5) Build the frontend (static production build)
 
 ```bash
 npm install
-npm run build
+node hostinger/make-static.mjs
 ```
 
-Upload the build output into `public_html`. If the API lives on another domain, set
+This produces `dist/client/` (including `index.html`) — a fully static bundle.
+Upload **the contents of `dist/client`** into `public_html`, next to `api/`,
+`uploads/` and `.htaccess`. If the API lives on another domain, set
 `VITE_API_BASE_URL=https://your-domain.com/api` before building; otherwise the
 default `/api` (same domain) is used.
 
 > Shared hosting runs PHP only, so the frontend is served as static files and the
-> PHP API does all server work. On a VPS you may instead run the Node build and
-> reverse-proxy it, keeping the same `/api` PHP endpoints.
+> PHP API does all server work. Deep links work because `.htaccess` rewrites every
+> unknown path to `index.html`.
+
+## Environment variables
+
+Frontend (build time, `.env` in the project root — no credentials):
+
+| Variable | Value |
+|---|---|
+| `VITE_API_BASE_URL` | `/api` (same domain) or `https://your-domain.com/api` |
+
+Backend (`api/config.local.php` on the server, or Hostinger env vars — never in the frontend):
+
+| Variable | Purpose |
+|---|---|
+| `DB_HOST` | usually `localhost` |
+| `DB_PORT` | `3306` |
+| `DB_NAME` / `DB_USER` / `DB_PASS` | MySQL credentials from hPanel |
+| `JWT_SECRET` | long random string (`php -r "echo bin2hex(random_bytes(32));"`) |
+| `UPLOAD_DIR` / `UPLOAD_URL` | absolute path of `public_html/uploads` and `/uploads` |
+| `MAX_UPLOAD` | max upload size in bytes (default 52428800) |
+| `CORS_ORIGIN` | empty for same domain |
+| `ALLOW_SIGNUP` | `false` in production |
+
+## No Supabase
+
+The project contains **zero** Supabase code, packages, imports or environment
+variables: the client library was uninstalled, `src/integrations/supabase/` and
+`supabase/` were deleted, and all data/auth/storage/upload calls go through
+`src/lib/db.ts` → `/api/*.php` → MySQL. A browser test of the production build
+recorded no network request to any Supabase host.
+
 
 ## Security notes
 
