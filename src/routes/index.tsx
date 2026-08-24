@@ -4,7 +4,7 @@ import { motion, useScroll, useTransform } from "motion/react";
 import { SiteHeader, SiteFooter } from "@/components/site-chrome";
 
 import services from "@/data/services.json";
-import { db as supabase } from "@/lib/db";
+import { db } from "@/lib/db";
 import { isVideo, mediaSrc } from "@/lib/media";
 import { Reveal, RevealLines, Stagger, StaggerItem } from "@/components/motion/primitives";
 import { Parallax } from "@/components/motion/parallax";
@@ -51,7 +51,7 @@ function Index() {
   const heroOpacity = useTransform(scrollY, [0, vh * 0.85], [1, 0.25]);
   const [dbItems, setDbItems] = useState<any[]>([]);
   useEffect(() => {
-    supabase.from("projects").select("id,title,description,category,cover_image,media_urls,sort_order,created_at")
+    db.from("projects").select("id,title,description,category,cover_image,media_urls,sort_order,created_at")
       .eq("published", true).order("sort_order", { ascending: true }).order("created_at", { ascending: false }).limit(6)
       .then(({ data }) =>
         setDbItems(

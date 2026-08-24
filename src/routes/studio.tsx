@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { SiteHeader, SiteFooter } from "@/components/site-chrome";
-import { db as supabase } from "@/lib/db";
+import { db } from "@/lib/db";
 import { mediaSrc } from "@/lib/media";
 import { Reveal, RevealLines } from "@/components/motion/primitives";
 import { MediaGrid, type GridTile } from "@/components/media-grid";
@@ -27,7 +27,7 @@ function StudioPage() {
   const [active, setActive] = useState<LightboxItem | null>(null);
 
   useEffect(() => {
-    supabase.from("studio_items").select("id,title,cover_image,media_urls,published,sort_order")
+    db.from("studio_items").select("id,title,cover_image,media_urls,published,sort_order")
       .eq("published", true).order("sort_order", { ascending: true }).order("created_at", { ascending: false })
       .then(({ data }) => { setItems((data as any) ?? []); setLoading(false); });
   }, []);

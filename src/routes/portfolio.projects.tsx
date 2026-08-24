@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { SiteHeader, SiteFooter } from "@/components/site-chrome";
-import { db as supabase } from "@/lib/db";
+import { db } from "@/lib/db";
 import { mediaSrc } from "@/lib/media";
 import { Reveal, RevealLines } from "@/components/motion/primitives";
 import { MediaGrid, type GridTile } from "@/components/media-grid";
@@ -30,7 +30,7 @@ type Tile = {
 function ProjectsGallery() {
   const [dbItems, setDbItems] = useState<any[]>([]);
   useEffect(() => {
-    supabase.from("projects").select("id,title,description,category,cover_image,media_urls,sort_order,created_at")
+    db.from("projects").select("id,title,description,category,cover_image,media_urls,sort_order,created_at")
       .eq("published", true).order("sort_order", { ascending: true }).order("created_at", { ascending: false })
       .then(({ data }) => setDbItems((data as any[])?.map(d => ({ ...d, cover_image: d.cover_image ?? d.media_urls?.[0] })) ?? []));
   }, []);

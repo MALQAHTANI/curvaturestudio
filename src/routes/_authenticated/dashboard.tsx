@@ -1,6 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { db as supabase } from "@/lib/db";
+import { db } from "@/lib/db";
 import { SiteHeader, SiteFooter } from "@/components/site-chrome";
 import { uploadMedia, isVideo, acceptedMime, mediaSrc, mediaThumb } from "@/lib/media";
 import { Lightbox, type LightboxItem } from "@/components/lightbox";
@@ -123,16 +123,16 @@ function Dashboard() {
 
   useEffect(() => {
     (async () => {
-      const { data: u } = await supabase.auth.getUser();
+      const { data: u } = await db.auth.getUser();
       setEmail(u.user?.email ?? "");
-      const { data } = await supabase
+      const { data } = await db
         .from("user_roles").select("role").eq("user_id", u.user!.id).eq("role", "employee").maybeSingle();
       setIsEmployee(!!data);
     })();
   }, []);
 
   async function signOut() {
-    await supabase.auth.signOut();
+    await db.auth.signOut();
     navigate({ to: "/" });
   }
 
@@ -201,7 +201,7 @@ function MessagesPanel() {
 
   async function refresh() {
     setLoading(true);
-    const { data } = await supabase
+    const { data } = await db
       .from("contact_messages").select("*").order("created_at", { ascending: false });
     setRows((data as any) ?? []);
     setLoading(false);
@@ -209,12 +209,12 @@ function MessagesPanel() {
   useEffect(() => { refresh(); }, []);
 
   async function toggleRead(m: Message) {
-    await supabase.from("contact_messages").update({ read: !m.read }).eq("id", m.id);
+    await db.from("contact_messages").update({ read: !m.read }).eq("id", m.id);
     refresh();
   }
   async function remove(id: string) {
     if (!confirm("Delete this message?")) return;
-    await supabase.from("contact_messages").delete().eq("id", id);
+    await db.from("contact_messages").delete().eq("id", id);
     refresh();
   }
 
@@ -280,11 +280,11 @@ function EventsPanel() {
 
   async function refresh() {
     setLoading(true);
-    const { data } = await (supabase.from("event_registrations" as never) as any)
+    const { data } = await (db.from("event_registrations" as never) as any)
       .select("*")
       .order("created_at", { ascending: false });
     setRows((data as Registration[]) ?? []);
-    const { data: ev } = await (supabase.from("events" as never) as any)
+    const { data: ev } = await (db.from("events" as never) as any)
       .select("*")
       .order("sort_order", { ascending: true })
       .order("created_at", { ascending: false });
@@ -315,7 +315,7 @@ function EventsPanel() {
         description: evDesc.trim() ? evDesc.trim().slice(0, 2000) : null,
       };
       if (cover) payload.cover_image = cover;
-      const table = supabase.from("events" as never) as any;
+      const table = db.from("events" as never) as any;
       const { error } = editingEvent
         ? await table.update(payload).eq("id", editingEvent)
         : await table.insert(payload);
@@ -329,12 +329,12 @@ function EventsPanel() {
   }
 
   async function toggleEventPublished(ev: EventRow) {
-    await (supabase.from("events" as never) as any).update({ published: !ev.published }).eq("id", ev.id);
+    await (db.from("events" as never) as any).update({ published: !ev.published }).eq("id", ev.id);
     refresh();
   }
   async function removeEvent(id: string) {
     if (!confirm("Delete this event?")) return;
-    await (supabase.from("events" as never) as any).delete().eq("id", id);
+    await (db.from("events" as never) as any).delete().eq("id", id);
     refresh();
   }
   function startEdit(ev: EventRow) {
@@ -350,7 +350,7 @@ function EventsPanel() {
     if (!reg.name.trim() || !reg.email.trim()) { setErr("Name and email are required."); return; }
     setErr(null);
     setSavingReg(true);
-    const { error } = await (supabase.from("event_registrations" as never) as any).insert({
+    const { error } = await (db.from("event_registrations" as never) as any).insert({
       name: reg.name.trim().slice(0, 120),
       email: reg.email.trim().slice(0, 255),
       phone: reg.phone.trim() ? reg.phone.trim().slice(0, 40) : null,
@@ -365,12 +365,12 @@ function EventsPanel() {
   }
 
   async function toggleRead(r: Registration) {
-    await (supabase.from("event_registrations" as never) as any).update({ read: !r.read }).eq("id", r.id);
+    await (db.from("event_registrations" as never) as any).update({ read: !r.read }).eq("id", r.id);
     refresh();
   }
   async function remove(id: string) {
     if (!confirm("Delete this registration?")) return;
-    await (supabase.from("event_registrations" as never) as any).delete().eq("id", id);
+    await (db.from("event_registrations" as never) as any).delete().eq("id", id);
     refresh();
   }
 
@@ -549,7 +549,7 @@ function ClientsPanel() {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const table = () => supabase.from("clients" as never) as any;
+  const table = () => db.from("clients" as never) as any;
 
   async function refresh() {
     setLoading(true);
@@ -688,7 +688,7 @@ function SectionEditor({ table, label }: { table: "projects" | "studio_items"; l
 
   async function refresh() {
     setLoading(true);
-    const { data, error } = await supabase.from(table).select("*").order("sort_order", { ascending: true }).order("created_at", { ascending: false });
+    const { data, error } = await db.from(table).select("*").order("sort_order", { ascending: true }).order("created_at", { ascending: false });
     if (!error) setItems((data as any) ?? []);
     setLoading(false);
   }
@@ -696,7 +696,7 @@ function SectionEditor({ table, label }: { table: "projects" | "studio_items"; l
 
   async function remove(id: string) {
     if (!confirm("Delete this item?")) return;
-    const { error } = await supabase.from(table).delete().eq("id", id);
+    const { error } = await db.from(table).delete().eq("id", id);
     if (error) { alert(error.message); return; }
     refresh();
   }
@@ -875,8 +875,8 @@ function ItemForm({
             }
           : payload;
       const { error } = isEdit
-        ? await supabase.from(table).update(fullPayload as never).eq("id", item!.id)
-        : await supabase.from(table).insert(fullPayload as never);
+        ? await db.from(table).update(fullPayload as never).eq("id", item!.id)
+        : await db.from(table).insert(fullPayload as never);
       if (error) throw error;
       onDone();
     } catch (err: any) {
@@ -1031,7 +1031,7 @@ function BackgroundsPanel() {
 
   async function refresh() {
     setLoading(true);
-    const { data } = await supabase
+    const { data } = await db
       .from("site_media")
       .select("id, slot, label, media_url")
       .order("label", { ascending: true });
@@ -1052,7 +1052,7 @@ function BackgroundsPanel() {
     setBusy(row.id);
     try {
       const url = await uploadMedia(file);
-      const { error: err } = await supabase.from("site_media").update({ media_url: url }).eq("id", row.id);
+      const { error: err } = await db.from("site_media").update({ media_url: url }).eq("id", row.id);
       if (err) throw new Error(err.message);
       await refresh();
     } catch (e) {
@@ -1064,7 +1064,7 @@ function BackgroundsPanel() {
   async function clearMedia(row: BackgroundRow) {
     if (!confirm(`Remove the media from "${row.label}"? The default background will be used.`)) return;
     setBusy(row.id);
-    await supabase.from("site_media").update({ media_url: null }).eq("id", row.id);
+    await db.from("site_media").update({ media_url: null }).eq("id", row.id);
     await refresh();
     setBusy(null);
   }
@@ -1072,7 +1072,7 @@ function BackgroundsPanel() {
   async function removeSlot(row: BackgroundRow) {
     if (!confirm(`Delete the background slot "${row.label}"?`)) return;
     setBusy(row.id);
-    await supabase.from("site_media").delete().eq("id", row.id);
+    await db.from("site_media").delete().eq("id", row.id);
     await refresh();
     setBusy(null);
   }
@@ -1087,7 +1087,7 @@ function BackgroundsPanel() {
       return;
     }
     setBusy("new");
-    const { error: err } = await supabase.from("site_media").insert({ label, slot });
+    const { error: err } = await db.from("site_media").insert({ label, slot });
     setBusy(null);
     if (err) {
       setError(err.message);
