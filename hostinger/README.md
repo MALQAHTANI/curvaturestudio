@@ -1,0 +1,85 @@
+# Curvature Studio — Hostinger (MySQL + PHP) deployment
+
+The site no longer depends on any hosted backend service. Data lives in **MySQL**,
+media lives in a folder on your own hosting, and login is **PHP + JWT** against MySQL.
+
+## What is in this folder
+
+| Path | Purpose |
+|---|---|
+| `schema.sql` | Full MySQL structure (users, roles, projects, studio, clients, events, registrations, messages, backgrounds) |
+| `data.sql` | Your current content, exported and ready to import (53 projects, 6 studio items, 8 clients, background slots) |
+| `api/` | The PHP backend: `auth.php`, `query.php`, `upload.php`, `thumb.php`, `lib.php`, `config.example.php`, `.htaccess` |
+| `uploads/.htaccess` | Hardening for the media folder (no script execution, long cache) |
+| `.htaccess` | Root rules for `public_html` (routing + caching + security headers) |
+
+The actual media files are delivered separately as a ZIP (`uploads/` + both SQL files),
+because binaries are not stored in the code repository.
+
+## 1) Create the database
+
+1. hPanel → **Databases → MySQL Databases** → create a database and a user, note the credentials.
+2. Open **phpMyAdmin** for that database → **Import** → upload `schema.sql` → run.
+3. Import `data.sql` the same way (it must run **after** `schema.sql`).
+
+## 2) Upload the files
+
+In `public_html`:
+
+```
+public_html/
+├── index.html + assets/      ← built frontend
+├── .htaccess                 ← hostinger/.htaccess
+├── api/                      ← hostinger/api/
+└── uploads/                  ← media files from the ZIP (plus uploads/.htaccess)
+```
+
+Make `uploads/` writable (permissions `755`).
+
+## 3) Configure the API
+
+1. Copy `api/config.example.php` to `api/config.local.php`.
+2. Fill in: database name/user/password, a long random `JWT_SECRET`, and `ALLOWED_ORIGINS`
+   (your domain, e.g. `https://curvaturestudio.com`).
+3. Keep `UPLOAD_DIR` pointing at the real path of `public_html/uploads` and
+   `UPLOAD_URL` at `/uploads`.
+
+`config.local.php`, `config.example.php` and `lib.php` are blocked from direct
+browser access by `api/.htaccess`.
+
+## 4) Create the employee account
+
+With `ALLOW_SIGNUP` temporarily set to `true` in `config.local.php`, open the site's
+`/auth` page and create the account (`info@curvaturestudio.com`). The **first** account
+created is automatically granted the employee role. Then set `ALLOW_SIGNUP` back to
+`false` so nobody else can register.
+
+## 5) Build the frontend
+
+```bash
+npm install
+npm run build
+```
+
+Upload the build output into `public_html`. If the API lives on another domain, set
+`VITE_API_BASE_URL=https://your-domain.com/api` before building; otherwise the
+default `/api` (same domain) is used.
+
+> Shared hosting runs PHP only, so the frontend is served as static files and the
+> PHP API does all server work. On a VPS you may instead run the Node build and
+> reverse-proxy it, keeping the same `/api` PHP endpoints.
+
+## Security notes
+
+- Passwords are hashed with `password_hash()` (bcrypt); only a signed JWT is stored in the browser.
+- `query.php` whitelists tables and columns, and unauthenticated visitors can only read
+  published rows and can only insert contact messages / event registrations.
+- The service credentials never leave the server: the browser only ever talks to `/api`.
+- Uploads are limited to 50 MB and to image/video extensions; the uploads folder cannot execute scripts.
+- Always serve the site over HTTPS (hPanel → SSL) so tokens are not sent in clear text.
+
+## Media URLs
+
+Old stored links are rewritten automatically to `/uploads/<file>` by the frontend,
+so imported content keeps working. Externally hosted images (e.g. the archive gallery)
+stay on their original URLs.
