@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { motion, useScroll, useTransform } from "motion/react";
 import { SiteHeader, SiteFooter } from "@/components/site-chrome";
-import projects from "@/data/projects.json";
+
 import services from "@/data/services.json";
 import { db as supabase } from "@/lib/db";
 import { isVideo, mediaSrc } from "@/lib/media";
