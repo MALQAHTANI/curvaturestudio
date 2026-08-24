@@ -49,9 +49,6 @@ function Index() {
   }, []);
   const heroScale = useTransform(scrollY, [0, vh], [1, 0.94]);
   const heroOpacity = useTransform(scrollY, [0, vh * 0.85], [1, 0.25]);
-  const staticFeatured = (projects as any[])
-    .filter((p) => p.published && p.cover_image && !p.cover_image.includes("88e8419e"))
-    .slice(0, 6);
   const [dbItems, setDbItems] = useState<any[]>([]);
   useEffect(() => {
     supabase.from("projects").select("id,title,description,category,cover_image,media_urls,sort_order,created_at")
