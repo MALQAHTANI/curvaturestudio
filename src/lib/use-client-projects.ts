@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { db as supabase } from "@/lib/db";
+import { db } from "@/lib/db";
 import { mediaSrc } from "@/lib/media";
 
 export type ClientProject = {
@@ -21,7 +21,7 @@ export function useClientProjects(limit?: number) {
 
   useEffect(() => {
     let alive = true;
-    let query = supabase
+    let query = db
       .from("projects")
       .select("id,title,client,description,category,services,tools,cover_image,media_urls,sort_order,created_at")
       .eq("published", true)

@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { motion } from "motion/react";
 import { SiteHeader, SiteFooter } from "@/components/site-chrome";
-import { db as supabase } from "@/lib/db";
+import { db } from "@/lib/db";
 import { Reveal, RevealLines, Stagger, StaggerItem } from "@/components/motion/primitives";
 import { MotionButton } from "@/components/motion/button";
 import contactVideo from "@/assets/contact-bg.mp4.asset.json";
@@ -38,7 +38,7 @@ function Contact() {
     const message = String(fd.get("message") ?? "").trim();
     if (!name || !email || !message) { setError("Please fill in the required fields."); return; }
     setError(null); setSending(true);
-    const { error: err } = await supabase.from("contact_messages").insert({
+    const { error: err } = await db.from("contact_messages").insert({
       name: name.slice(0, 100),
       email: email.slice(0, 255),
       company: subject ? subject.slice(0, 200) : null,

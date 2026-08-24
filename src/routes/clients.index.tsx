@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { motion } from "motion/react";
 import { SiteHeader, SiteFooter } from "@/components/site-chrome";
-import { db as supabase } from "@/lib/db";
+import { db } from "@/lib/db";
 import { mediaSrc } from "@/lib/media";
 import { Reveal, RevealLines } from "@/components/motion/primitives";
 import { DUR, EASE, viewportOnce } from "@/lib/motion";
@@ -35,7 +35,7 @@ function ClientsIndex() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    (supabase.from("clients" as never) as any)
+    (db.from("clients" as never) as any)
       .select("id,name,logo_url,website,sort_order")
       .eq("published", true)
       .order("sort_order", { ascending: true })

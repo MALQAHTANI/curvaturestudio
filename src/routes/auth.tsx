@@ -1,6 +1,6 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { db as supabase } from "@/lib/db";
+import { db } from "@/lib/db";
 import { SiteHeader, SiteFooter } from "@/components/site-chrome";
 
 export const Route = createFileRoute("/auth")({
@@ -24,7 +24,7 @@ function AuthPage() {
   const [notice, setNotice] = useState<string | null>(null);
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => {
+    db.auth.getSession().then(({ data }) => {
       if (data.session) navigate({ to: "/dashboard" });
     });
   }, [navigate]);
@@ -34,11 +34,11 @@ function AuthPage() {
     setError(null); setNotice(null); setLoading(true);
     try {
       if (mode === "signin") {
-        const { error } = await supabase.auth.signInWithPassword({ email, password });
+        const { error } = await db.auth.signInWithPassword({ email, password });
         if (error) throw error;
         navigate({ to: "/dashboard" });
       } else {
-        const { error } = await supabase.auth.signUp({ email, password });
+        const { error } = await db.auth.signUp({ email, password });
 
         if (error) throw error;
         setNotice("تم إنشاء الحساب. يمكنك تسجيل الدخول الآن.");

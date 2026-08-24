@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { db as supabase } from "@/lib/db";
+import { db } from "@/lib/db";
 import { mediaSrc } from "@/lib/media";
 
 /** خلفية موضع معيّن (صورة أو فيديو) تُدار من لوحة التحكم، مع بديل ثابت. */
@@ -9,7 +9,7 @@ export function useSiteMedia(slot: string, fallback: string): string {
   useEffect(() => {
     let alive = true;
     (async () => {
-      const { data } = await supabase
+      const { data } = await db
         .from("site_media")
         .select("media_url")
         .eq("slot", slot)

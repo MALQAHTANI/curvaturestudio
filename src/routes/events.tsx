@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { SiteHeader, SiteFooter } from "@/components/site-chrome";
-import { db as supabase } from "@/lib/db";
+import { db } from "@/lib/db";
 import { Reveal, RevealLines } from "@/components/motion/primitives";
 import { MotionButton } from "@/components/motion/button";
 
@@ -27,7 +27,7 @@ function EventsPage() {
 
   useEffect(() => {
     (async () => {
-      const { data } = await (supabase.from("events" as never) as any)
+      const { data } = await (db.from("events" as never) as any)
         .select("id,name")
         .eq("published", true)
         .order("sort_order", { ascending: true });
@@ -50,7 +50,7 @@ function EventsPage() {
     }
     setError(null);
     setSending(true);
-    const { error: err } = await (supabase.from("event_registrations" as never) as any).insert({
+    const { error: err } = await (db.from("event_registrations" as never) as any).insert({
       name: name.slice(0, 120),
       email: email.slice(0, 255),
       phone: phone ? phone.slice(0, 40) : null,

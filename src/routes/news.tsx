@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { SiteHeader, SiteFooter } from "@/components/site-chrome";
-import { db as supabase } from "@/lib/db";
+import { db } from "@/lib/db";
 import { isVideo, mediaSrc } from "@/lib/media";
 import { Reveal, RevealLines } from "@/components/motion/primitives";
 
@@ -37,7 +37,7 @@ function NewsPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    supabase
+    db
       .from("projects")
       .select("id,title,description,category,cover_image,media_urls,created_at")
       .eq("published", true)
