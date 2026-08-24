@@ -69,7 +69,7 @@ function Index() {
         ),
       );
   }, []);
-  const featured = [...dbItems, ...staticFeatured].slice(0, 6);
+  const featured = dbItems.slice(0, 6);
   const columns: ColumnProject[] = featured
     .filter((p) => p.cover_image)
     .map((p) => ({ id: p.id, title: p.title, category: p.category ?? "PROJECT", cover: p.cover_image }));
